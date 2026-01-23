@@ -1,52 +1,46 @@
-<x-guest-layout>
-    <form method="POST" action="{{ route('register') }}">
-        @csrf
+@extends('layouts.app')
 
-        <!-- Name -->
-        <div>
-            <x-input-label for="name" :value="__('Name')" />
-            <x-text-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" />
-            <x-input-error :messages="$errors->get('name')" class="mt-2" />
-        </div>
+@section('title', 'Registro - MOKeys')
 
-        <!-- Email Address -->
-        <div class="mt-4">
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
-        </div>
+@section('body-class', 'pagina-contacto')
 
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/estilos.css') }}" />
+    <link rel="stylesheet" href="{{ asset('css/formulario.css') }}" />
+@endpush
 
-            <x-text-input id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="new-password" />
+@section('content')
+    <main class="contenedor-formulario-principal">
+      <div class="caja-formulario" style="max-width: 450px;"> 
+        <h2 style="text-align: center; color: #0e273f; margin-top: 0;">Crear Cuenta</h2>
+        <p class="subtitulo-form">Únete a MOKeys y empieza a ahorrar.</p>
 
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
-        </div>
+        <p id="mensaje-error" class="error" style="color: #fa4841; display: none; text-align: center; font-weight: bold; margin-bottom: 20px;"></p>
 
-        <!-- Confirm Password -->
-        <div class="mt-4">
-            <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
+        <form action="/backend/auth/register.php" method="POST">
+            
+            <div class="grupo-input">
+                <label for="username">Nombre de usuario:</label>
+                <input type="text" id="username" name="username" required placeholder="Elige un nombre único">
+            </div>
 
-            <x-text-input id="password_confirmation" class="block mt-1 w-full"
-                            type="password"
-                            name="password_confirmation" required autocomplete="new-password" />
+            <div class="grupo-input">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required placeholder="tucorreo@ejemplo.com">
+            </div>
 
-            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
-        </div>
+            <div class="grupo-input">
+                <label for="password">Contraseña:</label>
+                <input type="password" id="password" name="password" required placeholder="Mínimo 8 caracteres">
+            </div>
 
-        <div class="flex items-center justify-end mt-4">
-            <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('login') }}">
-                {{ __('Already registered?') }}
-            </a>
+            <button type="submit" class="btn-enviar">Registrarse</button>
+        </form>
+        
+        <p style="text-align: center; margin-top: 20px;">
+            ¿Ya tienes cuenta? <a href="{{ url('/login') }}" style="color: #fa4841; font-weight: bold;">Inicia sesión aquí</a>.
+        </p>
 
-            <x-primary-button class="ms-4">
-                {{ __('Register') }}
-            </x-primary-button>
-        </div>
-    </form>
-</x-guest-layout>
+      </div>
+    </main>
+@endsection

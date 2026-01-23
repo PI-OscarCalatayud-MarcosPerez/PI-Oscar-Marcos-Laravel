@@ -1,0 +1,159 @@
+/* =========================================
+   ESTILOS EXCLUSIVOS DEL FORMULARIO
+   (El Header y Footer se cargan desde style.css)
+   ========================================= */
+
+/* Contenedor para centrar el formulario y separarlo del header fijo */
+.contenedor-formulario-principal {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    /* Ajustamos el padding para que no se pegue al header ni al footer */
+    padding: 40px 20px;
+    min-height: 60vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    margin-top: 20px;
+    /* Espacio extra por el header fijo */
+}
+
+/* La caja blanca del formulario */
+.caja-formulario {
+    background-color: #ffffff;
+    width: 100%;
+    max-width: 550px;
+    /* Ancho máximo para que se vea bien */
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(14, 39, 63, 0.15);
+    box-sizing: border-box;
+}
+
+.caja-formulario h1,
+.caja-formulario h2 {
+    color: #0e273f;
+    margin-top: 0;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.subtitulo-form {
+    text-align: center;
+    color: #666;
+    margin-bottom: 30px;
+}
+
+/* --- Inputs y Etiquetas --- */
+.grupo-input {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.grupo-input label {
+    font-weight: bold;
+    color: #0e273f;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+}
+
+.grupo-input input,
+.grupo-input select,
+.grupo-input textarea {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 6px;
+    font-family: "Rubik", sans-serif;
+    font-size: 1rem;
+    color: #333;
+    background-color: #f9f9f9;
+    box-sizing: border-box;
+    transition: all 0.3s ease;
+}
+
+/* Efecto al hacer clic (Foco) */
+.grupo-input input:focus,
+.grupo-input select:focus,
+.grupo-input textarea:focus {
+    border-color: #fa4841;
+    /* Naranja */
+    outline: none;
+    background-color: #fff;
+    box-shadow: 0 0 0 3px rgba(250, 72, 65, 0.1);
+}
+
+/* --- Checkbox --- */
+.grupo-checkbox {
+    margin-top: 15px;
+    margin-bottom: 25px;
+    display: flex;
+    flex-direction: column;
+}
+
+.grupo-checkbox label {
+    color: #333;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.grupo-checkbox input[type="checkbox"] {
+    accent-color: #fa4841;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+/* --- Botón Enviar --- */
+.btn-enviar {
+    width: 100%;
+    background-color: #fa4841;
+    color: white;
+    font-weight: bold;
+    font-size: 1.1rem;
+    padding: 15px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    font-family: "Rubik", sans-serif;
+}
+
+.btn-enviar:hover {
+    background-color: #d63a34;
+    transform: translateY(-2px);
+}
+
+.btn-enviar:focus {
+    outline: 3px solid #0e273f;
+}
+
+/* --- Mensajes de Error --- */
+.error {
+    color: #fa4841;
+    font-size: 0.85rem;
+    margin-top: 5px;
+    display: block;
+    font-weight: 600;
+}
+
+.caja-formulario p a {
+    color: #fa4841;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.caja-formulario p a:hover {
+    text-decoration: underline;
+}
+
+@media (max-width: 576px) {
+    .caja-formulario {
+        padding: 20px;
+        box-shadow: none;
+        border: 1px solid #eee;
+    }
+}

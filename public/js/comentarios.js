@@ -3,7 +3,7 @@ const API_URL = '../backend/api/comentarios.php';
 // 1. Cargar comentarios y verificar estado de sesión
 async function loadComments(productId) {
     document.getElementById('product_id_hidden').value = productId;
-    
+
     const listContainer = document.getElementById('comments-list');
     const formContainer = document.getElementById('comment-form-container');
     const loginMessage = document.getElementById('login-required-message');
@@ -13,15 +13,15 @@ async function loadComments(productId) {
     try {
         // Llamada GET a la API
         const response = await fetch(`${API_URL}?action=get&product_id=${productId}`);
-        const data = await response.json(); 
+        const data = await response.json();
 
         // A. Control de Visibilidad (Formulario vs Mensaje Login)
         if (data.is_logged_in) {
-            if(formContainer) formContainer.style.display = 'block';
-            if(loginMessage) loginMessage.style.display = 'none';
+            if (formContainer) formContainer.style.display = 'block';
+            if (loginMessage) loginMessage.style.display = 'none';
         } else {
-            if(formContainer) formContainer.style.display = 'none';
-            if(loginMessage) loginMessage.style.display = 'block';
+            if (formContainer) formContainer.style.display = 'none';
+            if (loginMessage) loginMessage.style.display = 'block';
         }
 
         // B. Renderizar la lista de comentarios
@@ -47,11 +47,11 @@ function renderComments(comments) {
     comments.forEach(c => {
         const stars = '★'.repeat(c.rating) + '☆'.repeat(5 - c.rating);
         const date = new Date(c.timestamp).toLocaleDateString('es-ES'); // Formato fecha español
-        
+
         // Botón de borrar (solo si tiene permiso)
-        const deleteBtn = c.can_delete ? 
+        const deleteBtn = c.can_delete ?
             `<button onclick="deleteComment('${c.id}')" class="btn-delete" title="Eliminar comentario">🗑️ Borrar</button>` : '';
-        
+
         // Clase para indicar si ya le di like
         const likeClass = c.liked_by_me ? 'liked' : '';
 
@@ -81,11 +81,11 @@ function renderComments(comments) {
 
 function updateStats(comments) {
     const total = comments ? comments.length : 0;
-    
+
     // 1. Actualizar el número total de opiniones
     const totalEl = document.getElementById('total-reviews');
-    if(totalEl) totalEl.textContent = total;
-    
+    if (totalEl) totalEl.textContent = total;
+
     // 2. Calcular la media numérica
     const avgEl = document.getElementById('average-rating');
     let average = 0;
@@ -93,9 +93,9 @@ function updateStats(comments) {
     if (total > 0) {
         const sum = comments.reduce((acc, c) => acc + c.rating, 0);
         average = (sum / total);
-        if(avgEl) avgEl.textContent = average.toFixed(1);
+        if (avgEl) avgEl.textContent = average.toFixed(1);
     } else {
-        if(avgEl) avgEl.textContent = '--';
+        if (avgEl) avgEl.textContent = '--';
     }
 
     // 3. PINTAR LAS ESTRELLAS EN EL RESUMEN (¡Esta es la parte nueva!)
@@ -109,7 +109,7 @@ function updateStats(comments) {
                 starsHtml += '<span class="filled">★</span>';
             } else {
                 // Si no, es normal (gris por CSS)
-                starsHtml += '<span>★</span>'; 
+                starsHtml += '<span>★</span>';
             }
         }
         starsContainer.innerHTML = starsHtml;
@@ -121,13 +121,13 @@ const form = document.getElementById('form-comentari');
 if (form) {
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        
+
         const productId = document.getElementById('product_id_hidden').value;
         const text = document.getElementById('comment-text').value;
         const ratingEl = document.querySelector('input[name="rate"]:checked');
         const rating = ratingEl ? ratingEl.value : 0;
 
-        if(rating == 0) {
+        if (rating == 0) {
             alert("Por favor, selecciona una puntuación de estrellas.");
             return;
         }
@@ -150,13 +150,13 @@ if (form) {
             if (result.success) {
                 // Limpiar formulario
                 document.getElementById('comment-text').value = '';
-                if(ratingEl) ratingEl.checked = false;
+                if (ratingEl) ratingEl.checked = false;
                 // Recargar comentarios para ver el nuevo
-                loadComments(productId); 
+                loadComments(productId);
             } else {
                 alert(result.message || 'Error al enviar.');
                 // Si el error es por no estar logueado, redirigir
-                if(response.status === 401) window.location.href = 'login.html';
+                if (response.status === 401) window.location.href = 'login.html';
             }
         } catch (error) {
             console.error(error);
@@ -175,19 +175,19 @@ async function toggleLike(commentId) {
         });
 
         const result = await response.json();
-        
+
         if (result.success) {
             const btn = document.querySelector(`#${commentId} .btn-like`);
-            if(btn) {
+            if (btn) {
                 const countSpan = btn.querySelector('.like-count');
                 // Actualizar número entre paréntesis
                 countSpan.textContent = `(${result.likes})`;
-                
+
                 if (result.liked) btn.classList.add('liked');
                 else btn.classList.remove('liked');
             }
         } else {
-            if(response.status === 401) alert("Inicia sesión para dar 'Me gusta'.");
+            if (response.status === 401) alert("Inicia sesión para dar 'Me gusta'.");
         }
     } catch (error) {
         console.error(error);
@@ -196,7 +196,7 @@ async function toggleLike(commentId) {
 
 // 6. Lógica de Borrar
 async function deleteComment(commentId) {
-    if(!confirm("¿Estás seguro de que quieres borrar este comentario?")) return;
+    if (!confirm("¿Estás seguro de que quieres borrar este comentario?")) return;
 
     try {
         const response = await fetch(`${API_URL}`, {
@@ -204,18 +204,18 @@ async function deleteComment(commentId) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ comment_id: commentId })
         });
-        
+
         const result = await response.json();
         if (result.success) {
             // Eliminar elemento del DOM visualmente
             const el = document.getElementById(commentId);
-            if(el) el.remove();
-            
+            if (el) el.remove();
+
             // Actualizar contador visualmente (-1)
             const totalEl = document.getElementById('total-reviews');
-            if(totalEl) totalEl.textContent = Math.max(0, parseInt(totalEl.textContent) - 1);
+            if (totalEl) totalEl.textContent = Math.max(0, parseInt(totalEl.textContent) - 1);
         } else {
             alert(result.message || "No se pudo borrar.");
         }
-    } catch(e) { console.error(e); }
+    } catch (e) { console.error(e); }
 }

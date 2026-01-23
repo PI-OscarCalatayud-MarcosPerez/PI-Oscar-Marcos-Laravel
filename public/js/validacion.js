@@ -1,9 +1,9 @@
-window.onload = function() {
-    
+window.onload = function () {
+
     // Capturamos el formulario
     var form = document.getElementById('formulario');
 
-    form.onsubmit = function(e) {
+    form.onsubmit = function (e) {
         var errores = false;
 
         // Limpiar errores previos

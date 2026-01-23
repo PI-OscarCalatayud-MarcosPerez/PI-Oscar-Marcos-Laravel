@@ -1,47 +1,43 @@
-<x-guest-layout>
-    <!-- Session Status -->
-    <x-auth-session-status class="mb-4" :status="session('status')" />
+@extends('layouts.app')
 
-    <form method="POST" action="{{ route('login') }}">
-        @csrf
+@section('title', 'Iniciar Sesión - MOKeys')
 
-        <!-- Email Address -->
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/estilos.css') }}" />
+@endpush
+
+@section('content')
+    <main class="contenedor-formulario-principal" id="main-content">
+      <div class="caja-formulario" style="max-width: 400px;">
+        <h2>Iniciar Sesión</h2>
+        <p id="mensaje-error" class="error" style="color: #fa4841; display: none; text-align: center; font-weight: bold;"></p>
+
+        <form action="/backend/auth/login.php" method="POST">
+            <div class="grupo-input">
+                <label for="username">Usuario:</label>
+                <input type="text" id="username" name="username" required placeholder="Ej: usuario123">
+            </div>
+            <div class="grupo-input">
+                <label for="password">Contraseña:</label>
+                <input type="password" id="password" name="password" required placeholder="Tu contraseña">
+            </div>
+            <button type="submit" class="btn-enviar">Entrar</button>
+        </form>
+        
+        <p style="text-align: center; margin-top: 20px;">
+            ¿No tienes cuenta? <a href="{{ url('/register') }}" style="color: #fa4841; font-weight: bold;">Regístrate aquí</a>.
+        </p>
+      </div>
+    </main>
+
+    <div class="container-fluid breadcrumb-container">
+        <div class="container px-md-5">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url('/') }}" style="color:#fa4841; text-decoration:none;">Inicio</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Login</li>
+                </ol>
+            </nav>
         </div>
-
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
-
-            <x-text-input id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="current-password" />
-
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
-        </div>
-
-        <!-- Remember Me -->
-        <div class="block mt-4">
-            <label for="remember_me" class="inline-flex items-center">
-                <input id="remember_me" type="checkbox" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500" name="remember">
-                <span class="ms-2 text-sm text-gray-600">{{ __('Remember me') }}</span>
-            </label>
-        </div>
-
-        <div class="flex items-center justify-end mt-4">
-            @if (Route::has('password.request'))
-                <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('password.request') }}">
-                    {{ __('Forgot your password?') }}
-                </a>
-            @endif
-
-            <x-primary-button class="ms-3">
-                {{ __('Log in') }}
-            </x-primary-button>
-        </div>
-    </form>
-</x-guest-layout>
+    </div>
+@endsection

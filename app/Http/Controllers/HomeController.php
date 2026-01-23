@@ -44,4 +44,8 @@ class HomeController extends Controller
 
         return redirect()->route('home')->with('success', '¡Opinión enviada!');
     }
+    public function contacto()
+{
+    return view('contacto.index');
+}
 }
