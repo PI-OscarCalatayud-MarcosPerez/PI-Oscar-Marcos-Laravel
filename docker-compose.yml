@@ -15,7 +15,7 @@ services:
       APP_DEBUG: "true"
       APP_URL: http://localhost
       DB_HOST: db
-      DB_DATABASE: laravel
+      DB_DATABASE: MOKeys
       DB_USERNAME: laravel
       DB_PASSWORD: laravel
       REDIS_HOST: redis
@@ -36,7 +36,7 @@ services:
   db:
     image: mysql:8.4
     environment:
-      MYSQL_DATABASE: laravel
+      MYSQL_DATABASE: MOKeys
       MYSQL_USER: laravel
       MYSQL_PASSWORD: laravel
       MYSQL_ROOT_PASSWORD: root

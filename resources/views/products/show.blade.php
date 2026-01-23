@@ -1,25 +1,23 @@
 @extends('layouts.app')
 
-@section('title', 'Detalle del Producto | MOKeys')
+@section('title', $product->nombre . ' | MOKeys')
 
 @push('styles')
     <link rel="stylesheet" href="{{ asset('css/productos.css') }}" />
 @endpush
 
 @section('content')
-    <div class="product-main" id="main-content">
+    <div class="product-main">
         <main class="product-detail-container">
             <div class="product-image">
-                <img id="p-image" src="" alt="Cargando imagen..." />
+                <img id="p-image" src="{{ asset($product->imagen_url) }}" alt="{{ $product->nombre }}">
             </div>
-
             <div class="product-info">
-                <h1 id="p-title">Cargando...</h1>
-                <span id="p-sku" class="product-sku">REF: --</span>
-                <p id="p-price" class="product-price">-- €</p>
-                <span id="p-stock" class="product-stock">Stock: --</span>
-                <p id="p-desc" class="product-desc"></p>
-                
+                <h1>{{ $product->nombre }}</h1>
+                <span class="product-sku">REF: {{ $product->sku }}</span>
+                <p class="product-price">{{ $product->precio }} €</p>
+                <span class="product-stock">Stock: {{ $product->stock }}</span>
+                <p class="product-desc">{{ $product->descripcion }}</p>
                 <button class="btn-buy-large">Añadir al Carrito 🛒</button>
             </div>
         </main>
@@ -28,49 +26,101 @@
             <div class="reviews-header">
                 <h2>Opiniones de la Comunidad</h2>
                 <div class="rating-summary">
-                    <div class="rating-number" id="average-rating">--</div>
-                    <div class="rating-stars">★★★★★</div>
-                    <div class="rating-count">Basado en <span id="total-reviews">0</span> opiniones</div>
+                    <div class="rating-number">{{ $product->media_estrellas }}</div>
+
+                    <div class="rating-stars">
+                        @for($i = 1; $i <= 5; $i++)
+                            @if($i <= round($product->media_estrellas))
+                                <span class="filled" style="color: #ffc700;">★</span>
+                            @else
+                                <span style="color: #ccc;">★</span>
+                            @endif
+                        @endfor
+                    </div>
+
+                    <div class="rating-count">Basado en {{ $product->reviews->count() }} opiniones</div>
                 </div>
             </div>
 
-            <div id="login-required-message" class="review-form-card" style="display:none;">
-                <p style="text-align:center;">Debes <a href="{{ url('/login') }}" style="color:#fa4841;">iniciar sesión</a> para dejar tu valoración.</p>
-            </div>
+            @auth
+                @php
+                    $userReview = $product->reviews->where('user_id', auth()->id())->first();
+                @endphp
 
-            <div id="comment-form-container" class="review-form-card" style="display:none;">
-                <h3>Deja tu valoración</h3>
-                <form id="form-comentari">
-                    <input type="hidden" id="product_id_hidden" value="">
-                    <div class="rate">
-                        <input type="radio" id="star5" name="rate" value="5" /><label for="star5" title="5 estrellas">★</label>
-                        <input type="radio" id="star4" name="rate" value="4" /><label for="star4" title="4 estrellas">★</label>
-                        <input type="radio" id="star3" name="rate" value="3" /><label for="star3" title="3 estrellas">★</label>
-                        <input type="radio" id="star2" name="rate" value="2" /><label for="star2" title="2 estrellas">★</label>
-                        <input type="radio" id="star1" name="rate" value="1" /><label for="star1" title="1 estrella">★</label>
+                @if($userReview)
+                    <div class="review-form-card" style="text-align: center; background-color: #f8f9fa; border-left: 5px solid #4CAF50;">
+                        <h3>¡Gracias por tu opinión!</h3>
+                        <p>Ya has valorado este juego con <strong>{{ $userReview->estrellas }} estrellas</strong>.</p>
+                        <p><i>"{{ $userReview->comentario }}"</i></p>
                     </div>
-                    <textarea id="comment-text" placeholder="¿Qué te ha parecido el juego?" required></textarea>
-                    <button type="submit" class="btn-submit-review">Publicar Opinión</button>
-                </form>
-            </div>
+                @else
+                    <div class="review-form-card">
+                        <h3>Deja tu valoración</h3>
 
-            <div class="reviews-list" id="comments-list">
-                <p style="text-align: center; color: #777;">Cargando opiniones...</p>
+                        @if ($errors->has('review'))
+                            <div class="alert alert-danger">
+                                {{ $errors->first('review') }}
+                            </div>
+                        @endif
+
+                        <form action="{{ route('reviews.store') }}" method="POST">
+                            @csrf
+                            <input type="hidden" name="product_id" value="{{ $product->id }}">
+
+                            <div class="rate">
+                                <input type="radio" id="star5" name="estrellas" value="5" /><label for="star5">★</label>
+                                <input type="radio" id="star4" name="estrellas" value="4" /><label for="star4">★</label>
+                                <input type="radio" id="star3" name="estrellas" value="3" /><label for="star3">★</label>
+                                <input type="radio" id="star2" name="estrellas" value="2" /><label for="star2">★</label>
+                                <input type="radio" id="star1" name="estrellas" value="1" /><label for="star1">★</label>
+                            </div>
+
+                            <textarea name="comentario" placeholder="¿Qué te ha parecido el juego?" required></textarea>
+                            <button type="submit" class="btn-submit-review">Publicar Opinión</button>
+                        </form>
+                    </div>
+                @endif
+            @else
+                <div class="review-form-card" style="text-align: center;">
+                    <p>Debes <a href="{{ route('login') }}" style="color:#fa4841; font-weight:bold;">iniciar sesión</a> para
+                        dejar tu valoración.</p>
+                </div>
+            @endauth
+
+            <div class="reviews-list">
+                @foreach($product->reviews as $review)
+                    <div class="comment-item">
+                        <div class="comment-header">
+                            <div>
+                                <span class="user-name">{{ $review->user->name }}</span>
+                                <span class="comment-stars">
+                                    @for($j = 1; $j <= 5; $j++)
+                                        <span style="color: {{ $j <= $review->estrellas ? '#ffc700' : '#ccc' }};">★</span>
+                                    @endfor
+                                </span>
+                            </div>
+                            <span class="comment-date">{{ $review->created_at->format('d/m/Y') }}</span>
+                        </div>
+                        <div class="comment-body">
+                            {{ $review->comentario }}
+
+                            @if(auth()->check() && auth()->user()->role === 'admin')
+                                <form action="{{ route('reviews.destroy', $review->id) }}" method="POST"
+                                    style="display:inline; float:right;">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-sm btn-danger"
+                                        onclick="return confirm('¿Seguro que quieres borrar este comentario?')">Borrar</button>
+                                </form>
+                            @endif
+                        </div>
+                    </div>
+                @endforeach
+
+                @if($product->reviews->isEmpty())
+                    <p style="text-align: center; color: #999;">Aún no hay opiniones. ¡Sé el primero!</p>
+                @endif
             </div>
         </section>
     </div>
-
-    <div class="container mt-3" style="max-width: 1200px;">
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{{ url('/') }}" style="color:#fa4841; text-decoration:none;">Inicio</a></li>
-                <li class="breadcrumb-item active" aria-current="page" id="breadcrumb-name">Producto</li>
-            </ol>
-        </nav>
-    </div>
-@endsection
-
-@section('scripts')
-    <script src="{{ asset('js/comentarios.js') }}"></script>
-    <script src="{{ asset('js/detalle.js') }}"></script>
 @endsection

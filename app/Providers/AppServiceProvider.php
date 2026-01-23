@@ -11,7 +11,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // Registrar bindings de repositorios
+        $this->app->bind(
+            \App\Repositories\BaseRepository::class,
+            \App\Repositories\ProductRepository::class
+        );
     }
 
     /**

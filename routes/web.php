@@ -1,38 +1,43 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\PageController;
+use App\Http\Controllers\ProductController;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
-*/
+
+
 
 Route::get('/', function () {
-    return view('index');
-});
+    return view('pages.home');
+})->name('home');
 
 Route::get('/contacto', function () {
-    return view('contacto');
-});
+    return view('pages.contacto');
+})->name('contacto');
 
-Route::get('/formulario', function () {
-    return view('formulario');
-});
+Route::get('/formulario', [App\Http\Controllers\ProductImportController::class, 'show'])->name('formulario');
 
-Route::get('/login', function () {
-    return view('auth.login');
-});
+require __DIR__ . '/auth.php';
 
-Route::get('/register', function () {
-    return view('auth.register');
-});
+// Catálogo de Productos (usando Controller + Repository/Service)
+Route::get('/products', [ProductController::class, 'index'])->name('products.index');
 
-Route::get('/product', function () {
-    return view('products.show');
+Route::get('/comprar', [ProductController::class, 'buy'])->name('products.buy');
+
+Route::get('/products/import', [App\Http\Controllers\ProductImportController::class, 'show'])->name('products.import.show');
+Route::post('/products/import', [App\Http\Controllers\ProductImportController::class, 'store'])->name('products.import.store');
+
+Route::get('/products/{product}', [ProductController::class, 'show'])->name('products.show');
+
+Route::post('/reviews', [App\Http\Controllers\ReviewController::class, 'store'])->name('reviews.store')->middleware('auth');
+Route::delete('/reviews/{review}', [App\Http\Controllers\ReviewController::class, 'destroy'])->name('reviews.destroy')->middleware('auth');
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
+use App\Http\Controllers\ProfileController;
+
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
