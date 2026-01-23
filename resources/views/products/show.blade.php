@@ -7,6 +7,21 @@
 @endpush
 
 @section('content')
+    <div class="container-fluid breadcrumb-container"
+        style="background-color: #f8f9fa; padding: 10px 0; margin-bottom: 20px;">
+        <div class="container px-md-5">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb" style="margin: 0;">
+                    <li class="breadcrumb-item"><a href="{{ route('home') }}"
+                            style="color:#fa4841; text-decoration:none;">Inicio</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('products.buy') }}"
+                            style="color:#fa4841; text-decoration:none;">Tienda</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ $product->nombre }}</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
     <div class="product-main">
         <main class="product-detail-container">
             <div class="product-image">
@@ -48,7 +63,8 @@
                 @endphp
 
                 @if($userReview)
-                    <div class="review-form-card" style="text-align: center; background-color: #f8f9fa; border-left: 5px solid #4CAF50;">
+                    <div class="review-form-card"
+                        style="text-align: center; background-color: #f8f9fa; border-left: 5px solid #4CAF50;">
                         <h3>¡Gracias por tu opinión!</h3>
                         <p>Ya has valorado este juego con <strong>{{ $userReview->estrellas }} estrellas</strong>.</p>
                         <p><i>"{{ $userReview->comentario }}"</i></p>

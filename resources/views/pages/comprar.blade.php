@@ -7,6 +7,19 @@
 @endpush
 
 @section('content')
+    <div class="container-fluid breadcrumb-container"
+        style="background-color: #f8f9fa; padding: 10px 0; margin-bottom: 20px;">
+        <div class="container px-md-5">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb" style="margin: 0;">
+                    <li class="breadcrumb-item"><a href="{{ route('home') }}"
+                            style="color:#fa4841; text-decoration:none;">Inicio</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Tienda</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
     <div class="shop-container container-fluid px-md-5">
         <aside class="sidebar-filtros">
             <div class="filter-header">
