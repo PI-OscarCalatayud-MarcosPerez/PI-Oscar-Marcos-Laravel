@@ -60,71 +60,33 @@ document.addEventListener("DOMContentLoaded", async () => {
         `;
         };
 
-        // Debug: Log loaded categories to help diagnosis
-        const uniqueCategories = [
-            ...new Set(
-                products.map((p) =>
-                    p.categoria ? p.categoria.toLowerCase().trim() : "null",
-                ),
-            ),
-        ];
-        console.log("Categorías cargadas desde BD:", uniqueCategories);
-
-        const renderCarousel = (categoryId, containerId) => {
+        // Lógica de Renderizado del Carrusel
+        const renderCarousel = (sectionId, containerId) => {
             const container = document.getElementById(containerId);
-            if (!container) return;
+            if (!container) return; // Si no existe el contenedor, salimos
 
-            // Filter with loose comparison (trim + lowercase)
-            let filtered = products.filter(
+            // Filtramos productos que coincidan con la sección (ej. 'comprados', 'ofertas')
+            // Usamos la propiedad 'seccion' que viene de la base de datos
+            const filtrados = products.filter(
                 (p) =>
-                    p.categoria &&
-                    p.categoria.toLowerCase().trim() ===
-                        categoryId.toLowerCase().trim(),
+                    p.seccion &&
+                    p.seccion.toLowerCase().trim() ===
+                        sectionId.toLowerCase().trim(),
             );
 
-            // Fallback strategies if specific tags aren't found (to prevent empty carousels)
-            if (filtered.length === 0) {
-                console.warn(
-                    `No products found for category '${categoryId}'. Available:`,
-                    uniqueCategories,
-                );
-
-                if (
-                    categoryId === "nuevos" &&
-                    uniqueCategories.includes("software")
-                ) {
-                    // Fallback: 'nuevos' section is titled "Software..." in HTML, so try 'software'
-                    filtered = products.filter(
-                        (p) =>
-                            p.categoria &&
-                            p.categoria.toLowerCase().trim() === "software",
-                    );
-                } else if (categoryId === "comprados" && products.length > 0) {
-                    // Fallback: Show random/first products for 'Best Sellers' if tag missing
-                    filtered = products.slice(0, 8);
-                } else if (categoryId === "ofertas" && products.length > 0) {
-                    // Fallback: Show cheap products
-                    filtered = products
-                        .filter((p) => {
-                            const price = parseFloat(p.precio || p.preu || 0);
-                            return price > 0 && price < 20;
-                        })
-                        .slice(0, 8);
-                    if (filtered.length === 0) filtered = products.slice(0, 8);
-                }
-            }
-
-            if (filtered.length > 0) {
-                container.innerHTML = filtered.map(createCard).join("");
+            // Si hay productos, los mostramos
+            if (filtrados.length > 0) {
+                container.innerHTML = filtrados.map(createCard).join("");
             } else {
                 container.innerHTML =
-                    "<p style='padding:20px; color: #333; text-align: center; width: 100%;'>No hay productos disponibles.</p>";
+                    "<p style='padding:20px; text-align: center;'>No hay productos disponibles en esta sección.</p>";
             }
         };
 
+        // Renderizamos las 3 secciones principales de la home
         renderCarousel("comprados", "lista-comprados");
         renderCarousel("ofertas", "lista-ofertas");
-        renderCarousel("nuevos", "lista-nuevos");
+        renderCarousel("software", "lista-nuevos"); // Nota: En el HTML el ID es 'lista-nuevos' pero cargamos software
     } catch (error) {
         console.error("Error cargando productos:", error);
     }

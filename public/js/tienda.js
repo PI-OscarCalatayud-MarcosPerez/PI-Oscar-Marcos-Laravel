@@ -26,20 +26,15 @@ document.addEventListener("DOMContentLoaded", async () => {
             .trim();
     }
 
-    // 1. CARGAR DATOS
+    // 1. CARGAR DATOS DESDE LA API
     try {
-        // UPDATED: Use the new Laravel API endpoint
         const response = await fetch("/api/products");
         const data = await response.json();
 
-        // Ajuste de estructura: Laravel returns array directly or inside 'data' property depending on pagination
-        todosLosProductos = Array.isArray(data)
-            ? data
-            : data.products
-              ? data.products
-              : data.data;
+        // Guardamos los productos en una variable global para poder filtrar luego
+        todosLosProductos = data;
 
-        // Renderizado inicial
+        // Renderizado inicial (mostramos todos los productos)
         aplicarFiltros();
     } catch (error) {
         console.error("Error cargando productos:", error);
@@ -58,30 +53,30 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
 
         productos.forEach((prod) => {
-            // Intenta usar 'genero', si no 'categoria'
-            // Note: Adapt property names to match Laravel model (usually camelCase or snake_case matching DB)
-            // Debug: console.log(prod) to see exact keys if needed. Assuming: nom->nombre, preu->precio based on migration
-
-            // MAPPING KEYS: The PHP migration says 'nombre', 'precio', 'imagen_url'.
-            // The JS code uses 'nom', 'preu', 'img'. We need to map or adapt.
-            // Let's inspect the keys from the first item to be sure, OR map them safely.
-
             const nombre = prod.nombre || prod.nom || "Sin Nombre";
             const precioVal = prod.precio || prod.preu || 0;
             let imagen = prod.imagen_url || prod.img || "img/placeholder.jpg";
+
             if (
                 imagen &&
                 !imagen.startsWith("http") &&
-                !imagen.startsWith("/")
+                !imagen.startsWith("data:")
             ) {
-                imagen = "/" + imagen;
+                let rawPath = imagen.startsWith("/")
+                    ? imagen.substring(1)
+                    : imagen;
+
+                if (!rawPath.startsWith("img/")) {
+                    rawPath = "img/" + rawPath;
+                }
+
+                imagen = "/" + rawPath;
             }
             const cat = prod.categoria || "General";
             const id = prod.id;
 
             const precio = parseFloat(precioVal).toFixed(2);
 
-            /* SIN BOTÓN: El div tiene el onclick y title */
             const html = `
                 <div class="shop-item"
                      onclick="window.location.href='/products/${id}'"
@@ -101,7 +96,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                 </div>
             `;
 
-            // Re-creating structure to match CSS class names exactly
             const itemDiv = document.createElement("div");
             itemDiv.className = "shop-item";
             itemDiv.onclick = () => (window.location.href = `/products/${id}`);

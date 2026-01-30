@@ -5,7 +5,7 @@
 @push('styles')
     <!-- Estilos específicos de la tienda -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="{{ asset('css/tienda.css') }}" />
+    <link rel="stylesheet" href="{{ asset('css/tienda.css') }}?v=1.1" />
 @endpush
 
 @section('content')
@@ -24,7 +24,10 @@
                 <label><input type="checkbox" name="cat" value="estrategia" /> Estrategia</label>
                 <label><input type="checkbox" name="cat" value="aventura" /> Aventura</label>
                 <label><input type="checkbox" name="cat" value="terror" /> Terror</label>
+                <label><input type="checkbox" name="cat" value="shooter" /> Shooter</label>
+                <label><input type="checkbox" name="cat" value="plataformas" /> Plataformas</label>
                 <label><input type="checkbox" name="cat" value="software" /> Software</label>
+                <label><input type="checkbox" name="cat" value="ia" /> Inteligencia Artificial</label>
             </div>
 
             <div class="filter-group">
@@ -60,5 +63,5 @@
 
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="{{ asset('js/tienda.js') }}"></script>
+    <script src="{{ asset('js/tienda.js') }}?v=1.1"></script>
 @endpush

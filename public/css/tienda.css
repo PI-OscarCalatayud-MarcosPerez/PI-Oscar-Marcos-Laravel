@@ -70,14 +70,32 @@
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 }
 
+#sortOrder {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: white;
+    color: #333;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    outline: none;
+    -webkit-appearance: auto; /* Fix for some browsers hiding dropdown arrow */
+    appearance: auto;
+}
+
+#sortOrder:hover,
+#sortOrder:focus {
+    border-color: #fa4841;
+    box-shadow: 0 0 0 3px rgba(250, 72, 65, 0.1);
+}
+
 .products-grid {
     display: grid;
-    /* Rejilla responsive automática */
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     gap: 25px;
 }
 
-/* Tarjeta de Producto (Reutiliza estilos base pero adaptados) */
 .shop-item {
     background: white;
     border-radius: 10px;

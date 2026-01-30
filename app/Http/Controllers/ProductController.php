@@ -8,16 +8,17 @@ use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
+    // Inyectamos el Servicio
     public function __construct(private ProductService $service)
     {
     }
 
     public function index()
     {
-        // El controlador solo coordina: pide datos al servicio y retorna vista
+        // 1. El controlador pide los datos al Servicio
         $products = $this->service->listar();
 
-        // Retorna la vista organizada en la carpeta 'products'
+        // 2. Retorna la vista con los datos
         return view('products.index', compact('products'));
     }
 
@@ -28,6 +29,7 @@ class ProductController extends Controller
 
     public function show($id)
     {
+        // Obtiene un producto individual
         $product = $this->service->obtener($id);
         return view('products.show', compact('product'));
     }

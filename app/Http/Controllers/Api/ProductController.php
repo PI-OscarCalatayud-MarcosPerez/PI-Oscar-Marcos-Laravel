@@ -3,30 +3,28 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Product;
-use Illuminate\Http\Request;
+use App\Services\ProductService; // Usamos el servicio
 
 class ProductController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function __construct(private ProductService $service)
     {
-        return response()->json(Product::all());
     }
 
-    /**
-     * Display the specified resource.
-     */
+    // Retorna todos los productos en formato JSON
+    public function index()
+    {
+        return response()->json($this->service->listar());
+    }
+
+    // Retorna un producto específico
     public function show(string $id)
     {
-        $product = Product::find($id);
-
-        if (!$product) {
+        try {
+            $product = $this->service->obtener($id);
+            return response()->json($product);
+        } catch (\Exception $e) {
             return response()->json(['message' => 'Producto no encontrado'], 404);
         }
-
-        return response()->json($product);
     }
 }
