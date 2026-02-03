@@ -1,80 +1,208 @@
 <script setup>
-import { ref, onMounted } from 'vue';
-import ProductService from '../services/ProductService';
-import { useRouter } from 'vue-router';
+import { ref, onMounted, computed, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import ProductService from '../services/ProductService'
 
-const router = useRouter();
-const products = ref([]);
-const loading = ref(true);
+const router = useRouter()
+const route = useRoute()
+
+// State
+const products = ref([])
+const loading = ref(true)
+const error = ref(null)
+
+// Filters State
+const searchTerm = ref('') // Connected to navbar search ideally, or local input
+const selectedCategories = ref([])
+const selectedPlatforms = ref([])
+const maxPrice = ref(100)
+const sortOrder = ref('default')
+
+// Filter Options
+const categories = ['Acción', 'RPG', 'Deportes', 'Estrategia', 'Aventura', 'Terror', 'Software']
+const platforms = ['PC', 'PS5', 'Xbox', 'Switch']
 
 const fetchProducts = async () => {
+    loading.value = true;
     try {
         const response = await ProductService.getProducts();
         const data = response.data;
         products.value = Array.isArray(data) ? data : (data.products || data.data || []);
-    } catch (error) {
-        console.error(error);
+    } catch (err) {
+        error.value = "Error listando productos";
+        console.error(err);
     } finally {
         loading.value = false;
     }
-};
+}
 
+// Helper to clean strings
+const normalizar = (texto) => {
+    if (!texto) return "";
+    return texto.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+}
+
+// Helper for images
 const getImage = (product) => {
     let img = product.imagen_url || product.img || "img/placeholder.jpg";
-    if (img && !img.startsWith('http') && !img.startsWith('/')) {
+    if (img && !img.startsWith('http') && !img.startsWith('data:')) {
+        if (img.startsWith('/')) img = img.substring(1);
+        if (!img.startsWith('img/')) img = 'img/' + img;
         img = '/' + img;
     }
     return img;
-};
+}
+
+// Computed Filtered Products
+const filteredProducts = computed(() => {
+    let filtered = products.value;
+
+    // 1. Search Text (if provided via query param or generic search)
+    // If you have a global search bus/store, use that. For now using query param q
+    const queryQ = route.query.q ? normalizar(route.query.q) : "";
+    if (queryQ) {
+        filtered = filtered.filter(p => {
+            const nom = p.nombre || p.nom || "";
+            return normalizar(nom).includes(queryQ);
+        });
+    }
+
+    // 2. Categories
+    if (selectedCategories.value.length > 0) {
+        const normalizedCats = selectedCategories.value.map(c => normalizar(c));
+        filtered = filtered.filter(p => {
+            const cat = p.categoria ? normalizar(p.categoria) : "";
+            return normalizedCats.includes(cat);
+        });
+    }
+
+    // 3. Platforms (Note: Assuming platform info exists or generic)
+    if (selectedPlatforms.value.length > 0) {
+        const normalizedPlats = selectedPlatforms.value.map(c => normalizar(c));
+        filtered = filtered.filter(p => {
+            const plat = p.plataforma ? normalizar(p.plataforma) : (p.descripcion ? normalizar(p.descripcion) : "");
+            // Simple fallback check in description if no field
+            return normalizedPlats.some(np => plat.includes(np));
+        });
+    }
+
+    // 4. Price
+    filtered = filtered.filter(p => {
+        const precio = parseFloat(p.precio || p.preu || 0);
+        return precio <= parseFloat(maxPrice.value);
+    });
+
+    // 5. Sorting
+    if (sortOrder.value === 'price-asc') {
+        filtered.sort((a, b) => parseFloat(a.precio) - parseFloat(b.precio));
+    } else if (sortOrder.value === 'price-desc') {
+        filtered.sort((a, b) => parseFloat(b.precio) - parseFloat(a.precio));
+    } else if (sortOrder.value === 'az') {
+        filtered.sort((a, b) => (a.nombre || '').localeCompare(b.nombre || ''));
+    }
+
+    return filtered;
+});
+
+const clearFilters = () => {
+    selectedCategories.value = [];
+    selectedPlatforms.value = [];
+    maxPrice.value = 100;
+    sortOrder.value = 'default';
+    router.replace({ query: {} }); // Clear search
+}
 
 const goToProduct = (id) => {
     router.push(`/products/${id}`);
-};
+}
 
 onMounted(() => {
     fetchProducts();
+    // Sync query params if needed
 });
 </script>
 
 <template>
-    <div class="container my-5">
-        <h1 class="text-center mb-4">Catálogo de Productos</h1>
-        
-        <div v-if="loading" class="text-center">
-            <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Cargando...</span>
-            </div>
+    <div class="container-fluid breadcrumb-container"
+        style="background-color: #f8f9fa; padding: 10px 0; margin-bottom: 20px;">
+        <div class="container px-md-5">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb" style="margin: 0;">
+                    <li class="breadcrumb-item">
+                        <RouterLink to="/" style="color:#fa4841; text-decoration:none;">Inicio</RouterLink>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">Tienda</li>
+                </ol>
+            </nav>
         </div>
+    </div>
 
-        <div v-else class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
-            <div v-for="product in products" :key="product.id" class="col">
-                <div class="card h-100 shadow-sm item-card" @click="goToProduct(product.id)">
-                    <img :src="getImage(product)" class="card-img-top" :alt="product.nombre" 
-                         style="height: 200px; object-fit: contain; padding: 10px;">
-                    <div class="card-body d-flex flex-column">
-                        <h5 class="card-title">{{ product.nombre }}</h5>
-                        <p class="card-text text-truncate">{{ product.descripcion }}</p>
-                        <div class="mt-auto d-flex justify-content-between align-items-center">
-                            <span class="fs-5 fw-bold">{{ parseFloat(product.precio).toFixed(2) }} €</span>
-                            <button class="btn btn-danger">Ver más</button>
-                        </div>
+    <div class="shop-container container-fluid px-md-5">
+        <!-- Sidebar -->
+        <aside class="sidebar-filtros">
+            <div class="filter-header">
+                <h3>Filtrar por</h3>
+                <button @click="clearFilters" class="btn-clean">Limpiar</button>
+            </div>
+
+            <div class="filter-group">
+                <h4>Género</h4>
+                <label v-for="cat in categories" :key="cat">
+                    <input type="checkbox" :value="cat" v-model="selectedCategories" /> {{ cat }}
+                </label>
+            </div>
+
+            <div class="filter-group">
+                <h4>Plataforma</h4>
+                <label v-for="plat in platforms" :key="plat">
+                    <input type="checkbox" :value="plat" v-model="selectedPlatforms" /> {{ plat }}
+                </label>
+            </div>
+
+            <div class="filter-group">
+                <h4>Precio Máximo</h4>
+                <input type="range" min="0" max="100" v-model="maxPrice" style="width: 100%" />
+                <p>Hasta: <span>{{ maxPrice }}</span>€</p>
+            </div>
+        </aside>
+
+        <!-- Product Grid -->
+        <section class="products-section">
+            <div class="products-header">
+                <span>{{ filteredProducts.length }} productos encontrados</span>
+                <select v-model="sortOrder" id="sortOrder">
+                    <option value="default">Orden por defecto</option>
+                    <option value="price-asc">Precio: Menor a Mayor</option>
+                    <option value="price-desc">Precio: Mayor a Menor</option>
+                    <option value="az">Nombre: A-Z</option>
+                </select>
+            </div>
+
+            <div class="products-grid">
+                <div v-if="loading">Cargando...</div>
+                <div v-if="error">{{ error }}</div>
+
+                <div v-for="product in filteredProducts" :key="product.id" class="shop-item"
+                    @click="goToProduct(product.id)" :title="'Ver detalles de ' + product.nombre">
+                    <div class="shop-item-img"
+                        :style="{ backgroundImage: 'url(' + getImage(product) + ')', backgroundSize: 'cover', backgroundPosition: 'center', height: '200px' }">
+                    </div>
+                    <div class="shop-item-info">
+                        <p class="shop-item-title">{{ product.nombre }}</p>
+                        <p style="font-size:0.9rem; color:#666;">{{ product.categoria }}</p>
+                        <p class="shop-item-price">{{ parseFloat(product.precio).toFixed(2) }}€</p>
                     </div>
                 </div>
+
+                <p v-if="!loading && filteredProducts.length === 0"
+                    style="grid-column: 1/-1; text-align: center; color: #666;">
+                    No se encontraron productos con esos filtros.
+                </p>
             </div>
-        </div>
-        
-        <div v-if="!loading && products.length === 0" class="text-center">
-            <p>No hay productos disponibles.</p>
-        </div>
+        </section>
     </div>
 </template>
 
 <style scoped>
-.item-card {
-    cursor: pointer;
-    transition: transform 0.2s;
-}
-.item-card:hover {
-    transform: translateY(-5px);
-}
+@import '../../../assets/css/tienda.css';
 </style>

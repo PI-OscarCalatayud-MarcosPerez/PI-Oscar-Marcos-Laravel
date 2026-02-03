@@ -27,7 +27,7 @@ class RegisteredUserController extends Controller
      *
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request)
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -41,12 +41,20 @@ class RegisteredUserController extends Controller
             'username' => $request->name, // Mapeamos el input 'name' (Nombre de usuario) tambien a 'username'
             'last_name' => $request->last_name,
             'email' => $request->email,
-            'password' => Hash::make($request->password),
+            'password' => $request->password,
         ]);
 
         event(new Registered($user));
 
-        Auth::login($user);
+        if ($request->wantsJson()) {
+            // Session Auth: Login is already done. Just return user.
+            // CSRF protection relies on the cookie set by the middleware.
+            return response()->json([
+                'user' => $user,
+                // 'access_token' => $token, // No tokens without Sanctum
+                // 'token_type' => 'Bearer',
+            ], 201);
+        }
 
         return redirect(route('dashboard', absolute: false));
     }

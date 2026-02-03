@@ -39,7 +39,6 @@ body {
 }
 
 @keyframes slide-avisos {
-
     0%,
     30% {
         transform: translateY(0);
@@ -142,21 +141,21 @@ header {
 }
 
 .users {
-    background-image: url("../img/usuario.png");
+    background-image: url("/img/usuario.png");
     background-size: 58px;
 }
 
 .carro {
-    background-image: url("../img/carrito.png");
+    background-image: url("/img/carrito.png");
     background-size: 34px;
 }
 
 .users:hover {
-    background-image: url("../img/usuario1.png");
+    background-image: url("/img/usuario1.png");
 }
 
 .carro:hover {
-    background-image: url("../img/carrito1.png");
+    background-image: url("/img/carrito1.png");
 }
 
 .menu-toggle {
@@ -325,15 +324,15 @@ header {
 }
 
 .rate label:before {
-    content: '★ ';
+    content: "★ ";
 }
 
-.rate input:checked~label {
+.rate input:checked ~ label {
     color: #ffc700;
 }
 
-.rate:not(:checked)>label:hover,
-.rate:not(:checked)>label:hover~label {
+.rate:not(:checked) > label:hover,
+.rate:not(:checked) > label:hover ~ label {
     color: #ffc700;
 }
 

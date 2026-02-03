@@ -22,6 +22,7 @@ class ProductController extends Controller
     {
         try {
             $product = $this->service->obtener($id);
+            $product->load('reviews.user', 'reviews'); // Eager load relationships
             return response()->json($product);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Producto no encontrado'], 404);

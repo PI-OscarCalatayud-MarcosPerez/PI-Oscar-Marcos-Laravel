@@ -14,40 +14,43 @@ const handleLogin = async () => {
         await authStore.login({ email: email.value, password: password.value });
         router.push('/');
     } catch (err) {
-        error.value = "Invalid credentials";
+        console.error(err);
+        error.value = err.response?.data?.message || err.message || "Invalid credentials";
     }
 };
 </script>
 
 <template>
-<div class="login-container">
-    <div class="login-card">
-        <h2>Iniciar Sesión</h2>
-        <form @submit.prevent="handleLogin" class="login-form">
-            <div class="form-group">
-                <label>Email:</label>
-                <input type="email" v-model="email" placeholder="tu@email.com" required />
-            </div>
-            <div class="form-group">
-                <label>Contraseña:</label>
-                <input type="password" v-model="password" placeholder="Tu contraseña" required />
-            </div>
-            
-            <div class="form-group checkbox-group">
-                <input type="checkbox" id="remember" />
-                <label for="remember" style="display:inline; margin-left: 5px; font-weight: normal;">Recordarme</label>
-            </div>
+    <div class="login-container">
+        <div class="login-card">
+            <h2>Iniciar Sesión</h2>
+            <form @submit.prevent="handleLogin" class="login-form">
+                <div class="form-group">
+                    <label>Email:</label>
+                    <input type="email" v-model="email" placeholder="tu@email.com" required />
+                </div>
+                <div class="form-group">
+                    <label>Contraseña:</label>
+                    <input type="password" v-model="password" placeholder="Tu contraseña" required />
+                </div>
 
-            <button type="submit">Entrar</button>
-            
-            <p class="register-link">
-                ¿No tienes cuenta? <a href="/register" style="color: #fa4841; font-weight: bold;">Regístrate aquí.</a>
-            </p>
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="remember" />
+                    <label for="remember"
+                        style="display:inline; margin-left: 5px; font-weight: normal;">Recordarme</label>
+                </div>
 
-            <p v-if="error" class="error">{{ error }}</p>
-        </form>
+                <button type="submit">Entrar</button>
+
+                <p class="register-link">
+                    ¿No tienes cuenta? <a href="/register" style="color: #fa4841; font-weight: bold;">Regístrate
+                        aquí.</a>
+                </p>
+
+                <p v-if="error" class="error">{{ error }}</p>
+            </form>
+        </div>
     </div>
-</div>
 </template>
 
 <style>
@@ -55,6 +58,7 @@ const handleLogin = async () => {
 body {
     background-color: #eaf2f2;
 }
+
 .login-container {
     display: flex;
     justify-content: center;
@@ -62,6 +66,7 @@ body {
     min-height: 80vh;
     padding: 20px;
 }
+
 .login-card {
     background-color: white;
     padding: 40px;
@@ -70,15 +75,18 @@ body {
     width: 100%;
     max-width: 400px;
 }
+
 .login-card h2 {
     text-align: center;
     color: #0e273f;
     margin-top: 0;
     margin-bottom: 25px;
 }
+
 .form-group {
     margin-bottom: 20px;
 }
+
 .form-group label {
     display: block;
     margin-bottom: 8px;
@@ -86,6 +94,7 @@ body {
     font-weight: bold;
     font-size: 0.9rem;
 }
+
 .form-group input {
     width: 100%;
     padding: 12px;
@@ -95,25 +104,32 @@ body {
     box-sizing: border-box;
     transition: border-color 0.3s;
 }
+
 /* SPECIFIC FIX FOR CHECKBOX */
 .checkbox-group {
     display: flex;
     align-items: center;
     justify-content: flex-start;
 }
+
 .checkbox-group input[type="checkbox"] {
-    width: auto; /* Reset width for checkbox */
+    width: auto;
+    /* Reset width for checkbox */
     margin-right: 10px;
-    flex-shrink: 0; /* Prevent shrinking */
+    flex-shrink: 0;
+    /* Prevent shrinking */
 }
+
 .checkbox-group label {
-    margin-bottom: 0; /* Align perfectly with checkbox */
+    margin-bottom: 0;
+    /* Align perfectly with checkbox */
 }
 
 .form-group input:focus {
     border-color: #0e273f;
     outline: none;
 }
+
 button[type="submit"] {
     width: 100%;
     padding: 14px;
@@ -127,9 +143,11 @@ button[type="submit"] {
     transition: background-color 0.3s;
     margin-top: 10px;
 }
+
 button:hover {
     background-color: #d63a34;
 }
+
 .error {
     color: red;
     text-align: center;

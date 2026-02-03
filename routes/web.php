@@ -15,6 +15,8 @@ Route::get('/contacto', function () {
     return view('pages.contacto');
 })->name('contacto');
 
+Route::get('/sanctum/csrf-cookie', [App\Http\Controllers\Api\CsrfCookieController::class, 'show']); // Custom CSRF endpoint for Session Auth
+
 Route::get('/formulario', [App\Http\Controllers\ProductImportController::class, 'show'])->name('formulario');
 
 require __DIR__ . '/auth.php';

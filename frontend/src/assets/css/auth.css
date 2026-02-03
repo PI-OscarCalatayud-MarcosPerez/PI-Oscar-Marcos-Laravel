@@ -1,71 +1,70 @@
-/* frontend/css/auth.css */
-
+/* Global styles for auth page */
 body {
-    font-family: "Rubik", sans-serif;
     background-color: #eaf2f2;
-    /* Mismo fondo que tu web */
+}
+.login-container {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
-    /* Ocupa toda la altura de la pantalla */
-    margin: 0;
+    min-height: 80vh;
+    padding: 20px;
 }
-
-main {
+.login-card {
     background-color: white;
     padding: 40px;
     border-radius: 10px;
     box-shadow: 0 10px 25px rgba(14, 39, 63, 0.15);
-    /* Sombra suave */
     width: 100%;
     max-width: 400px;
-    /* Ancho máximo de la tarjeta */
 }
-
-h2 {
+.login-card h2 {
     text-align: center;
     color: #0e273f;
-    /* Azul corporativo */
     margin-top: 0;
     margin-bottom: 25px;
 }
-
-form div {
+.form-group {
     margin-bottom: 20px;
 }
-
-label {
+.form-group label {
     display: block;
     margin-bottom: 8px;
     color: #0e273f;
     font-weight: bold;
     font-size: 0.9rem;
 }
-
-input[type="text"],
-input[type="email"],
-input[type="password"] {
+.form-group input {
     width: 100%;
     padding: 12px;
     border: 2px solid #e0e0e0;
     border-radius: 6px;
     font-size: 1rem;
     box-sizing: border-box;
-    /* Importante para que el padding no rompa el ancho */
     transition: border-color 0.3s;
 }
+/* SPECIFIC FIX FOR CHECKBOX */
+.checkbox-group {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+.checkbox-group input[type="checkbox"] {
+    width: auto; /* Reset width for checkbox */
+    margin-right: 10px;
+    flex-shrink: 0; /* Prevent shrinking */
+}
+.checkbox-group label {
+    margin-bottom: 0; /* Align perfectly with checkbox */
+}
 
-input:focus {
+.form-group input:focus {
     border-color: #0e273f;
     outline: none;
 }
-
-button {
+button[type="submit"] {
     width: 100%;
     padding: 14px;
     background-color: #fa4841;
-    /* Rojo corporativo */
     color: white;
     border: none;
     border-radius: 6px;
@@ -73,25 +72,23 @@ button {
     font-weight: bold;
     cursor: pointer;
     transition: background-color 0.3s;
+    margin-top: 10px;
 }
-
 button:hover {
     background-color: #d63a34;
 }
-
-p {
+.error {
+    color: red;
     text-align: center;
-    margin-top: 20px;
-    font-size: 0.9rem;
-    color: #666;
+    margin-top: 15px;
 }
 
+/* Links */
 a {
     color: #fa4841;
     text-decoration: none;
     font-weight: bold;
 }
-
 a:hover {
     text-decoration: underline;
 }
