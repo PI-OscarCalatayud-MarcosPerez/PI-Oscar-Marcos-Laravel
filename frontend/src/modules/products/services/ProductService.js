@@ -1,10 +1,10 @@
-import http from '@/services/http';
+import http from "@/services/http";
 
 export default {
     getProducts() {
-        return http.get('/products');
+        return http.get("/api/products");
     },
     getProduct(id) {
-        return http.get(`/products/${id}`);
-    }
-}
+        return http.get(`/api/products/${id}`);
+    },
+};
