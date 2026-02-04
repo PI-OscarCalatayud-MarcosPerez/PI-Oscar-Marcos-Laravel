@@ -35,6 +35,7 @@ services:
 
   db:
     image: mysql:8.4
+    container_name: mokeys_db
     environment:
       MYSQL_DATABASE: MOKeys
       MYSQL_USER: laravel
@@ -57,5 +58,21 @@ services:
     depends_on:
       - db
 
+  # --- N8N (Configuración Limpia) ---
+  n8n:
+    image: docker.n8n.io/n8nio/n8n
+    container_name: n8n_app
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_HOST=localhost
+      - GENERIC_TIMEZONE=Europe/Madrid
+      - N8N_SECURE_COOKIE=false
+    volumes:
+      - n8n_data_clean:/home/node/.n8n
+    depends_on:
+      - db
+
 volumes:
   db_data:
+  n8n_data_clean: # Volumen nuevo

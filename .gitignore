@@ -22,3 +22,11 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+n8n-local/
+/vendor
+/node_modules
+.env
+backup_credenciales.json
+mis_credenciales.json
+*_credenciales.json
+*.json
