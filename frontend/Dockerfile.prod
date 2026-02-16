@@ -1,0 +1,31 @@
+# Etapa 1: Build de la aplicación Vue
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+# Copiar archivos de dependencias
+COPY package*.json ./
+
+# Instalar dependencias
+RUN npm ci
+
+# Copiar código fuente
+COPY . .
+
+# Build de producción
+RUN npm run build
+
+# Etapa 2: Servir con Nginx
+FROM nginx:1.27-alpine
+
+# Copiar archivos estáticos generados desde la etapa de build
+COPY --from=builder /app/dist /usr/share/nginx/html
+
+# Copiar configuración de Nginx para SPA
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Exponer puerto 80
+EXPOSE 80
+
+# Arrancar Nginx
+CMD ["nginx", "-g", "daemon off;"]

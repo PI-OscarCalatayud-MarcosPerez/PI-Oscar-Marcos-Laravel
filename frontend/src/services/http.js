@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const http = axios.create({
-    baseURL: "http://localhost", // Basic URL, avoiding advanced proxies if possible, or just let empty if using Proxy
+    baseURL: "",
     withCredentials: true,
     headers: {
         "Content-Type": "application/json",
@@ -9,12 +9,26 @@ const http = axios.create({
     },
 });
 
+// Helper function to get cookie value
+function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(";").shift();
+}
+
 // Request interceptor
 http.interceptors.request.use((config) => {
     const token = localStorage.getItem("token");
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
     }
+
+    // Add XSRF token from cookies
+    const xsrfToken = getCookie("XSRF-TOKEN");
+    if (xsrfToken) {
+        config.headers["X-XSRF-TOKEN"] = decodeURIComponent(xsrfToken);
+    }
+
     return config;
 });
 

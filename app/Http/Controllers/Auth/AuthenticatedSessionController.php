@@ -28,17 +28,12 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        if ($request->wantsJson()) {
-            return response()->json(['user' => Auth::user()], 200);
-        }
-
-        return redirect()->intended(route('dashboard', absolute: false));
+        // Siempre devolver JSON para SPA (Vue)
+        return response()->json(['user' => Auth::user()], 200);
     }
 
-    /**
-     * Destroy an authenticated session.
-     */
-    public function destroy(Request $request): RedirectResponse
+
+    public function destroy(Request $request)
     {
         Auth::guard('web')->logout();
 
@@ -46,6 +41,7 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        // Devolver JSON para SPA (Vue)
+        return response()->json(['message' => 'Logged out successfully'], 200);
     }
 }

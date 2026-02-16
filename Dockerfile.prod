@@ -1,0 +1,44 @@
+# Multi-stage build para Laravel en producción
+FROM composer:2 AS composer
+WORKDIR /app
+COPY composer.json composer.lock ./
+RUN composer install --no-dev --optimize-autoloader --no-scripts --no-interaction
+
+FROM php:8.3-fpm-alpine
+
+ARG WWWUSER=1000
+ARG WWWGROUP=1000
+
+# Instalar extensiones PHP necesarias y dependencias
+RUN apk add --no-cache \
+      git curl zip unzip bash \
+      icu-dev libxml2-dev oniguruma-dev \
+      libpng-dev freetype-dev libjpeg-turbo-dev \
+      libzip-dev mysql-client
+
+# Configurar e instalar extensiones
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg && \
+    docker-php-ext-install -j"$(nproc)" \
+      pdo pdo_mysql mbstring exif pcntl bcmath intl gd zip
+
+# Copiar dependencias de Composer desde la etapa anterior
+COPY --from=composer /app/vendor /var/www/html/vendor
+
+# Copiar código fuente
+COPY --chown=www-data:www-data . /var/www/html
+
+# Configurar permisos para directorios críticos
+RUN chown -R www-data:www-data \
+    /var/www/html/storage \
+    /var/www/html/bootstrap/cache && \
+    chmod -R 775 \
+    /var/www/html/storage \
+    /var/www/html/bootstrap/cache
+
+WORKDIR /var/www/html
+
+USER www-data
+
+EXPOSE 9000
+
+CMD ["php-fpm"]

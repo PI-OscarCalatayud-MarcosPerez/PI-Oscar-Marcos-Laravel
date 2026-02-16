@@ -16,6 +16,7 @@ export default defineConfig({
             "/api": {
                 target: "http://localhost",
                 changeOrigin: true,
+                secure: false,
                 headers: {
                     Accept: "application/json",
                     "X-Requested-With": "XMLHttpRequest",
@@ -24,6 +25,34 @@ export default defineConfig({
             "/sanctum": {
                 target: "http://localhost",
                 changeOrigin: true,
+                secure: false,
+                cookieDomainRewrite: "",
+            },
+            "/login": {
+                target: "http://localhost",
+                changeOrigin: true,
+                secure: false,
+                cookieDomainRewrite: "",
+            },
+            "/logout": {
+                target: "http://localhost",
+                changeOrigin: true,
+                secure: false,
+            },
+            "/register": {
+                target: "http://localhost",
+                changeOrigin: true,
+                secure: false,
+            },
+            "/user": {
+                target: "http://localhost",
+                changeOrigin: true,
+                secure: false,
+            },
+            "/reviews": {
+                target: "http://localhost",
+                changeOrigin: true,
+                secure: false,
             },
         },
     },

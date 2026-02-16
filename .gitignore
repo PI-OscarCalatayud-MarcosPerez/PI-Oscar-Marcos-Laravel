@@ -22,11 +22,10 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
-n8n-local/
-/vendor
-/node_modules
-.env
-backup_credenciales.json
-mis_credenciales.json
+
+# Sensitive credentials and N8N configuration
 *_credenciales.json
-*.json
+backup_*.json
+mis_*.json
+n8n-local/
+passwordN8N.txt

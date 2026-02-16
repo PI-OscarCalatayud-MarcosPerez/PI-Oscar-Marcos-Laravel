@@ -6,6 +6,7 @@ import ProductService from '../services/ProductService';
 import { useAuthStore } from '../../auth/store/authStore';
 // Use axios/api instance for posting reviews
 import http from '@/services/http';
+import RoleGuard from '../../roles/components/RoleGuard.vue';
 
 const route = useRoute();
 const authStore = useAuthStore();
@@ -92,6 +93,18 @@ const submitReview = async () => {
     }
 };
 
+const deleteReview = async (reviewId) => {
+    if (!confirm('¿Estás seguro de que quieres eliminar este comentario?')) return;
+
+    try {
+        await http.delete(`/reviews/${reviewId}`);
+        // Remove from local array
+        product.value.reviews = product.value.reviews.filter(r => r.id !== reviewId);
+    } catch (err) {
+        alert(err.response?.data?.message || 'Error al eliminar comentario');
+    }
+};
+
 onMounted(() => {
     fetchProduct();
     // Maybe ensure user is loaded
@@ -127,7 +140,9 @@ onMounted(() => {
                     <div class="rating-summary">
                         <div class="rating-number">{{product.media_estrellas || (product.reviews &&
                             product.reviews.length ?
-                            (product.reviews.reduce((a, b) => a + b.estrellas,0)/product.reviews.length).toFixed(1) : 0) }}
+                            (product.reviews.reduce((a, b) => a + b.estrellas, 0) / product.reviews.length).toFixed(1) :
+                            0)
+                            }}
                         </div>
 
                         <!-- Stars logic -->
@@ -193,7 +208,13 @@ onMounted(() => {
                         </div>
                         <div class="comment-body">
                             {{ review.comentario }}
-                            <!-- Delete button for admin could go here check authStore.user.role === 'admin' -->
+                            <!-- Delete button for admin/moderators -->
+                            <RoleGuard permission="moderate">
+                                <button class="btn-delete-comment" @click="deleteReview(review.id)"
+                                    title="Eliminar comentario">
+                                    🗑️
+                                </button>
+                            </RoleGuard>
                         </div>
                     </div>
 
@@ -210,4 +231,22 @@ onMounted(() => {
 
 /* Fix for Rate Stars in Vue: CSS expects inputs to be siblings of labels.
    Vue v-model works fine with radios. */
+
+.btn-delete-comment {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    margin-left: 10px;
+    transition: all 0.3s;
+    float: right;
+}
+
+.btn-delete-comment:hover {
+    background-color: #c82333;
+    transform: scale(1.05);
+}
 </style>

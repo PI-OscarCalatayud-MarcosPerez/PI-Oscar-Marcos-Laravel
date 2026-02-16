@@ -43,8 +43,8 @@ const handleLogin = async () => {
                 <button type="submit">Entrar</button>
 
                 <p class="register-link">
-                    ¿No tienes cuenta? <a href="/register" style="color: #fa4841; font-weight: bold;">Regístrate
-                        aquí.</a>
+                    ¿No tienes cuenta? <RouterLink to="/register" style="color: #fa4841; font-weight: bold;">Regístrate
+                        aquí.</RouterLink>
                 </p>
 
                 <p v-if="error" class="error">{{ error }}</p>
