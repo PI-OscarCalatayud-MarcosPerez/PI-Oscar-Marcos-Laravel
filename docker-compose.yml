@@ -58,6 +58,23 @@ services:
     depends_on:
       - db
 
+  # --- Frontend Vue (Vite Dev Server) ---
+  frontend:
+    image: node:20-alpine
+    working_dir: /app
+    volumes:
+      - ./frontend:/app
+    ports:
+      - "5173:5173"
+    environment:
+      - NODE_ENV=development
+      - VITE_API_BASE_URL=http://localhost/api
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    depends_on:
+      - web
+    stdin_open: true
+    tty: true
+
   # --- N8N (Configuración Limpia) ---
   n8n:
     image: docker.n8n.io/n8nio/n8n
