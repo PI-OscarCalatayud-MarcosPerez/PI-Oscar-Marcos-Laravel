@@ -49,3 +49,13 @@ use App\Http\Controllers\ProfileController;
 //     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
 //     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 // });
+
+// Ruta principal para SPA (Vue)
+Route::get('/', function () {
+    return view('spa');
+});
+
+// Catch-all para cualquier otra ruta que no sea API, la maneja Vue Router
+Route::get('/{any}', function () {
+    return view('spa');
+})->where('any', '.*');

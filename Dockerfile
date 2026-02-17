@@ -1,38 +1,31 @@
-# === PHP-FPM 8.3 (Alpine) con extensiones comunes ===
-FROM php:8.3-fpm-alpine
+FROM php:8.2-fpm
 
-ARG WWWUSER=1000
-ARG WWWGROUP=1000
+# Instalar dependencias del sistema y extensiones PHP
+RUN apt-get update && apt-get install -y \
+    git \
+    curl \
+    libpng-dev \
+    libonig-dev \
+    libxml2-dev \
+    zip \
+    unzip \
+    libzip-dev \
+    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Paquetes de runtime + headers para extensiones
-RUN set -eux; \
-    apk add --no-cache \
-      git curl zip unzip bash shadow openssl \
-      icu icu-dev libxml2-dev oniguruma-dev \
-      libpng-dev freetype-dev libjpeg-turbo-dev \
-      libzip-dev linux-headers \
-      nodejs npm; \
-    # Dependencias de compilación (phpize, autoconf, etc.)
-    apk add --no-cache --virtual .build-deps $PHPIZE_DEPS; \
-    # Configurar e instalar extensiones nativas
-    docker-php-ext-configure gd --with-freetype --with-jpeg; \
-    docker-php-ext-install -j"$(nproc)" \
-      pdo pdo_mysql mbstring exif pcntl bcmath intl gd zip; \
-    # PECL redis (requiere phpize/autoconf)
-    pecl install redis; \
-    docker-php-ext-enable redis; \
-    # Limpiar deps de build para reducir tamaño
-    apk del .build-deps
+# Obtener Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Composer
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+# Establecer directorio de trabajo
+WORKDIR /var/www
 
-# Usuario no root (evitar problemas de permisos con el host)
-RUN usermod -u ${WWWUSER} www-data && groupmod -g ${WWWGROUP} www-data
+# Crear usuario de sistema para correr comandos de Composer y Artisan
+RUN useradd -G www-data,root -u 1000 -d /home/dev dev
+RUN mkdir -p /home/dev/.composer && \
+    chown -R dev:dev /home/dev
 
-USER www-data
-WORKDIR /var/www/html
+# Exponer puertos
+EXPOSE 8000
 
-# Instalar dependencias del proyecto si ya hay composer.json (no falla si no existe)
-RUN if [ -f composer.json ]; then composer install --no-interaction; fi
-
+# Comando por defecto (servidor de desarrollo de Laravel)
+CMD php artisan serve --host=0.0.0.0 --port=8000
