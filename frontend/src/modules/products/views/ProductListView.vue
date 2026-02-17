@@ -203,6 +203,6 @@ onMounted(() => {
     </div>
 </template>
 
-<style scoped>
-@import '../../../assets/css/tienda.css';
+<style>
+@import '../../../assets/css/product-list.css';
 </style>

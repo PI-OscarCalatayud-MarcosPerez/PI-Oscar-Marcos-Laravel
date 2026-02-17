@@ -1,5 +1,5 @@
-import { storeToRefs } from 'pinia';
-import { useAuthStore } from '../../auth/store/authStore';
+import { storeToRefs } from "pinia";
+import { useAuthStore } from "../../auth/store/authStore";
 
 export function useRole() {
     const authStore = useAuthStore();
@@ -7,28 +7,42 @@ export function useRole() {
 
     const can = (permission) => {
         const role = user.value?.role;
-        // Simple logic: admin has all permissions. 
-        // This should match the table in C3.
+
         const rules = {
-            admin: ['create', 'edit', 'delete', 'moderate', 'admin-panel'],
-            gerent: ['create', 'edit', 'delete', 'moderate', 'admin-panel'],
-            venedor: ['create', 'edit', 'delete'],
-            editor: ['moderate'],
-            user: ['read', 'comment']
+            admin: [
+                "create",
+                "edit",
+                "delete",
+                "moderate",
+                "admin-panel",
+                "sell",
+                "delete-comments",
+            ],
+            gerent: [
+                "create",
+                "edit",
+                "delete",
+                "moderate",
+                "admin-panel",
+                "sell",
+            ],
+            venedor: ["sell", "create", "edit"],
+            editor: ["moderate"],
+            user: ["read", "comment"],
         };
 
-        // If role is missing, default to empty
+        // Si no hay role, return false
         if (!role) return false;
 
-        // Admin/Gerent access all
-        if (role === 'admin' || role === 'gerent') return true;
+        // Admin y Gerent tienen acceso a todo
+        if (role === "admin" || role === "gerent") return true;
 
         return rules[role]?.includes(permission) ?? false;
     };
 
     const is = (roleName) => {
         return user.value?.role === roleName;
-    }
+    };
 
     return { can, is };
 }

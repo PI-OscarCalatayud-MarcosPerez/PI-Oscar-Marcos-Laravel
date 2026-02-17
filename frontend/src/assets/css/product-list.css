@@ -1,29 +1,32 @@
-/* Layout Principal */
+/* Estilos para ProductListView (Tienda) */
+
 .shop-container {
-    display: grid;
-    grid-template-columns: 250px 1fr; /* Sidebar fijo 250px, resto flexible */
-    gap: 30px;
     padding-top: 40px;
     padding-bottom: 60px;
-    min-height: 80vh;
+    min-height: 800px;
 }
 
-/* Sidebar */
+/* Sidebar flotante*/
 .sidebar-filtros {
     background: white;
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-    height: fit-content;
+    width: 250px;
+    float: left;
+    margin-right: 30px;
 }
 
 .filter-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
     margin-bottom: 20px;
     border-bottom: 2px solid #eee;
     padding-bottom: 10px;
+    overflow: hidden;
+}
+
+.filter-header h3 {
+    float: left;
+    margin: 0;
 }
 
 .btn-clean {
@@ -31,8 +34,9 @@
     border: none;
     color: #fa4841;
     cursor: pointer;
-    font-size: 0.9rem;
+    font-size: 14px;
     text-decoration: underline;
+    float: right;
 }
 
 .filter-group {
@@ -40,7 +44,7 @@
 }
 
 .filter-group h4 {
-    font-size: 1rem;
+    font-size: 16px;
     color: #0e273f;
     font-weight: bold;
     margin-bottom: 10px;
@@ -54,20 +58,26 @@
 }
 
 .filter-group input[type="checkbox"] {
-    accent-color: #fa4841;
     margin-right: 8px;
 }
 
 /* Zona de Productos */
+.products-section {
+    overflow: hidden;
+}
+
 .products-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
     margin-bottom: 20px;
     background: white;
     padding: 15px;
     border-radius: 10px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+}
+
+.products-header span {
+    float: left;
+    line-height: 35px;
 }
 
 #sortOrder {
@@ -76,12 +86,11 @@
     border-radius: 5px;
     background-color: white;
     color: #333;
-    font-size: 0.95rem;
+    font-size: 15px;
     cursor: pointer;
     transition: all 0.3s ease;
     outline: none;
-    -webkit-appearance: auto; /* Fix for some browsers hiding dropdown arrow */
-    appearance: auto;
+    float: right;
 }
 
 #sortOrder:hover,
@@ -91,9 +100,7 @@
 }
 
 .products-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 25px;
+    overflow: hidden;
 }
 
 .shop-item {
@@ -102,8 +109,11 @@
     overflow: hidden;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
     transition: transform 0.3s;
-    display: flex;
-    flex-direction: column;
+    width: 220px;
+    float: left;
+    margin-right: 25px;
+    margin-bottom: 25px;
+    cursor: pointer;
 }
 
 .shop-item:hover {
@@ -119,46 +129,49 @@
 
 .shop-item-info {
     padding: 15px;
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
 }
 
 .shop-item-title {
     font-weight: bold;
     color: #0e273f;
     margin-bottom: 5px;
-    font-size: 1rem;
+    font-size: 16px;
 }
 
 .shop-item-price {
     color: #fa4841;
     font-weight: bold;
-    font-size: 1.2rem;
-    margin-top: auto; /* Empuja el precio abajo */
-}
-
-/* Añadidos */
-.shop-item {
-    cursor: pointer; /* Hace que salga la manita al pasar el ratón */
-    transition:
-        transform 0.2s ease,
-        box-shadow 0.2s ease;
-}
-
-.shop-item:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
-    border: 1px solid #fa4841;
+    font-size: 19px;
+    margin-top: 10px;
+    display: block;
 }
 
 /* Responsive */
 @media (max-width: 900px) {
-    .shop-container {
-        grid-template-columns: 1fr; /* Una sola columna en móvil */
+    .sidebar-filtros {
+        width: 100%;
+        float: none;
+        margin-right: 0;
+        margin-bottom: 20px;
     }
 
-    .sidebar-filtros {
-        margin-bottom: 20px;
+    .products-section {
+        width: 100%;
+    }
+
+    .shop-item {
+        width: calc(50% - 12px);
+        margin-right: 12px;
+    }
+
+    .shop-item:nth-child(2n) {
+        margin-right: 0;
+    }
+}
+
+@media (max-width: 576px) {
+    .shop-item {
+        width: 100%;
+        margin-right: 0;
     }
 }

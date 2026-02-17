@@ -79,18 +79,6 @@ const handleRegister = async () => {
     </div>
 </template>
 
-<style scoped>
-@import '../../../assets/css/auth.css';
-
-/* Local overrides */
-.subtitulo-form {
-    text-align: center;
-    color: #666;
-    margin-bottom: 20px;
-}
-
-.register-link {
-    text-align: center;
-    margin-top: 20px;
-}
+<style>
+@import '../../../assets/css/register.css';
 </style>

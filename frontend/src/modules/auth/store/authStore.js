@@ -4,7 +4,7 @@ import authService from "../services/authService";
 
 export const useAuthStore = defineStore("auth", () => {
     const user = ref(null);
-    const isAuthenticated = ref(!!localStorage.getItem("token")); // Simplified without token storage since we rely on cookie
+    const isAuthenticated = ref(!!localStorage.getItem("token"));
 
     async function login(credentials) {
         try {

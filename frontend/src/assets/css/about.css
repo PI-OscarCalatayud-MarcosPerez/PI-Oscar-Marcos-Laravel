@@ -1,0 +1,189 @@
+/* Estilos para AboutView - Sobre Nosotros */
+
+.about-container {
+    min-height: 640px;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+.about-hero {
+    background: linear-gradient(135deg, #0e273f 0%, #1a3a5c 100%);
+    padding: 80px 20px;
+    text-align: center;
+    color: white;
+}
+
+.about-hero h1 {
+    font-size: 56px;
+    margin: 0 0 20px 0;
+    font-weight: bold;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.tagline {
+    font-size: 24px;
+    margin: 0;
+    opacity: 0.9;
+}
+
+.about-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 60px 20px;
+}
+
+.about-section {
+    background: white;
+    padding: 50px 40px;
+    margin-bottom: 30px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.about-section h2 {
+    font-size: 36px;
+    color: #0e273f;
+    margin: 0 0 25px 0;
+    text-align: center;
+}
+
+.about-section p {
+    font-size: 18px;
+    line-height: 1.8;
+    color: #495057;
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* Features Grid */
+.features-grid {
+    display: block;
+    margin-top: 40px;
+    text-align: center;
+}
+
+.feature-card {
+    display: inline-block;
+    width: 45%;
+    margin: 20px 2%;
+    padding: 30px;
+    background: #f8f9fa;
+    border-radius: 15px;
+    border-left: 4px solid #fa4841;
+    transition: all 0.3s;
+    vertical-align: top;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.feature-icon {
+    font-size: 48px;
+    margin-bottom: 15px;
+    color: #fa4841;
+}
+
+.feature-card h3 {
+    font-size: 24px;
+    color: #0e273f;
+    margin: 0 0 15px 0;
+}
+
+.feature-card p {
+    font-size: 16px;
+    color: #6c757d;
+    margin: 0;
+}
+
+/* Team Section */
+.team-description {
+    margin-bottom: 40px;
+}
+
+.team-stats {
+    text-align: center;
+    margin-top: 40px;
+}
+
+.stat {
+    display: inline-block;
+    width: 30%;
+    margin: 20px 1.5%;
+    padding: 30px;
+    background: linear-gradient(135deg, #fa4841 0%, #e03f39 100%);
+    border-radius: 15px;
+    color: white;
+    vertical-align: top;
+}
+
+.stat-number {
+    font-size: 48px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.stat-label {
+    font-size: 18px;
+    opacity: 0.9;
+}
+
+/* CTA Section */
+.cta {
+    text-align: center;
+    background: linear-gradient(135deg, #0e273f 0%, #1a3a5c 100%);
+    color: white;
+}
+
+.cta h2 {
+    color: white;
+}
+
+.cta p {
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 30px;
+}
+
+.btn-cta {
+    display: inline-block;
+    padding: 16px 40px;
+    background: #fa4841;
+    color: white;
+    text-decoration: none;
+    border-radius: 30px;
+    font-size: 20px;
+    font-weight: bold;
+    transition: all 0.3s;
+}
+
+.btn-cta:hover {
+    background: #e03f39;
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(250, 72, 65, 0.4);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .about-hero h1 {
+        font-size: 40px;
+    }
+
+    .tagline {
+        font-size: 18px;
+    }
+
+    .about-section {
+        padding: 30px 20px;
+    }
+
+    .feature-card,
+    .stat {
+        width: 100%;
+        margin: 15px 0;
+    }
+
+    .about-section h2 {
+        font-size: 28px;
+    }
+}

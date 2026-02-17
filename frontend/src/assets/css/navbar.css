@@ -1,0 +1,229 @@
+/* Estilos para Navbar */
+
+.nav-container {
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 3px 20px;
+    overflow: hidden;
+    position: relative;
+    min-height: 86px;
+}
+
+.logo-img {
+    height: 80px;
+    width: auto;
+    vertical-align: middle;
+    float: left;
+}
+
+.d-flex {
+    float: right;
+    margin-top: 15px;
+}
+
+#navLinks {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 15px;
+    text-align: center;
+}
+
+.enlaces_navegacion {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: inline-block;
+}
+
+.enlaces_navegacion li {
+    display: inline-block;
+    margin: 0 15px;
+}
+
+.enlaces_navegacion a {
+    text-decoration: none;
+    color: white;
+    font-weight: bold;
+    font-size: 24px;
+    transition: 0.3s;
+    line-height: 45px;
+}
+
+.enlaces_navegacion a:hover,
+.enlaces_navegacion a:focus {
+    color: #fa4841;
+}
+
+.link-with-icon:hover {
+    color: #fa4841 !important;
+}
+
+.link-with-icon {
+    display: inline-block;
+}
+
+.icon-upload {
+    width: 20px;
+    height: 20px;
+    vertical-align: middle;
+    margin-right: 8px;
+    content: url("/img/boton-circular-plus.png");
+    transition: all 0.3s;
+}
+
+.link-with-icon:hover .icon-upload {
+    content: url("/img/boton-circular-plus.png");
+    transform: scale(1.1);
+}
+
+.menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 32px;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+    vertical-align: middle;
+}
+
+.busqueda {
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 15px;
+}
+
+.busqueda input {
+    width: 200px;
+    height: 40px;
+    font-size: 16px;
+    padding: 8px 15px;
+    border: 1px solid #ccc;
+    border-radius: 25px;
+    outline: none;
+    vertical-align: middle;
+}
+
+.user-name {
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 15px;
+    margin-right: 8px;
+    display: inline-block;
+    vertical-align: middle;
+    line-height: 45px;
+}
+
+.users,
+.carro {
+    display: inline-block;
+    vertical-align: middle;
+    height: 45px;
+    width: 35px;
+    background-repeat: no-repeat;
+    background-position: center;
+    cursor: pointer;
+    margin: 0 5px;
+}
+
+.users {
+    background-image: url("/img/usuario.png");
+    background-size: 58px;
+}
+
+.carro {
+    background-image: url("/img/carrito.png");
+    background-size: 34px;
+}
+
+.users:hover {
+    background-image: url("/img/usuario1.png");
+}
+
+.carro:hover {
+    background-image: url("/img/carrito1.png");
+}
+
+/* Responsive */
+@media (max-width: 991px) {
+    .nav-container {
+        text-align: left;
+    }
+
+    .logo-img {
+        height: 70px;
+    }
+
+    .menu-toggle {
+        display: block;
+        float: right;
+        margin-top: 20px;
+    }
+
+    #navLinks {
+        position: static;
+        transform: none;
+        text-align: center;
+        top: auto;
+        left: auto;
+        padding-top: 0;
+    }
+
+    .enlaces_navegacion {
+        display: none;
+        position: absolute;
+        top: 92px;
+        left: 0;
+        width: 100%;
+        background-color: #0e273f;
+        padding: 20px;
+        text-align: center;
+        box-shadow: 0 10px 10px rgba(0, 0, 0, 0.3);
+        z-index: 1000;
+    }
+
+    .enlaces_navegacion.active {
+        display: block;
+    }
+
+    .enlaces_navegacion li {
+        display: block;
+        margin: 0 0 20px 0;
+    }
+
+    .d-flex {
+        margin-top: 25px;
+    }
+
+    .busqueda {
+        display: none;
+    }
+}
+
+@media (max-width: 576px) {
+    .logo-img {
+        height: 60px;
+    }
+
+    .user-name {
+        display: none;
+    }
+
+    .users,
+    .carro {
+        margin: 0 3px;
+        height: 40px;
+        width: 30px;
+    }
+
+    .menu-toggle {
+        margin-top: 15px;
+    }
+
+    .d-flex {
+        margin-top: 20px;
+    }
+}
