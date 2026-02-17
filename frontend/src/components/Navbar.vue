@@ -6,7 +6,7 @@ import { useRole } from '../modules/roles/composables/useRole';
 
 const authStore = useAuthStore();
 const router = useRouter();
-const { can, is } = useRole();
+const { can, hasRole } = useRole();
 const isMenuOpen = ref(false);
 
 const toggleMenu = () => {
@@ -44,7 +44,7 @@ const userName = computed(() => {
                     <li>
                         <RouterLink to="/about">Sobre Nosotros</RouterLink>
                     </li>
-                    <li v-if="is('admin')">
+                    <li v-if="hasRole('admin', 'gerent')">
                         <RouterLink to="/import" class="link-with-icon">
                             <img src="/img/boton-circular-plus.png" alt="Subir" class="icon-upload" />
                             Subir

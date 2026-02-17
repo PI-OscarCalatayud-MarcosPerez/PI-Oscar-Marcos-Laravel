@@ -1,66 +1,76 @@
 import { defineStore } from "pinia";
-import { ref } from "vue";
-import authService from "../services/authService";
+import { apiLogin, apiLogout, apiGetUser } from "../api";
 
-export const useAuthStore = defineStore("auth", () => {
-    const user = ref(null);
-    const isAuthenticated = ref(!!localStorage.getItem("token"));
+export const useAuthStore = defineStore("auth", {
+    state: () => ({
+        user: null,
+        token: localStorage.getItem("token"),
+        bootstrapped: false,
+    }),
 
-    async function login(credentials) {
-        try {
-            const response = await authService.login(credentials);
-            user.value = response.data.user;
-            isAuthenticated.value = true;
-            localStorage.setItem("isAuthenticated", "true");
-        } catch (error) {
-            console.error("Login failed", error);
-            throw error;
-        }
-    }
+    getters: {
+        isAuthenticated: (state) => !!state.token,
+        role: (state) => state.user?.role ?? null,
+    },
 
-    async function register(userData) {
-        try {
-            const response = await authService.register(userData);
-            user.value = response.data.user;
-            isAuthenticated.value = true;
-            localStorage.setItem("isAuthenticated", "true");
-        } catch (error) {
-            console.error("Registration failed", error);
-            throw error;
-        }
-    }
+    actions: {
+        async login(credentials) {
+            try {
+                const { token, user } = await apiLogin(credentials);
+                this.token = token;
+                this.user = user;
+                localStorage.setItem("token", token);
+                console.log("Login successful:", user);
+            } catch (error) {
+                console.error("Login error:", error);
+                throw error;
+            }
+        },
 
-    async function logout() {
-        try {
-            await authService.logout();
-        } catch (err) {
-            console.error("Logout failed on server", err);
-        } finally {
-            user.value = null;
-            isAuthenticated.value = false;
-            localStorage.removeItem("isAuthenticated");
-        }
-    }
+        async register(userData) {
+            // ... (mantener igual si no se usa mucho aun)
+            const { data } = await http.post("/api/register", userData);
+            const { token, user } = data;
+            this.token = token;
+            this.user = user;
+            localStorage.setItem("token", token);
+        },
 
-    async function fetchUser() {
-        try {
-            const response = await authService.getUser();
-            user.value = response.data;
-            isAuthenticated.value = true;
-            localStorage.setItem("isAuthenticated", "true");
-        } catch (error) {
-            user.value = null;
-            isAuthenticated.value = false;
-            localStorage.removeItem("isAuthenticated");
-        }
-    }
+        async logout() {
+            try {
+                await apiLogout();
+            } catch (e) {
+                console.error("Logout API error", e);
+            }
+            this.hardLogout();
+        },
 
-    return {
-        user,
-        isAuthenticated,
-        login,
-        register,
-        logout,
-        fetchUser,
-    };
+        hardLogout() {
+            console.log("Hard logout executed");
+            this.user = null;
+            this.token = null;
+            localStorage.removeItem("token");
+        },
+
+        async bootstrap() {
+            if (!this.token) {
+                this.bootstrapped = true;
+                return;
+            }
+
+            try {
+                console.log("Bootstrapping user...");
+                this.user = await apiGetUser();
+                console.log("Bootstrap success:", this.user);
+            } catch (error) {
+                console.error("Bootstrap error:", error);
+                // Solo hacer logout si es error de autenticación (401)
+                if (error.response?.status === 401) {
+                    this.hardLogout();
+                }
+            } finally {
+                this.bootstrapped = true;
+            }
+        },
+    },
 });

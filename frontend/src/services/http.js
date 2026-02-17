@@ -1,43 +1,24 @@
 import axios from "axios";
+import { useAuthStore } from "@/modules/auth/store/authStore";
 
 const http = axios.create({
-    baseURL: "",
+    baseURL: import.meta.env.VITE_API_URL || "",
     withCredentials: true,
-    headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-    },
+    timeout: 8000,
 });
 
-function getCookie(name) {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop().split(";").shift();
-}
-
 http.interceptors.request.use((config) => {
-    const token = localStorage.getItem("token");
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-    }
-
-    const xsrfToken = getCookie("XSRF-TOKEN");
-    if (xsrfToken) {
-        config.headers["X-XSRF-TOKEN"] = decodeURIComponent(xsrfToken);
-    }
-
+    const auth = useAuthStore();
+    if (auth.token) config.headers.Authorization = `Bearer ${auth.token}`;
     return config;
 });
 
 http.interceptors.response.use(
-    (response) => {
-        return response;
-    },
-    (error) => {
-        if (error.response && error.response.status === 401) {
-            localStorage.removeItem("token");
-        }
-        return Promise.reject(error);
+    (res) => res,
+    (err) => {
+        const auth = useAuthStore();
+        if (err?.response?.status === 401) auth.hardLogout();
+        return Promise.reject(err);
     },
 );
 

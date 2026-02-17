@@ -62,26 +62,32 @@ const router = createRouter({
     ],
 });
 
-// Guard global para proteger rutas
-router.beforeEach((to, from, next) => {
-    const authStore = useAuthStore();
+router.beforeEach(async (to) => {
+    const auth = useAuthStore();
+    console.log(`[Router] Navigate to: ${to.fullPath}`);
+    console.log(
+        `[Router] Auth state: token=${!!auth.token}, user=${auth.user?.email}`,
+    );
 
-    // Si la ruta requiere autenticación
-    if (to.meta.requiresAuth && !authStore.isAuthenticated) {
-        next("/login");
-        return;
+    if (!auth.bootstrapped) {
+        console.log("[Router] Bootstrapping...");
+        await auth.bootstrap();
     }
 
-    // Si la ruta requiere roles específicos
+    if (to.meta.requiresAuth && !auth.isAuthenticated) {
+        console.warn("[Router] Redirecting to login");
+        return { name: "login", query: { redirect: to.fullPath } };
+    }
+
     if (to.meta.roles) {
-        const userRole = authStore.user?.role;
+        const userRole = auth.role;
+        console.log(
+            `[Router] Checking roles: ${to.meta.roles} vs User: ${userRole}`,
+        );
         if (!userRole || !to.meta.roles.includes(userRole)) {
-            next("/forbidden");
-            return;
+            return { name: "forbidden" };
         }
     }
-
-    next();
 });
 
 export default router;

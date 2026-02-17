@@ -9,7 +9,7 @@ import RoleGuard from '../../roles/components/RoleGuard.vue';
 
 const route = useRoute();
 const authStore = useAuthStore();
-const { is } = useRole();
+const { hasRole } = useRole();
 const product = ref(null);
 const loading = ref(true);
 const error = ref(null);
@@ -94,10 +94,10 @@ const deleteReview = async (reviewId) => {
     }
 };
 
-onMounted(() => {
+onMounted(async () => {
     fetchProduct();
-    if (!authStore.user && authStore.isAuthenticated) {
-        authStore.fetchUser();
+    if (!authStore.bootstrapped) {
+        await authStore.bootstrap();
     }
 });
 </script>
@@ -130,7 +130,7 @@ onMounted(() => {
                             product.reviews.length ?
                             (product.reviews.reduce((a, b) => a + b.estrellas, 0) / product.reviews.length).toFixed(1) :
                             0)
-                            }}
+                        }}
                         </div>
 
                         <div class="rating-stars">
@@ -192,8 +192,8 @@ onMounted(() => {
                         </div>
                         <div class="comment-body">
                             {{ review.comentario }}
-                            <button v-if="is('admin')" class="btn-delete-comment" @click="deleteReview(review.id)"
-                                title="Eliminar comentario">
+                            <button v-if="hasRole('admin', 'gerent')" class="btn-delete-comment"
+                                @click="deleteReview(review.id)" title="Eliminar comentario">
                                 <img src="/img/borrar.png" alt="Eliminar" class="icon-delete" />
                             </button>
                         </div>

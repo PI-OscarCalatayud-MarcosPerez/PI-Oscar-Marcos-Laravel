@@ -1,37 +1,41 @@
 <script setup>
-import { ref } from 'vue';
-import { useAuthStore } from '../store/authStore';
-import { useRouter } from 'vue-router';
+import { reactive } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { useAuthStore } from '@/modules/auth/store/authStore'
+import { useUiStore } from '@/stores/uiStore'
+import UiToast from '@/components/UiToast.vue'
 
-const email = ref('');
-const password = ref('');
-const error = ref(null);
-const authStore = useAuthStore();
-const router = useRouter();
+const auth = useAuthStore()
+const ui = useUiStore()
+const router = useRouter()
+const route = useRoute()
 
-const handleLogin = async () => {
+const form = reactive({ email: '', password: '' })
+
+async function handleLogin() {
     try {
-        await authStore.login({ email: email.value, password: password.value });
-        router.push('/');
+        await auth.login(form)
+        ui.showToast('success', 'Sesión iniciada')
+        router.push(route.query.redirect || '/')
     } catch (err) {
-        console.error(err);
-        error.value = err.response?.data?.message || err.message || "Invalid credentials";
+        ui.showToast('error', 'Credenciales incorrectas')
     }
-};
+}
 </script>
 
 <template>
+    <UiToast />
     <div class="login-container">
         <div class="login-card">
             <h2>Iniciar Sesión</h2>
             <form @submit.prevent="handleLogin" class="login-form">
                 <div class="form-group">
                     <label>Email:</label>
-                    <input type="email" v-model="email" placeholder="tu@email.com" required />
+                    <input type="email" v-model="form.email" placeholder="tu@email.com" required />
                 </div>
                 <div class="form-group">
                     <label>Contraseña:</label>
-                    <input type="password" v-model="password" placeholder="Tu contraseña" required />
+                    <input type="password" v-model="form.password" placeholder="Tu contraseña" required />
                 </div>
 
                 <div class="form-group checkbox-group">
@@ -43,11 +47,9 @@ const handleLogin = async () => {
                 <button type="submit">Entrar</button>
 
                 <p class="register-link">
-                    ¿No tienes cuenta? <RouterLink to="/register" style="color: #fa4841; font-weight: bold;">Regístrate
-                        aquí.</RouterLink>
+                    ¿No tienes cuenta?
+                    <RouterLink to="/register" style="color: #fa4841; font-weight: bold;">Regístrate aquí.</RouterLink>
                 </p>
-
-                <p v-if="error" class="error">{{ error }}</p>
             </form>
         </div>
     </div>
