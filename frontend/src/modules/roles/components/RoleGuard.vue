@@ -1,18 +1,15 @@
 <script setup>
-import { useRole } from '../composables/useRole';
+import { useRole } from '@/modules/roles/composables/useRole'
 
 const props = defineProps({
-  permission: {
-    type: String,
-    required: true
-  }
-});
+    roles: { type: Array, default: () => [] },
+    permission: { type: String, default: '' },
+})
 
-const { can } = useRole();
+const { hasRole, can } = useRole()
 </script>
 
 <template>
-  <div v-if="can(props.permission)">
-    <slot></slot>
-  </div>
+    <slot
+        v-if="(props.roles.length ? hasRole(...props.roles) : true) && (props.permission ? can(props.permission) : true)" />
 </template>

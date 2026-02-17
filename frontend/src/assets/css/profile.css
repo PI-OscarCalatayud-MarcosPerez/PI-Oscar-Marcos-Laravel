@@ -1,0 +1,215 @@
+/* Estilos para ProfileView - Diseño mejorado */
+
+.profile-container {
+    min-height: 640px;
+    padding: 40px 20px;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+.profile-card {
+    max-width: 700px;
+    width: 100%;
+    margin: 0 auto;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+/* Header con nombre grande */
+.profile-header {
+    background: linear-gradient(135deg, #0e273f 0%, #1a3a5c 100%);
+    padding: 40px 30px;
+    text-align: center;
+    color: white;
+}
+
+.profile-name {
+    font-size: 48px;
+    font-weight: bold;
+    margin: 0 0 15px 0;
+    color: white;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.role-badge {
+    display: inline-block;
+    padding: 8px 20px;
+    border-radius: 25px;
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.badge-admin {
+    background-color: #fa4841;
+    color: white;
+}
+
+.badge-venedor {
+    background-color: #4caf50;
+    color: white;
+}
+
+.badge-editor {
+    background-color: #ff9800;
+    color: white;
+}
+
+.badge-user {
+    background-color: #2196f3;
+    color: white;
+}
+
+/* Información del usuario */
+.profile-info {
+    padding: 30px;
+}
+
+.info-item {
+    padding: 20px;
+    margin-bottom: 15px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    border-left: 4px solid #0e273f;
+    transition: all 0.3s;
+}
+
+.info-item:hover {
+    background: #e9ecef;
+    transform: translateX(5px);
+}
+
+.info-item label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: #0e273f;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.info-item p {
+    font-size: 18px;
+    color: #495057;
+    margin: 0;
+    font-weight: 500;
+}
+
+/* Acciones */
+.profile-actions {
+    padding: 20px 30px 30px 30px;
+    background: #f8f9fa;
+}
+
+.btn-action {
+    width: 100%;
+    padding: 16px 24px;
+    margin-bottom: 12px;
+    border: none;
+    border-radius: 12px;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: block;
+    text-align: left;
+    position: relative;
+}
+
+.btn-action span {
+    vertical-align: middle;
+    margin-left: 8px;
+}
+
+.action-icon {
+    width: 28px;
+    height: 28px;
+    vertical-align: middle;
+    transition: all 0.3s;
+}
+
+.btn-admin {
+    background: linear-gradient(135deg, #fa4841 0%, #e03f39 100%);
+    color: white;
+}
+
+.btn-admin:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(250, 72, 65, 0.4);
+}
+
+.btn-admin:hover .action-icon {
+    content: url("/img/boton-circular-plus2.png");
+    transform: rotate(90deg);
+}
+
+.btn-upload {
+    background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+    color: white;
+}
+
+.btn-upload:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+}
+
+.btn-upload:hover .action-icon {
+    content: url("/img/boton-circular-plus2.png");
+    transform: scale(1.2);
+}
+
+.btn-logout {
+    background: linear-gradient(135deg, #0e273f 0%, #1a3a5c 100%);
+    color: white;
+}
+
+.btn-logout:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(14, 39, 63, 0.4);
+}
+
+.btn-logout:hover .action-icon {
+    content: url("/img/puerta-abierta2.png");
+    transform: translateX(5px);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .profile-name {
+        font-size: 36px;
+    }
+
+    .profile-card {
+        border-radius: 15px;
+    }
+
+    .profile-header {
+        padding: 30px 20px;
+    }
+
+    .profile-info {
+        padding: 20px;
+    }
+
+    .info-item {
+        padding: 15px;
+    }
+
+    .btn-action {
+        font-size: 16px;
+        padding: 14px 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .profile-name {
+        font-size: 28px;
+    }
+
+    .profile-container {
+        padding: 20px 10px;
+    }
+}
