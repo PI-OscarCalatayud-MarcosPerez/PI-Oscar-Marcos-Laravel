@@ -3,8 +3,10 @@ import { ref, computed } from 'vue';
 import { RouterLink, useRouter } from 'vue-router';
 import { useAuthStore } from '../modules/auth/store/authStore';
 import { useRole } from '../modules/roles/composables/useRole';
+import { useCartStore } from '../modules/cart/store/cartStore';
 
 const authStore = useAuthStore();
+const cartStore = useCartStore();
 const router = useRouter();
 const { can, hasRole } = useRole();
 const isMenuOpen = ref(false);
@@ -44,12 +46,6 @@ const userName = computed(() => {
                     <li>
                         <RouterLink to="/about">Sobre Nosotros</RouterLink>
                     </li>
-                    <li v-if="hasRole('admin', 'gerent')">
-                        <RouterLink to="/import" class="link-with-icon">
-                            <img src="/img/boton-circular-plus.png" alt="Subir" class="icon-upload" />
-                            Subir
-                        </RouterLink>
-                    </li>
                 </ul>
             </nav>
 
@@ -58,14 +54,14 @@ const userName = computed(() => {
                     <input type="text" placeholder="Buscar..." name="q" aria-label="Buscar producto" />
                 </form>
 
-                <span v-if="authStore.isAuthenticated" class="user-name d-none d-lg-inline">
-                    {{ userName }}
-                </span>
+                <RouterLink to="/cart" class="carro" aria-label="Carrito">
+                    <span v-if="cartStore.itemCount > 0" class="cart-badge">{{ cartStore.itemCount }}</span>
+                </RouterLink>
+
                 <RouterLink v-if="authStore.isAuthenticated" to="/profile" class="users" aria-label="Perfil">
                 </RouterLink>
                 <RouterLink v-else to="/login" class="users" aria-label="Login"></RouterLink>
 
-                <a href="#" class="carro" aria-label="Carrito"></a>
                 <button class="menu-toggle" id="menuToggle" aria-label="Menú" @click="toggleMenu">
                     {{ isMenuOpen ? '✕' : '☰' }}
                 </button>

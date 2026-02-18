@@ -11,8 +11,11 @@ Route::get('/user', function (Request $request) {
 // API Publica de Productos
 Route::apiResource('products', ProductController::class)->only(['index', 'show']);
 Route::post('/register', [App\Http\Controllers\Auth\RegisteredUserController::class, 'store']); // Registration for API
+Route::post('/import', [App\Http\Controllers\ProductImportController::class, 'importApi']);
+
 
 Route::middleware(['web', 'auth:web'])->group(function () {
     Route::post('/reviews', [App\Http\Controllers\Api\ReviewController::class, 'store']);
+    Route::put('/reviews/{id}', [App\Http\Controllers\Api\ReviewController::class, 'update']);
     Route::delete('/reviews/{id}', [App\Http\Controllers\Api\ReviewController::class, 'destroy']);
 });

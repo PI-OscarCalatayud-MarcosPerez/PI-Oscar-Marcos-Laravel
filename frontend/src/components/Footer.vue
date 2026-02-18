@@ -7,11 +7,11 @@
         </div>
         <div class="col-md-6 text-center mb-4 mb-md-0">
           <div class="d-flex justify-content-center gap-5 footer-enlaces">
-            <div class="text-start">
+            <div class="text-center">
               <h6 class="text-uppercase fw-bold text-white">Help</h6>
               <a href="#">FAQ</a><br /><a href="#">Service</a><br /><a href="#">Guides</a>
             </div>
-            <div class="text-start">
+            <div class="text-center">
               <h6 class="text-uppercase fw-bold text-white">Other</h6>
               <a href="#">Privacy</a><br /><a href="#">Sitemap</a>
             </div>

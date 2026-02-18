@@ -101,18 +101,6 @@ const handleSubmit = () => {
     </div>
   </main>
 
-  <div class="container-fluid breadcrumb-container">
-    <div class="container px-md-5">
-      <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item">
-            <RouterLink to="/" style="color:#fa4841; text-decoration:none;">Inicio</RouterLink>
-          </li>
-          <li class="breadcrumb-item active" aria-current="page">Contacto</li>
-        </ol>
-      </nav>
-    </div>
-  </div>
 </template>
 
 <style>

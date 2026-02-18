@@ -4,9 +4,9 @@
     margin: 0 auto;
     padding: 40px 20px;
     min-height: 60vh;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
+    display: grid;
+    justify-items: center;
+    align-items: start;
     margin-top: 20px;
 }
 
@@ -36,8 +36,8 @@
 
 .grupo-input {
     margin-bottom: 20px;
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    gap: 0;
 }
 
 .grupo-input label {
@@ -62,12 +62,10 @@
     transition: all 0.3s ease;
 }
 
-/* Efecto al hacer clic (Foco) */
 .grupo-input input:focus,
 .grupo-input select:focus,
 .grupo-input textarea:focus {
     border-color: #fa4841;
-    /* Naranja */
     outline: none;
     background-color: #fff;
     box-shadow: 0 0 0 3px rgba(250, 72, 65, 0.1);
@@ -77,14 +75,14 @@
 .grupo-checkbox {
     margin-top: 15px;
     margin-bottom: 25px;
-    display: flex;
-    flex-direction: column;
+    display: grid;
 }
 
 .grupo-checkbox label {
     color: #333;
     cursor: pointer;
-    display: flex;
+    display: grid;
+    grid-template-columns: auto 1fr;
     align-items: center;
     gap: 10px;
 }

@@ -2,9 +2,29 @@
 import { ref, onMounted, computed, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import ProductService from '../services/ProductService'
+import { useCartStore } from '@/modules/cart/store/cartStore'
+import { useUiStore } from '@/stores/uiStore'
 
 const router = useRouter()
 const route = useRoute()
+const cartStore = useCartStore()
+const ui = useUiStore()
+
+const addToCart = (product) => {
+    cartStore.addItem({
+        id: product.id,
+        title: product.nombre,
+        price: parseFloat(product.precio),
+        image: getImage(product),
+        quantity: 1
+    })
+    ui.showToast('success', 'Producto añadido al carrito')
+}
+
+const buyNow = (product) => {
+    addToCart(product)
+    router.push('/cart') // Or /checkout if user prefers
+}
 
 // State
 const products = ref([])
@@ -57,8 +77,6 @@ const getImage = (product) => {
 const filteredProducts = computed(() => {
     let filtered = products.value;
 
-    // 1. Search Text (if provided via query param or generic search)
-    // If you have a global search bus/store, use that. For now using query param q
     const queryQ = route.query.q ? normalizar(route.query.q) : "";
     if (queryQ) {
         filtered = filtered.filter(p => {
@@ -123,19 +141,6 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="container-fluid breadcrumb-container"
-        style="background-color: #f8f9fa; padding: 10px 0; margin-bottom: 20px;">
-        <div class="container px-md-5">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb" style="margin: 0;">
-                    <li class="breadcrumb-item">
-                        <RouterLink to="/" style="color:#fa4841; text-decoration:none;">Inicio</RouterLink>
-                    </li>
-                    <li class="breadcrumb-item active" aria-current="page">Tienda</li>
-                </ol>
-            </nav>
-        </div>
-    </div>
 
     <div class="shop-container container-fluid px-md-5">
         <!-- Sidebar -->
@@ -183,12 +188,13 @@ onMounted(() => {
                 <div v-if="error">{{ error }}</div>
 
                 <div v-for="product in filteredProducts" :key="product.id" class="shop-item"
-                    @click="goToProduct(product.id)" :title="'Ver detalles de ' + product.nombre">
-                    <div class="shop-item-img"
-                        :style="{ backgroundImage: 'url(' + getImage(product) + ')', backgroundSize: 'cover', backgroundPosition: 'center', height: '200px' }">
+                    :title="'Ver detalles de ' + product.nombre">
+                    <div class="shop-item-img" @click="goToProduct(product.id)"
+                        :style="{ backgroundImage: 'url(' + getImage(product) + ')', backgroundSize: 'cover', backgroundPosition: 'center', height: '200px', cursor: 'pointer' }">
                     </div>
                     <div class="shop-item-info">
-                        <p class="shop-item-title">{{ product.nombre }}</p>
+                        <p class="shop-item-title" @click="goToProduct(product.id)" style="cursor:pointer">{{
+                            product.nombre }}</p>
                         <p style="font-size:0.9rem; color:#666;">{{ product.categoria }}</p>
                         <p class="shop-item-price">{{ parseFloat(product.precio).toFixed(2) }}€</p>
                     </div>

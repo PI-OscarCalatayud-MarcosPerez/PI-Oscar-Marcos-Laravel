@@ -9,6 +9,7 @@ const RULES = {
         "moderate",
         "manage_users",
         "delete-comments",
+        "sell",
     ],
     gerent: ["create", "edit", "delete", "moderate", "sell"],
     venedor: ["create", "edit", "sell"],

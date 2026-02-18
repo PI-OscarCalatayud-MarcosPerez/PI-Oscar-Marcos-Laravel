@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
-import { apiLogin, apiLogout, apiGetUser } from "../api";
+import { apiLogin, apiGetUser, apiLogout } from "../services/authService";
+import http from "@/services/http";
 
 export const useAuthStore = defineStore("auth", {
     state: () => ({
@@ -9,18 +10,27 @@ export const useAuthStore = defineStore("auth", {
     }),
 
     getters: {
-        isAuthenticated: (state) => !!state.token,
+        isAuthenticated: (state) => !!state.token || !!state.user,
         role: (state) => state.user?.role ?? null,
     },
 
     actions: {
         async login(credentials) {
             try {
-                const { token, user } = await apiLogin(credentials);
-                this.token = token;
-                this.user = user;
-                localStorage.setItem("token", token);
-                console.log("Login successful:", user);
+                const { data } = await apiLogin(credentials);
+                const response = data;
+                if (response && response.token) {
+                    this.token = response.token;
+                    localStorage.setItem("token", response.token);
+                }
+
+                if (!response.user) {
+                    this.user = await apiGetUser();
+                } else {
+                    this.user = response.user;
+                }
+
+                console.log("Login successful:", this.user);
             } catch (error) {
                 console.error("Login error:", error);
                 throw error;
@@ -28,7 +38,6 @@ export const useAuthStore = defineStore("auth", {
         },
 
         async register(userData) {
-            // ... (mantener igual si no se usa mucho aun)
             const { data } = await http.post("/api/register", userData);
             const { token, user } = data;
             this.token = token;
@@ -64,7 +73,6 @@ export const useAuthStore = defineStore("auth", {
                 console.log("Bootstrap success:", this.user);
             } catch (error) {
                 console.error("Bootstrap error:", error);
-                // Solo hacer logout si es error de autenticación (401)
                 if (error.response?.status === 401) {
                     this.hardLogout();
                 }

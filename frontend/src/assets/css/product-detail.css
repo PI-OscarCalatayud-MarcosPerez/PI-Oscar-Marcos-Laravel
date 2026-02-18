@@ -74,24 +74,7 @@
     margin-bottom: 30px;
 }
 
-.btn-buy-large {
-    display: block;
-    width: 100%;
-    max-width: 300px;
-    background-color: #fa4841;
-    color: white;
-    padding: 15px;
-    font-size: 20px;
-    text-align: center;
-    text-decoration: none;
-    border-radius: 8px;
-    border: none;
-    cursor: pointer;
-}
-
-.btn-buy-large:hover {
-    background-color: #e03f39;
-}
+/* .btn-buy-large styles moved below to combine with flex layout */
 
 .reviews-container {
     max-width: 800px;
@@ -117,7 +100,7 @@
 }
 
 .rating-stars .filled {
-    color: #ffc700;
+    color: #fa4841;
 }
 
 .review-form-card {
@@ -169,12 +152,12 @@
 }
 
 .rate input:checked ~ label {
-    color: #ffc700;
+    color: #fa4841;
 }
 
 .rate:not(:checked) > label:hover,
 .rate:not(:checked) > label:hover ~ label {
-    color: #ffc700;
+    color: #fa4841;
 }
 
 .comment-item {
@@ -234,43 +217,61 @@
     background-color: transparent;
 }
 
-.icon-delete {
-    width: 28px;
-    height: 28px;
-    content: url("/img/borrar2.png");
+/* CSS Grid Layout for Product Actions */
+.product-actions {
+    display: grid;
+    grid-template-columns: auto auto;
+    gap: 10px;
+    margin-top: 20px;
+    width: fit-content;
 }
 
-@media (max-width: 900px) {
-    .product-detail-container {
-        padding: 20px;
-    }
-
-    .product-image {
-        width: 100%;
-        float: none;
-        margin-right: 0;
-        text-align: center;
-        margin-bottom: 30px;
-    }
-
-    .product-image img {
-        max-width: 80%;
-        margin: 0 auto;
-    }
-
-    .product-info {
-        width: 100%;
-        float: none;
-    }
-
-    .btn-buy-large {
-        width: 100%;
-    }
+.btn-buy-large {
+    display: grid;
+    place-items: center;
+    width: 280px;
+    height: 55px;
+    background-color: #fa4841;
+    color: white;
+    font-size: 20px;
+    font-weight: bold;
+    text-decoration: none;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    padding: 0 20px;
+    transition: background 0.3s;
 }
 
-.item:focus,
-.btn-buy-large:focus {
-    outline: 4px solid #fa4841;
-    outline-offset: 2px;
-    z-index: 1000;
+.btn-buy-large:hover {
+    background-color: #e03f39;
+}
+
+.reviews-container {
+    max-width: 800px;
+    width: 100%;
+    margin: 0 auto 50px auto;
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+/* ... existing styles ... */
+
+.btn-add-cart {
+    background-color: #fa4841;
+    border: none;
+    border-radius: 8px;
+    width: 60px;
+    height: 55px;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+}
+
+.btn-add-cart img {
+    filter: brightness(0) invert(1);
+    width: 24px;
+    height: 24px;
 }

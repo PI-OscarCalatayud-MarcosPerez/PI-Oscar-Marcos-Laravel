@@ -37,18 +37,27 @@ const getRoleLabel = (role) => {
 
             <div class="profile-info">
                 <div class="info-item">
-                    <label>📧 Email</label>
-                    <p>{{ auth.user?.email || 'No disponible' }}</p>
+                    <img src="/img/sobre_rojo.png" alt="Email" class="profile-icon" />
+                    <div>
+                        <label>Email</label>
+                        <p>{{ auth.user?.email || 'No disponible' }}</p>
+                    </div>
                 </div>
 
                 <div class="info-item" v-if="auth.user?.last_name">
-                    <label>👤 Apellidos</label>
-                    <p>{{ auth.user?.last_name }}</p>
+                    <img src="/img/usuario.png" alt="Apellidos" class="profile-icon" />
+                    <div>
+                        <label>Apellidos</label>
+                        <p>{{ auth.user?.last_name }}</p>
+                    </div>
                 </div>
 
                 <div class="info-item" v-if="auth.user?.username">
-                    <label>🔖 Usuario</label>
-                    <p>{{ auth.user?.username }}</p>
+                    <img src="/img/usuario1.png" alt="Usuario" class="profile-icon" />
+                    <div>
+                        <label>Usuario</label>
+                        <p>{{ auth.user?.username }}</p>
+                    </div>
                 </div>
             </div>
 
