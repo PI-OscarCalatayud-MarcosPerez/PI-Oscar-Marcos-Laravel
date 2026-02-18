@@ -142,8 +142,57 @@
     color: #fa4841;
     font-weight: bold;
     font-size: 19px;
+    margin: 0;
+}
+
+.price-action-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
     margin-top: 10px;
-    display: block;
+}
+
+.action-buttons {
+    display: grid;
+    grid-auto-flow: column;
+    gap: 8px;
+}
+
+.btn-buy {
+    background-color: #fa4841;
+    color: white;
+    border: none;
+    padding: 5px 12px;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s;
+}
+
+.btn-buy:hover {
+    background-color: #e03f39;
+}
+
+.btn-cart-icon {
+    background-color: #333;
+    border: none;
+    padding: 5px 8px;
+    border-radius: 5px;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    transition: background-color 0.2s;
+}
+
+.btn-cart-icon img {
+    width: 20px;
+    height: 20px;
+    filter: invert(1);
+}
+
+.btn-cart-icon:hover {
+    background-color: #555;
 }
 
 /* Responsive */

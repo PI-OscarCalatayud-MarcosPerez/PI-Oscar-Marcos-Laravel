@@ -1,0 +1,209 @@
+/* Estilos para el Carrito - Layout Grid (Sin Flexbox) */
+
+.cart-container {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 0 20px;
+    font-family: "Inter", sans-serif;
+}
+
+.cart-title {
+    font-size: 32px;
+    margin-bottom: 30px;
+    color: #0e273f;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 10px;
+}
+
+/* Layout Principal con CSS Grid */
+.cart-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr; /* 2 partes para productos, 1 para resumen */
+    gap: 40px;
+    align-items: start;
+}
+
+/* Columna de Productos */
+.cart-items {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.cart-item {
+    display: grid;
+    grid-template-columns: 100px auto 120px; /* Imagen, Detalles, Precio */
+    gap: 20px;
+    padding: 20px 0;
+    border-bottom: 1px solid #eee;
+    align-items: center;
+}
+
+.cart-item:last-child {
+    border-bottom: none;
+}
+
+.item-image img {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    object-fit: cover;
+}
+
+.item-details h3 {
+    margin: 0 0 10px 0;
+    font-size: 18px;
+    color: #333;
+}
+
+.item-quantity {
+    display: inline-block;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.item-quantity button {
+    background: #f8f9fa;
+    border: none;
+    padding: 5px 12px;
+    cursor: pointer;
+    font-size: 16px;
+    color: #333;
+}
+
+.item-quantity span {
+    display: inline-block;
+    padding: 5px 10px;
+    font-weight: 600;
+}
+
+.item-price {
+    text-align: right;
+    font-weight: bold;
+    font-size: 18px;
+    color: #0e273f;
+}
+
+.remove-btn {
+    display: grid;
+    place-items: center;
+    background-color: #fa4841;
+    border: none;
+    cursor: pointer;
+    margin-top: 10px;
+    margin-left: auto;
+    padding: 10px;
+    border-radius: 8px;
+    width: 44px;
+    height: 44px;
+    transition: none;
+}
+
+.remove-btn img {
+    width: 24px;
+    height: 24px;
+    opacity: 1;
+    /* Icono blanco */
+    filter: brightness(0) invert(1);
+}
+
+/* Sin efecto hover (mismo color) */
+.remove-btn:hover {
+    background-color: #fa4841;
+    opacity: 1;
+}
+
+/* Columna de Resumen */
+.cart-summary {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 30px;
+    border: 1px solid #eee;
+    position: sticky;
+    top: 20px;
+}
+
+.cart-summary h2 {
+    font-size: 22px;
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #0e273f;
+}
+
+.summary-row {
+    display: grid;
+    grid-template-columns: 1fr auto; /* Texto izquierda, Precio derecha */
+    margin-bottom: 15px;
+    color: #555;
+    font-size: 16px;
+}
+
+.coupon-section {
+    margin: 20px 0;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 10px;
+}
+
+.coupon-section input {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+}
+
+.coupon-section button {
+    background: #333;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 0 15px;
+    cursor: pointer;
+}
+
+.terms-section {
+    margin: 20px 0;
+    font-size: 14px;
+    color: #666;
+}
+
+.terms-section input {
+    margin-right: 8px;
+}
+
+.total-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 2px solid #ddd;
+    font-size: 24px;
+    font-weight: bold;
+    color: #0e273f;
+}
+
+.checkout-btn {
+    width: 100%;
+    background: #fa4841; /* Color corporativo */
+    color: white;
+    border: none;
+    padding: 15px;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 20px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.checkout-btn:hover {
+    background: #e03f39;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .cart-grid {
+        grid-template-columns: 1fr; /* Una sola columna en móviles */
+    }
+}

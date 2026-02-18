@@ -1,6 +1,3 @@
-/* --- CSS ESTÁTICO (Diseño Limpio + Bootstrap) --- */
-
-/* --- HTML Y BODY --- */
 html {
     scrollbar-width: none;
     scroll-behavior: smooth;
@@ -21,7 +18,6 @@ body {
     background-color: #eaf2f2;
 }
 
-/* --- BARRA DE AVISO --- */
 .aviso-slider {
     background-color: #515151;
     width: 100%;
@@ -64,7 +60,6 @@ body {
     }
 }
 
-/* --- CABECERA --- */
 header {
     background-color: #0e273f;
     min-height: 92px;
@@ -113,7 +108,6 @@ header {
     color: #fa4841;
 }
 
-/* Icono de hamburguesa */
 .menu-toggle {
     display: none;
     background: none;
@@ -125,7 +119,6 @@ header {
     line-height: 1;
 }
 
-/* Búsqueda y acciones */
 .busqueda input {
     width: 200px;
     height: 40px;
@@ -166,7 +159,6 @@ header {
     background-image: url("/img/carrito1.png");
 }
 
-/* --- INICIO / HERO --- */
 .inicio-container {
     position: relative;
     height: 500px;
@@ -253,7 +245,6 @@ header {
     display: none;
 }
 
-/* Estilos de ITEMS (Estos son los que crea tu JS dinámico) */
 .item {
     display: inline-block;
     vertical-align: top;
@@ -314,7 +305,6 @@ header {
     margin-top: 10px;
 }
 
-/* Hover Desktop */
 @media (min-width: 992px) {
     .item:hover {
         width: 350px;
@@ -389,7 +379,6 @@ header {
     right: 15px;
 }
 
-/* --- CATEGORÍAS --- */
 .categorias-section {
     background-color: #2e4b6e;
     padding: 60px 0;
@@ -420,7 +409,6 @@ header {
     transform: scale(1.05);
 }
 
-/* --- FOOTER --- */
 footer {
     background-color: #0e273f;
     color: white;
@@ -442,7 +430,6 @@ footer {
     color: white;
 }
 
-/* --- MEDIA QUERIES (RESPONSIVE) --- */
 @media (max-width: 991px) {
     .menu-toggle {
         display: block;
@@ -503,7 +490,6 @@ footer {
         display: none;
     }
 
-    /* Ocultar video en móvil */
     .video-background {
         background-size: cover;
         background-position: center;

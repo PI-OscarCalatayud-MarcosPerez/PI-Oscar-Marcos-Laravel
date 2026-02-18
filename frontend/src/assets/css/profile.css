@@ -1,4 +1,4 @@
-/* Estilos para ProfileView - Diseño mejorado */
+/* Estilos para ProfileView */
 
 .profile-container {
     min-height: 640px;
@@ -68,12 +68,22 @@
 }
 
 .info-item {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
     padding: 20px;
     margin-bottom: 15px;
     background: #f8f9fa;
     border-radius: 12px;
     border-left: 4px solid #0e273f;
     transition: all 0.3s;
+}
+
+.profile-icon {
+    width: 40px;
+    height: 40px;
+    margin-right: 20px;
+    object-fit: contain;
 }
 
 .info-item:hover {

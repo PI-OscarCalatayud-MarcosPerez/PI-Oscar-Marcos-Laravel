@@ -16,7 +16,7 @@ async function handleLogin() {
     try {
         await auth.login(form)
         ui.showToast('success', 'Sesión iniciada')
-        router.push(route.query.redirect || '/')
+        router.push(route.query.redirect || '/profile')
     } catch (err) {
         ui.showToast('error', 'Credenciales incorrectas')
     }

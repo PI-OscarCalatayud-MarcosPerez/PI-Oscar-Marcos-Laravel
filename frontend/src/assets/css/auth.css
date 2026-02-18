@@ -3,9 +3,8 @@ body {
     background-color: #eaf2f2;
 }
 .login-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    display: grid;
+    place-items: center;
     min-height: 80vh;
     padding: 20px;
 }
@@ -42,19 +41,17 @@ body {
     box-sizing: border-box;
     transition: border-color 0.3s;
 }
-/* SPECIFIC FIX FOR CHECKBOX */
 .checkbox-group {
-    display: flex;
+    display: grid;
+    grid-template-columns: auto 1fr;
     align-items: center;
-    justify-content: flex-start;
 }
 .checkbox-group input[type="checkbox"] {
-    width: auto; /* Reset width for checkbox */
+    width: auto;
     margin-right: 10px;
-    flex-shrink: 0; /* Prevent shrinking */
 }
 .checkbox-group label {
-    margin-bottom: 0; /* Align perfectly with checkbox */
+    margin-bottom: 0;
 }
 
 .form-group input:focus {

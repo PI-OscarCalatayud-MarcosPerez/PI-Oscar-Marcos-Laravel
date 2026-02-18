@@ -141,4 +141,129 @@ class ProductImportController extends Controller
 
         return view('pages.formulario', compact('messages', 'csvErrors', 'rowErrors', 'importedCount'));
     }
+
+    /**
+     * API Version: Procesa la subida del archivo CSV y devuelve JSON.
+     */
+    public function importApi(Request $request)
+    {
+        // 1. Validar subida
+        $request->validate([
+            'arxiuCsv' => 'required|file|mimes:csv,txt|max:2048', // 2MB máximo
+        ]);
+
+        $file = $request->file('arxiuCsv');
+        $path = $file->getRealPath();
+
+        $messages = [];
+        $csvErrors = [];
+        $rowErrors = [];
+        $importedCount = 0;
+        $nuevosAgregados = 0;
+
+        $expectedHeaders = ['id', 'nombre', 'descripcion', 'precio', 'img', 'estoc', 'categoria'];
+
+        // 2. Abrir fichero
+        if (($handle = fopen($path, "r")) !== FALSE) {
+            $headerRow = fgetcsv($handle, 1000, ",");
+
+            if ($headerRow) {
+                // Limpieza BOM y comillas
+                $headerRow[0] = preg_replace('/^\xEF\xBB\xBF/', '', $headerRow[0]);
+
+                if (count($headerRow) === 1)
+                    $headerRow = str_getcsv(trim($headerRow[0], '"'), ",");
+
+                $headers = array_map('strtolower', array_map('trim', $headerRow));
+                $headerMap = array_flip($headers);
+
+                // Validar columnas
+                $missing = array_diff($expectedHeaders, $headers);
+                if (!empty($missing)) {
+                    $csvErrors[] = "Faltan columnas: " . implode(', ', $missing);
+                } else {
+                    $rowNum = 1;
+
+                    while (($row = fgetcsv($handle, 1000, ",")) !== FALSE) {
+                        $rowNum++;
+
+                        if (count($row) === 1) {
+                            $row = str_getcsv(trim($row[0], '"'), ",");
+                            foreach ($row as $k => $v)
+                                $row[$k] = str_replace('""', '"', $v);
+                        }
+
+                        if (implode('', $row) == '')
+                            continue;
+
+                        if (count($row) != count($headers)) {
+                            $rowErrors[] = "Fila $rowNum ignorada: Columnas insuficientes.";
+                            continue;
+                        }
+
+                        // Mapear datos
+                        $id = (int) $row[$headerMap['id']];
+                        $nom = trim($row[$headerMap['nombre']]);
+                        $preu = (float) str_replace(',', '.', $row[$headerMap['precio']]);
+                        $estoc = (int) $row[$headerMap['estoc']];
+                        $categoria = trim($row[$headerMap['categoria']]);
+                        $img = trim($row[$headerMap['img']]);
+                        $descripcio = trim($row[$headerMap['descripcion']]);
+
+                        if (Product::find($id)) {
+                            $rowErrors[] = "Fila $rowNum ignorada: El ID $id ya existe.";
+                            continue;
+                        }
+
+                        $sku = 'JUEGO-' . $id;
+                        if (Product::where('sku', $sku)->exists()) {
+                            $rowErrors[] = "Fila $rowNum ignorada: El SKU $sku ya existe.";
+                            continue;
+                        }
+
+                        if (empty($nom) || $preu <= 0 || $estoc < 0) {
+                            $rowErrors[] = "Fila $rowNum ignorada: Datos inválidos ($nom).";
+                            continue;
+                        }
+
+                        try {
+                            $product = new Product();
+                            $product->id = $id;
+                            $product->sku = $sku;
+                            $product->nombre = $nom;
+                            $product->descripcion = $descripcio;
+                            $product->precio = $preu;
+                            $product->stock = $estoc;
+                            $product->imagen_url = $img;
+                            $product->categoria = $categoria;
+                            $product->save();
+
+                            $nuevosAgregados++;
+                        } catch (\Exception $e) {
+                            $rowErrors[] = "Fila $rowNum error al guardar: " . $e->getMessage();
+                        }
+                    }
+                }
+            } else {
+                $csvErrors[] = "El archivo CSV está vacío o no se puede leer.";
+            }
+            fclose($handle);
+        } else {
+            $csvErrors[] = "No se pudo abrir el archivo CSV.";
+        }
+
+        if ($nuevosAgregados > 0) {
+            $importedCount = $nuevosAgregados;
+            $totalCount = Product::count();
+            $messages[] = "Proceso completado. $importedCount productos añadidos. Total: $totalCount.";
+        }
+
+        return response()->json([
+            'success' => true,
+            'imported_count' => $importedCount,
+            'messages' => $messages,
+            'errors' => $csvErrors,
+            'row_warnings' => $rowErrors
+        ]);
+    }
 }

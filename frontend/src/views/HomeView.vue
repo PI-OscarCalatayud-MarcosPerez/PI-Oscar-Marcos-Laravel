@@ -181,15 +181,6 @@ onMounted(() => {
     </section>
   </main>
 
-  <div class="container-fluid breadcrumb-container">
-    <div class="container px-md-5">
-      <nav aria-label="breadcrumb">
-        <ol class="breadcrumb" id="breadcrumbs-list">
-          <li class="breadcrumb-item active" aria-current="page">Inicio</li>
-        </ol>
-      </nav>
-    </div>
-  </div>
 </template>
 
 <style>
