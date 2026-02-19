@@ -35,7 +35,7 @@ const submitForm = async () => {
         formData.append('stock', form.value.stock);
         formData.append('categoria', form.value.categoria);
         formData.append('seccion', form.value.seccion || ''); // Opcional
-        
+
         if (form.value.imagen) {
             formData.append('imagen', form.value.imagen);
         }
@@ -50,14 +50,14 @@ const submitForm = async () => {
         setTimeout(() => {
             router.push('/products');
         }, 2000);
-        
+
     } catch (err) {
         console.error(err);
         if (err.response && err.response.status === 401) {
-             error.value = "Tu sesión ha expirado. Por favor, inicia sesión nuevamente.";
-             // Opcional: router.push('/login');
+            error.value = "Tu sesión ha expirado. Por favor, inicia sesión nuevamente.";
+            // Opcional: router.push('/login');
         } else {
-             error.value = err.response?.data?.message || "Error al crear el producto.";
+            error.value = err.response?.data?.message || "Error al crear el producto.";
         }
     } finally {
         loading.value = false;
@@ -68,11 +68,11 @@ const submitForm = async () => {
 <template>
     <div class="container my-5">
         <h2 class="text-center mb-4">Vender Producto</h2>
-        
+
         <div v-if="success" class="alert alert-success">
             Producto creado exitosamente. Redirigiendo...
         </div>
-        
+
         <div v-if="error" class="alert alert-danger">
             {{ error }}
         </div>
@@ -91,7 +91,8 @@ const submitForm = async () => {
             <div class="row">
                 <div class="col-md-6 mb-3">
                     <label for="precio" class="form-label">Precio (€)</label>
-                    <input type="number" id="precio" v-model="form.precio" class="form-control" step="0.01" min="0" required />
+                    <input type="number" id="precio" v-model="form.precio" class="form-control" step="0.01" min="0"
+                        required />
                 </div>
                 <div class="col-md-6 mb-3">
                     <label for="stock" class="form-label">Stock</label>
@@ -111,7 +112,8 @@ const submitForm = async () => {
                 </div>
                 <div class="col-md-6 mb-3">
                     <label for="seccion" class="form-label">Sección (Opcional)</label>
-                    <input type="text" id="seccion" v-model="form.seccion" class="form-control" placeholder="Ej. RPG, Acción" />
+                    <input type="text" id="seccion" v-model="form.seccion" class="form-control"
+                        placeholder="Ej. RPG, Acción" />
                 </div>
             </div>
 
@@ -127,6 +129,6 @@ const submitForm = async () => {
     </div>
 </template>
 
-<style scoped>
-/* Estilos adicionales si es necesario, heredando de Bootstrap */
+<style>
+@import '../assets/css/sell.css';
 </style>

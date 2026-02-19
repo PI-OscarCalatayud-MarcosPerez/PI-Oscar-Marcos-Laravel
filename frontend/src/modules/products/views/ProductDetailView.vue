@@ -10,6 +10,7 @@ import http from '@/services/http';
 import RoleGuard from '../../roles/components/RoleGuard.vue';
 
 
+
 const route = useRoute();
 const router = useRouter();
 const authStore = useAuthStore();
@@ -299,7 +300,8 @@ onMounted(async () => {
                                 <div class="comment-actions" style="float:right;">
                                     <button v-if="canEditReview(review)" class="btn-action-comment"
                                         @click="startEdit(review)" title="Editar comentario">
-                                        <span style="font-size:20px; color:#555;">✎</span>
+                                        <img src="/img/lapiz.png" alt="Editar" class="icon-action"
+                                            style="width:20px; vertical-align:middle;" />
                                     </button>
                                     <button
                                         v-if="hasRole('admin', 'gerent') || (authStore.user && authStore.user.id === review.user_id)"
@@ -322,37 +324,4 @@ onMounted(async () => {
 
 <style>
 @import '../../../assets/css/product-detail.css';
-
-.btn-action-comment {
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 0 5px;
-    opacity: 0.7;
-    transition: opacity 0.2s;
-}
-
-.btn-action-comment:hover {
-    opacity: 1;
-}
-
-.btn-save-edit,
-.btn-cancel-edit {
-    padding: 5px 15px;
-    border-radius: 5px;
-    border: none;
-    cursor: pointer;
-    margin-right: 10px;
-    font-size: 14px;
-}
-
-.btn-save-edit {
-    background-color: #fa4841;
-    color: white;
-}
-
-.btn-cancel-edit {
-    background-color: #ccc;
-    color: #333;
-}
 </style>
