@@ -1,22 +1,33 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import http from '../services/http'; // Usamos la instancia configurada con interceptores
+import CategoryService from '../modules/products/services/CategoryService';
 
 const router = useRouter();
 const loading = ref(false);
 const error = ref(null);
 const success = ref(false);
+const categories = ref([]);
 
 const form = ref({
     nombre: '',
     descripcion: '',
     precio: '',
     stock: '',
-    categoria: '',
+    category_id: null,
     seccion: '',
     imagen: null
 });
+
+const fetchCategories = async () => {
+    try {
+        const response = await CategoryService.getCategories();
+        categories.value = response.data;
+    } catch (err) {
+        console.error("Error fetching categories:", err);
+    }
+};
 
 const handleFileUpload = (event) => {
     form.value.imagen = event.target.files[0];
@@ -33,7 +44,9 @@ const submitForm = async () => {
         formData.append('descripcion', form.value.descripcion);
         formData.append('precio', form.value.precio);
         formData.append('stock', form.value.stock);
-        formData.append('categoria', form.value.categoria);
+        if (form.value.category_id) {
+            formData.append('category_id', form.value.category_id);
+        }
         formData.append('seccion', form.value.seccion || ''); // Opcional
 
         if (form.value.imagen) {
@@ -63,6 +76,10 @@ const submitForm = async () => {
         loading.value = false;
     }
 };
+
+onMounted(() => {
+    fetchCategories();
+});
 </script>
 
 <template>
@@ -103,11 +120,11 @@ const submitForm = async () => {
             <div class="row">
                 <div class="col-md-6 mb-3">
                     <label for="categoria" class="form-label">Categoría</label>
-                    <select id="categoria" v-model="form.categoria" class="form-select">
-                        <option value="">Seleccionar...</option>
-                        <option value="videojuegos">Videojuegos</option>
-                        <option value="consolas">Consolas</option>
-                        <option value="accesorios">Accesorios</option>
+                    <select id="categoria" v-model="form.category_id" class="form-select">
+                        <option :value="null">Seleccionar...</option>
+                        <option v-for="cat in categories" :key="cat.id" :value="cat.id">
+                            {{ cat.name }}
+                        </option>
                     </select>
                 </div>
                 <div class="col-md-6 mb-3">
@@ -122,7 +139,7 @@ const submitForm = async () => {
                 <input type="file" id="imagen" @change="handleFileUpload" class="form-control" accept="image/*" />
             </div>
 
-            <button type="submit" class="btn btn-primary w-100" :disabled="loading">
+            <button type="submit" class="btn btn-publicar w-100" :disabled="loading">
                 {{ loading ? 'Publicando...' : 'Publicar Producto' }}
             </button>
         </form>

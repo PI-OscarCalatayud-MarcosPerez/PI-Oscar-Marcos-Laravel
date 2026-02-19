@@ -1,1 +1,19 @@
 /* SellView CSS */
+
+.btn-publicar {
+    background-color: #fa4841;
+    border-color: #fa4841;
+    color: white;
+    font-weight: bold;
+    transition: none; /* Remove transition if any */
+}
+
+.btn-publicar:hover,
+.btn-publicar:focus,
+.btn-publicar:active {
+    background-color: #fa4841 !important;
+    border-color: #fa4841 !important;
+    color: white !important;
+    box-shadow: none !important;
+    transform: none !important;
+}

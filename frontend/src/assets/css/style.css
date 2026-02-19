@@ -18,6 +18,11 @@ body {
     background-color: #eaf2f2;
 }
 
+.badge-discount {
+    background-color: #fa4841 !important;
+    color: white;
+}
+
 .aviso-slider {
     background-color: #515151;
     width: 100%;
