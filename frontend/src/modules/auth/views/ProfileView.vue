@@ -1,26 +1,18 @@
 <script setup>
-import { useAuthStore } from '../store/authStore';
-import { useRouter } from 'vue-router';
-import RoleGuard from '../../roles/components/RoleGuard.vue';
+import { useAuthStore } from '@/modules/auth/store/authStore'
+import { useRouter } from 'vue-router'
+import { useRole } from '@/modules/roles/composables/useRole'
+import RoleBadge from '@/modules/roles/components/RoleBadge.vue'
+import UiToast from '@/components/UiToast.vue'
 
-const authStore = useAuthStore();
-const router = useRouter();
+const auth = useAuthStore()
+const router = useRouter()
+const { hasRole } = useRole()
 
 const handleLogout = async () => {
-    await authStore.logout();
-    router.push('/login');
-};
-
-const getRoleBadgeClass = (role) => {
-    const classes = {
-        admin: 'badge-admin',
-        gerent: 'badge-admin',
-        venedor: 'badge-venedor',
-        editor: 'badge-editor',
-        user: 'badge-user'
-    };
-    return classes[role] || 'badge-user';
-};
+    await auth.logout()
+    router.push('/login')
+}
 
 const getRoleLabel = (role) => {
     const labels = {
@@ -29,176 +21,53 @@ const getRoleLabel = (role) => {
         venedor: 'Vendedor',
         editor: 'Editor',
         user: 'Usuario'
-    };
-    return labels[role] || 'Usuario';
-};
+    }
+    return labels[role] || 'Usuario'
+}
 </script>
 
 <template>
+    <UiToast />
     <div class="profile-container">
         <div class="profile-card">
-            <h2>Mi Perfil</h2>
+            <div class="profile-header">
+                <h1 class="profile-name">{{ auth.user?.name || 'Usuario' }}</h1>
+                <RoleBadge :role="auth.user?.role" />
+            </div>
 
             <div class="profile-info">
                 <div class="info-item">
-                    <label>Nombre:</label>
-                    <p>{{ authStore.user?.name || 'Usuario' }}</p>
+                    <label>📧 Email</label>
+                    <p>{{ auth.user?.email || 'No disponible' }}</p>
                 </div>
 
-                <div class="info-item">
-                    <label>Email:</label>
-                    <p>{{ authStore.user?.email || 'No disponible' }}</p>
+                <div class="info-item" v-if="auth.user?.last_name">
+                    <label>👤 Apellidos</label>
+                    <p>{{ auth.user?.last_name }}</p>
                 </div>
 
-                <div class="info-item">
-                    <label>Rol:</label>
-                    <span :class="['role-badge', getRoleBadgeClass(authStore.user?.role)]">
-                        {{ getRoleLabel(authStore.user?.role) }}
-                    </span>
+                <div class="info-item" v-if="auth.user?.username">
+                    <label>🔖 Usuario</label>
+                    <p>{{ auth.user?.username }}</p>
                 </div>
             </div>
 
             <div class="profile-actions">
-                <!-- Opciones específicas según rol -->
-                <RoleGuard permission="admin-panel">
-                    <button class="btn-admin" @click="router.push('/import')">
-                        🔧 Panel de Administración
-                    </button>
-                </RoleGuard>
+                <button v-if="hasRole('venedor', 'admin', 'gerent')" class="btn-action btn-upload"
+                    @click="router.push('/import')">
+                    <img src="/img/boton-circular-plus.png" alt="Subir" class="action-icon" />
+                    <span>Subir Productos</span>
+                </button>
 
-                <RoleGuard permission="create">
-                    <button class="btn-secondary" @click="router.push('/import')">
-                        ➕ Subir Productos
-                    </button>
-                </RoleGuard>
-
-                <button class="btn-logout" @click="handleLogout">
-                    🚪 Cerrar Sesión
+                <button class="btn-action btn-logout" @click="handleLogout">
+                    <img src="/img/puerta-abierta.png" alt="Salir" class="action-icon" />
+                    <span>Cerrar Sesión</span>
                 </button>
             </div>
         </div>
     </div>
 </template>
 
-<style scoped>
-.profile-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 60vh;
-    padding: 20px;
-}
-
-.profile-card {
-    background-color: white;
-    padding: 40px;
-    border-radius: 10px;
-    box-shadow: 0 10px 25px rgba(14, 39, 63, 0.15);
-    width: 100%;
-    max-width: 500px;
-}
-
-.profile-card h2 {
-    text-align: center;
-    color: #0e273f;
-    margin-top: 0;
-    margin-bottom: 30px;
-}
-
-.profile-info {
-    margin-bottom: 30px;
-}
-
-.info-item {
-    margin-bottom: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.info-item label {
-    font-weight: bold;
-    color: #0e273f;
-    font-size: 0.9rem;
-}
-
-.info-item p {
-    color: #555;
-    margin: 0;
-    font-size: 1rem;
-}
-
-.role-badge {
-    display: inline-block;
-    padding: 8px 16px;
-    border-radius: 6px;
-    font-weight: bold;
-    font-size: 0.9rem;
-    text-align: center;
-    max-width: fit-content;
-}
-
-.badge-admin {
-    background-color: #ff6b6b;
-    color: white;
-}
-
-.badge-venedor {
-    background-color: #4ecdc4;
-    color: white;
-}
-
-.badge-editor {
-    background-color: #95e1d3;
-    color: #0e273f;
-}
-
-.badge-user {
-    background-color: #e0e0e0;
-    color: #0e273f;
-}
-
-.profile-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.profile-actions button {
-    width: 100%;
-    padding: 14px;
-    border: none;
-    border-radius: 6px;
-    font-size: 1rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s;
-}
-
-.btn-admin {
-    background-color: #fa4841;
-    color: white;
-}
-
-.btn-admin:hover {
-    background-color: #d63a34;
-}
-
-.btn-secondary {
-    background-color: #4ecdc4;
-    color: white;
-}
-
-.btn-secondary:hover {
-    background-color: #3bb3ab;
-}
-
-.btn-logout {
-    background-color: #6c757d;
-    color: white;
-}
-
-.btn-logout:hover {
-    background-color: #5a6268;
-}
+<style>
+@import '../../../assets/css/profile.css';
 </style>

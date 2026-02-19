@@ -6,7 +6,7 @@ import { useRole } from '../modules/roles/composables/useRole';
 
 const authStore = useAuthStore();
 const router = useRouter();
-const { can } = useRole();
+const { can, hasRole } = useRole();
 const isMenuOpen = ref(false);
 
 const toggleMenu = () => {
@@ -26,22 +26,29 @@ const userName = computed(() => {
 <template>
     <div class="container-fluid px-md-5">
         <div class="nav-container">
-            <img src="/img/imagencolor.webp" alt="Logotipo MOKeys" class="logo-img" />
+            <RouterLink to="/">
+                <img src="/img/imagencolor.webp" alt="Logotipo MOKeys" class="logo-img" />
+            </RouterLink>
 
             <nav id="navLinks" aria-label="Menú principal">
                 <ul class="enlaces_navegacion" :class="{ active: isMenuOpen }">
                     <li>
-                        <RouterLink to="/">Inicio</RouterLink>
-                    </li>
-                    <li>
                         <RouterLink to="/products">Comprar</RouterLink>
                     </li>
-                    <li><a href="#">Vender</a></li>
+                    <li v-if="can('sell')">
+                        <a href="#">Vender</a>
+                    </li>
                     <li>
                         <RouterLink to="/contacto">Contacto</RouterLink>
                     </li>
-                    <li v-if="can('create')">
-                        <RouterLink to="/import">Subir</RouterLink>
+                    <li>
+                        <RouterLink to="/about">Sobre Nosotros</RouterLink>
+                    </li>
+                    <li v-if="hasRole('admin', 'gerent')">
+                        <RouterLink to="/import" class="link-with-icon">
+                            <img src="/img/boton-circular-plus.png" alt="Subir" class="icon-upload" />
+                            Subir
+                        </RouterLink>
                     </li>
                 </ul>
             </nav>
@@ -67,17 +74,6 @@ const userName = computed(() => {
     </div>
 </template>
 
-<style scoped>
-/* Inherits from style.css imported globally */
-.nav-container {
-    justify-content: space-between !important;
-    /* Force space-between to push items to edges */
-}
-
-.user-name {
-    color: #0e273f;
-    font-weight: 600;
-    font-size: 0.95rem;
-    margin-right: 8px;
-}
+<style>
+@import '../assets/css/navbar.css';
 </style>

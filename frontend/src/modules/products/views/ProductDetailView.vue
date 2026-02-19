@@ -2,19 +2,18 @@
 import { ref, onMounted, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import ProductService from '../services/ProductService';
-// Import auth store if you have one
 import { useAuthStore } from '../../auth/store/authStore';
-// Use axios/api instance for posting reviews
+import { useRole } from '../../roles/composables/useRole';
 import http from '@/services/http';
 import RoleGuard from '../../roles/components/RoleGuard.vue';
 
 const route = useRoute();
 const authStore = useAuthStore();
+const { hasRole } = useRole();
 const product = ref(null);
 const loading = ref(true);
 const error = ref(null);
 
-// Review Form State
 const rating = ref(5);
 const comment = ref('');
 const submitting = ref(false);
@@ -33,7 +32,6 @@ const fetchProduct = async () => {
     }
 }
 
-// Helpers
 const getImage = (prod) => {
     if (!prod) return "img/placeholder.jpg";
     let img = prod.imagen_url || prod.img || "img/placeholder.jpg";
@@ -50,10 +48,8 @@ const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('es-ES');
 }
 
-// Review Logic
 const userHasReview = computed(() => {
     if (!product.value || !authStore.user) return false;
-    // Assuming API load 'reviews.user' and we have user ID in authStore
     return product.value.reviews?.some(r => r.user_id === authStore.user.id);
 });
 
@@ -71,19 +67,13 @@ const submitReview = async () => {
             estrellas: rating.value,
             comentario: comment.value
         };
-        const response = await http.post('/reviews', payload);
+        const response = await http.post('/api/reviews', payload);
 
-        // Add new review to list immediately or refetch
-        // We push the new review to the local array to show it instantly
-        // API returns the created review
         if (product.value.reviews) {
             product.value.reviews.push(response.data);
         } else {
             product.value.reviews = [response.data];
         }
-
-        // Recalculate average star (optional local only update)
-        // Or just refetch for accuracy
         await fetchProduct();
 
     } catch (err) {
@@ -97,19 +87,17 @@ const deleteReview = async (reviewId) => {
     if (!confirm('¿Estás seguro de que quieres eliminar este comentario?')) return;
 
     try {
-        await http.delete(`/reviews/${reviewId}`);
-        // Remove from local array
+        await http.delete(`/api/reviews/${reviewId}`);
         product.value.reviews = product.value.reviews.filter(r => r.id !== reviewId);
     } catch (err) {
         alert(err.response?.data?.message || 'Error al eliminar comentario');
     }
 };
 
-onMounted(() => {
+onMounted(async () => {
     fetchProduct();
-    // Maybe ensure user is loaded
-    if (!authStore.user && authStore.isAuthenticated) {
-        authStore.fetchUser();
+    if (!authStore.bootstrapped) {
+        await authStore.bootstrap();
     }
 });
 </script>
@@ -142,10 +130,9 @@ onMounted(() => {
                             product.reviews.length ?
                             (product.reviews.reduce((a, b) => a + b.estrellas, 0) / product.reviews.length).toFixed(1) :
                             0)
-                            }}
+                        }}
                         </div>
 
-                        <!-- Stars logic -->
                         <div class="rating-stars">
                             <span v-for="i in 5" :key="i"
                                 :style="{ color: i <= Math.round(product.media_estrellas || 0) ? '#ffc700' : '#ccc' }">★</span>
@@ -156,7 +143,6 @@ onMounted(() => {
                     </div>
                 </div>
 
-                <!-- Auth Logic for Review Form -->
                 <div v-if="authStore.isAuthenticated">
                     <div v-if="userHasReview && userReview" class="review-form-card"
                         style="text-align: center; background-color: #f8f9fa; border-left: 5px solid #4CAF50;">
@@ -169,8 +155,6 @@ onMounted(() => {
                         <h3>Deja tu valoración</h3>
                         <form @submit.prevent="submitReview">
                             <div class="rate">
-                                <!-- CSS logic for stars is likely input:checked ~ label, so we need reverse order in HTML if reusing that CSS or use click handlers -->
-                                <!-- Reusing the CSS snippet provided: float:left + flex-direction:row-reverse -->
                                 <input type="radio" id="star5" value="5" v-model="rating" /><label for="star5">★</label>
                                 <input type="radio" id="star4" value="4" v-model="rating" /><label for="star4">★</label>
                                 <input type="radio" id="star3" value="3" v-model="rating" /><label for="star3">★</label>
@@ -208,13 +192,10 @@ onMounted(() => {
                         </div>
                         <div class="comment-body">
                             {{ review.comentario }}
-                            <!-- Delete button for admin/moderators -->
-                            <RoleGuard permission="moderate">
-                                <button class="btn-delete-comment" @click="deleteReview(review.id)"
-                                    title="Eliminar comentario">
-                                    🗑️
-                                </button>
-                            </RoleGuard>
+                            <button v-if="hasRole('admin', 'gerent')" class="btn-delete-comment"
+                                @click="deleteReview(review.id)" title="Eliminar comentario">
+                                <img src="/img/borrar.png" alt="Eliminar" class="icon-delete" />
+                            </button>
                         </div>
                     </div>
 
@@ -226,27 +207,6 @@ onMounted(() => {
     </div>
 </template>
 
-<style scoped>
-@import '../../../assets/css/productos.css';
-
-/* Fix for Rate Stars in Vue: CSS expects inputs to be siblings of labels.
-   Vue v-model works fine with radios. */
-
-.btn-delete-comment {
-    background-color: #dc3545;
-    color: white;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.9rem;
-    margin-left: 10px;
-    transition: all 0.3s;
-    float: right;
-}
-
-.btn-delete-comment:hover {
-    background-color: #c82333;
-    transform: scale(1.05);
-}
+<style>
+@import '../../../assets/css/product-detail.css';
 </style>

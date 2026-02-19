@@ -27,32 +27,32 @@ const software = computed(() => products.value.filter(p => p.seccion === 'softwa
 
 // Fallback logic for images
 const getImage = (product) => {
-    let img = product.imagen_url || product.img || "img/placeholder.jpg";
-    if (img && !img.startsWith('http') && !img.startsWith('/')) {
-        img = '/' + img;
-    }
-    return img;
+  let img = product.imagen_url || product.img || "img/placeholder.jpg";
+  if (img && !img.startsWith('http') && !img.startsWith('/')) {
+    img = '/' + img;
+  }
+  return img;
 };
 
 // Carousel Logic
 const scrollCarousel = (id, direction) => {
-    const track = document.getElementById(id);
-    if(track) {
-        const item = track.querySelector(".item");
-        const scrollAmount = item ? item.offsetWidth + 20 : 300;
-        track.scrollBy({
-            left: direction * scrollAmount,
-            behavior: "smooth",
-        });
-    }
+  const track = document.getElementById(id);
+  if (track) {
+    const item = track.querySelector(".item");
+    const scrollAmount = item ? item.offsetWidth + 20 : 300;
+    track.scrollBy({
+      left: direction * scrollAmount,
+      behavior: "smooth",
+    });
+  }
 };
 
 const goToProduct = (id) => {
-    router.push(`/products/${id}`);
+  router.push(`/products/${id}`);
 };
 
 onMounted(() => {
-    fetchProducts();
+  fetchProducts();
 });
 </script>
 
@@ -86,16 +86,16 @@ onMounted(() => {
       </button>
 
       <div class="carousel-track carousel" id="lista-comprados" tabindex="-1">
-          <div v-for="product in comprados" :key="product.id" class="item" @click="goToProduct(product.id)" role="button">
-            <div class="item-imagen">
-                <img :src="getImage(product)" :alt="product.nombre" loading="lazy" />
-            </div>
-            <div class="item-info">
-                <p class="item-titulo">{{ product.nombre }}</p>
-                <p class="item-descripcion-hover">{{ product.descripcion }}</p>
-                <p class="price">{{ parseFloat(product.precio).toFixed(2) }}€</p>
-            </div>
+        <div v-for="product in comprados" :key="product.id" class="item" @click="goToProduct(product.id)" role="button">
+          <div class="item-imagen">
+            <img :src="getImage(product)" :alt="product.nombre" loading="lazy" />
           </div>
+          <div class="item-info">
+            <p class="item-titulo">{{ product.nombre }}</p>
+            <p class="item-descripcion-hover">{{ product.descripcion }}</p>
+            <p class="price">{{ parseFloat(product.precio).toFixed(2) }}€</p>
+          </div>
+        </div>
       </div>
 
       <button class="nav-btn next-btn" @click="scrollCarousel('lista-comprados', 1)" aria-label="Ver siguientes">
@@ -111,16 +111,16 @@ onMounted(() => {
       </button>
 
       <div class="carousel-track carousel" id="lista-ofertas" tabindex="-1">
-          <div v-for="product in ofertas" :key="product.id" class="item" @click="goToProduct(product.id)" role="button">
-            <div class="item-imagen">
-                <img :src="getImage(product)" :alt="product.nombre" loading="lazy" />
-            </div>
-            <div class="item-info">
-                <p class="item-titulo">{{ product.nombre }}</p>
-                <p class="item-descripcion-hover">{{ product.descripcion }}</p>
-                <p class="price">{{ parseFloat(product.precio).toFixed(2) }}€</p>
-            </div>
+        <div v-for="product in ofertas" :key="product.id" class="item" @click="goToProduct(product.id)" role="button">
+          <div class="item-imagen">
+            <img :src="getImage(product)" :alt="product.nombre" loading="lazy" />
           </div>
+          <div class="item-info">
+            <p class="item-titulo">{{ product.nombre }}</p>
+            <p class="item-descripcion-hover">{{ product.descripcion }}</p>
+            <p class="price">{{ parseFloat(product.precio).toFixed(2) }}€</p>
+          </div>
+        </div>
       </div>
 
       <button class="nav-btn next-btn" @click="scrollCarousel('lista-ofertas', 1)" aria-label="Ver siguientes">
@@ -136,16 +136,16 @@ onMounted(() => {
       </button>
 
       <div class="carousel-track carousel" id="lista-nuevos" tabindex="-1">
-           <div v-for="product in software" :key="product.id" class="item" @click="goToProduct(product.id)" role="button">
-            <div class="item-imagen">
-                <img :src="getImage(product)" :alt="product.nombre" loading="lazy" />
-            </div>
-            <div class="item-info">
-                <p class="item-titulo">{{ product.nombre }}</p>
-                <p class="item-descripcion-hover">{{ product.descripcion }}</p>
-                <p class="price">{{ parseFloat(product.precio).toFixed(2) }}€</p>
-            </div>
+        <div v-for="product in software" :key="product.id" class="item" @click="goToProduct(product.id)" role="button">
+          <div class="item-imagen">
+            <img :src="getImage(product)" :alt="product.nombre" loading="lazy" />
           </div>
+          <div class="item-info">
+            <p class="item-titulo">{{ product.nombre }}</p>
+            <p class="item-descripcion-hover">{{ product.descripcion }}</p>
+            <p class="price">{{ parseFloat(product.precio).toFixed(2) }}€</p>
+          </div>
+        </div>
       </div>
 
       <button class="nav-btn next-btn" @click="scrollCarousel('lista-nuevos', 1)" aria-label="Ver siguientes">
@@ -159,7 +159,7 @@ onMounted(() => {
           Lo mejor del gaming, por categorías
         </h2>
         <div class="row row-cols-2 row-cols-md-4 row-cols-lg-8 g-4">
-           <!-- Hardcoded categories as per Blade -->
+          <!-- Hardcoded categories as per Blade -->
           <div class="col"><button class="categoria-btn">Acción 🎮</button></div>
           <div class="col"><button class="categoria-btn">Puzzle 🧩</button></div>
           <div class="col"><button class="categoria-btn">Deportes ⚽</button></div>
@@ -192,6 +192,6 @@ onMounted(() => {
   </div>
 </template>
 
-<style scoped>
-/* Scoped styles mainly handled by global style.css, but we can override here */
+<style>
+@import '../assets/css/home.css';
 </style>

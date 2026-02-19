@@ -1,0 +1,112 @@
+/* Estilos para LoginView */
+
+body {
+    background-color: #eaf2f2;
+}
+
+.login-container {
+    text-align: center;
+    min-height: 800px;
+    padding: 20px;
+    padding-top: 100px;
+}
+
+.login-card {
+    background-color: white;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(14, 39, 63, 0.15);
+    width: 100%;
+    max-width: 400px;
+    display: inline-block;
+    text-align: left;
+}
+
+.login-card h2 {
+    text-align: center;
+    color: #0e273f;
+    margin-top: 0;
+    margin-bottom: 25px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #0e273f;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 16px;
+    box-sizing: border-box;
+    transition: border-color 0.3s;
+}
+
+.checkbox-group {
+    text-align: left;
+}
+
+.checkbox-group input[type="checkbox"] {
+    width: auto;
+    margin-right: 10px;
+    vertical-align: middle;
+}
+
+.checkbox-group label {
+    margin-bottom: 0;
+    display: inline;
+    vertical-align: middle;
+}
+
+.form-group input:focus {
+    border-color: #0e273f;
+    outline: none;
+}
+
+button[type="submit"] {
+    width: 100%;
+    padding: 14px;
+    background-color: #fa4841;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 17px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-top: 10px;
+}
+
+button:hover {
+    background-color: #d63a34;
+}
+
+.error {
+    color: red;
+    text-align: center;
+    margin-top: 15px;
+}
+
+.register-link {
+    text-align: center;
+    margin-top: 20px;
+}
+
+a {
+    color: #fa4841;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+a:hover {
+    text-decoration: underline;
+}

@@ -1,0 +1,276 @@
+/* Estilos para ProductDetailView */
+
+.product-main {
+    max-width: 1200px;
+    width: 90%;
+    margin: 0 auto;
+    padding: 40px 0;
+    min-height: 600px;
+    padding-top: 40px;
+}
+
+.product-detail-container {
+    background: white;
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    margin-bottom: 40px;
+    overflow: hidden;
+}
+
+.product-image {
+    width: 48%;
+    float: left;
+    margin-right: 4%;
+}
+
+.product-image img {
+    width: 100%;
+    border-radius: 10px;
+    object-fit: cover;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.product-info {
+    width: 48%;
+    float: left;
+}
+
+.product-info h1 {
+    font-size: 40px;
+    color: #0e273f;
+    margin-top: 0;
+    line-height: 1.2;
+}
+
+.product-sku {
+    color: #888;
+    display: block;
+    margin-bottom: 20px;
+    font-size: 14px;
+}
+
+.product-price {
+    font-size: 35px;
+    color: #fa4841;
+    font-weight: bold;
+    margin: 20px 0;
+}
+
+.product-stock {
+    display: inline-block;
+    background: #eaf2f2;
+    padding: 5px 10px;
+    border-radius: 5px;
+    color: #0e273f;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.product-desc {
+    font-size: 18px;
+    color: #555;
+    line-height: 1.6;
+    margin-bottom: 30px;
+}
+
+.btn-buy-large {
+    display: block;
+    width: 100%;
+    max-width: 300px;
+    background-color: #fa4841;
+    color: white;
+    padding: 15px;
+    font-size: 20px;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-buy-large:hover {
+    background-color: #e03f39;
+}
+
+.reviews-container {
+    max-width: 800px;
+    width: 100%;
+    margin: 0 auto 50px auto;
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.reviews-header {
+    text-align: center;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+}
+
+.rating-stars {
+    color: #ccc;
+    font-size: 24px;
+    display: inline-block;
+}
+
+.rating-stars .filled {
+    color: #ffc700;
+}
+
+.review-form-card {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.review-form-card textarea {
+    width: 100%;
+    height: 100px;
+    padding: 10px;
+    margin-top: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.btn-submit-review {
+    background-color: #0e273f;
+    color: white;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 5px;
+    margin-top: 10px;
+    cursor: pointer;
+}
+
+.rate {
+    float: left;
+    height: 46px;
+    padding: 0;
+}
+
+.rate input {
+    display: none;
+}
+
+.rate label {
+    float: right;
+    cursor: pointer;
+    font-size: 30px;
+    color: #ccc;
+    width: 1em;
+}
+
+.rate label:before {
+    content: "★ ";
+}
+
+.rate input:checked ~ label {
+    color: #ffc700;
+}
+
+.rate:not(:checked) > label:hover,
+.rate:not(:checked) > label:hover ~ label {
+    color: #ffc700;
+}
+
+.comment-item {
+    border: 1px solid #ddd;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    background: white;
+}
+
+.comment-header {
+    margin-bottom: 10px;
+    overflow: hidden;
+}
+
+.comment-header > div {
+    float: left;
+}
+
+.comment-date {
+    float: right;
+}
+
+.user-name {
+    font-weight: bold;
+    color: #0e273f;
+}
+
+.comment-stars {
+    color: #fa4841;
+    margin-left: 10px;
+}
+
+.comment-body {
+    color: #555;
+    line-height: 1.5;
+}
+
+.comment-footer {
+    margin-top: 10px;
+    font-size: 12px;
+    color: #888;
+}
+
+.btn-delete-comment {
+    background: none;
+    background-color: transparent;
+    border: none;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    float: right;
+}
+
+.btn-delete-comment:hover {
+    background: none;
+    background-color: transparent;
+}
+
+.icon-delete {
+    width: 28px;
+    height: 28px;
+    content: url("/img/borrar2.png");
+}
+
+@media (max-width: 900px) {
+    .product-detail-container {
+        padding: 20px;
+    }
+
+    .product-image {
+        width: 100%;
+        float: none;
+        margin-right: 0;
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .product-image img {
+        max-width: 80%;
+        margin: 0 auto;
+    }
+
+    .product-info {
+        width: 100%;
+        float: none;
+    }
+
+    .btn-buy-large {
+        width: 100%;
+    }
+}
+
+.item:focus,
+.btn-buy-large:focus {
+    outline: 4px solid #fa4841;
+    outline-offset: 2px;
+    z-index: 1000;
+}

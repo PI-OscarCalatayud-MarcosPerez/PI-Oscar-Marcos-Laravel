@@ -1,0 +1,22 @@
+/* Estilos para Footer */
+
+footer {
+    background-color: #0e273f;
+    color: white;
+    padding: 40px 0;
+}
+
+.footer-logo-img {
+    height: 50px;
+}
+
+.footer-enlaces a {
+    color: #ccc;
+    text-decoration: none;
+    font-size: 14px;
+    transition: 0.2s;
+}
+
+.footer-enlaces a:hover {
+    color: white;
+}
