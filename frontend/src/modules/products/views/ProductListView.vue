@@ -34,9 +34,9 @@ const buyNow = (product) => {
 }
 
 // Filters State (Local UI state for inputs, syncing with store)
-const maxPrice = ref(100)
+const maxPrice = ref(route.query.max_price || 100)
 const sortOrder = ref('default')
-const selectedPlatforms = ref([])
+const selectedPlatforms = ref(route.query.platform ? route.query.platform.split(',') : [])
 const categories = ref([])
 const platforms = ['PC', 'PS5', 'Xbox', 'Switch']
 
@@ -47,6 +47,12 @@ const fetchCategories = async () => {
     } catch (err) {
         console.error("Error fetching categories:", err);
     }
+}
+
+// Helper to capitalize strings
+const formatCategory = (name) => {
+    if (!name) return '';
+    return name.charAt(0).toUpperCase() + name.slice(1);
 }
 
 // Helper to clean strings
@@ -67,42 +73,8 @@ const getImage = (product) => {
 }
 
 const filteredProducts = computed(() => {
-    let filtered = productStore.products;
-
-    // 1. Client-side Search (if not backend)
-    const queryQ = route.query.q ? normalizar(route.query.q) : "";
-    if (queryQ) {
-        filtered = filtered.filter(p => {
-            const nom = p.nombre || p.nom || "";
-            return normalizar(nom).includes(queryQ);
-        });
-    }
-
-    // 2. Platforms
-    if (selectedPlatforms.value.length > 0) {
-        const normalizedPlats = selectedPlatforms.value.map(c => normalizar(c));
-        filtered = filtered.filter(p => {
-            const plat = p.plataforma ? normalizar(p.plataforma) : (p.descripcion ? normalizar(p.descripcion) : "");
-            return normalizedPlats.some(np => plat.includes(np));
-        });
-    }
-
-    // 3. Price
-    filtered = filtered.filter(p => {
-        const precio = parseFloat(p.precio || p.preu || 0);
-        return precio <= parseFloat(maxPrice.value);
-    });
-
-    // 4. Sorting
-    if (sortOrder.value === 'price-asc') {
-        filtered.sort((a, b) => parseFloat(a.precio) - parseFloat(b.precio));
-    } else if (sortOrder.value === 'price-desc') {
-        filtered.sort((a, b) => parseFloat(b.precio) - parseFloat(a.precio));
-    } else if (sortOrder.value === 'az') {
-        filtered.sort((a, b) => (a.nombre || '').localeCompare(b.nombre || ''));
-    }
-
-    return filtered;
+    // Backend filtering handles everything now
+    return productStore.products;
 });
 
 const clearFilters = () => {
@@ -111,6 +83,22 @@ const clearFilters = () => {
     sortOrder.value = 'default';
     productStore.clearFilters(); // Clear store filters
     router.replace({ query: {} });
+}
+
+// Update Max Price
+const updateMaxPrice = () => {
+    router.push({ query: { ...route.query, max_price: maxPrice.value } });
+}
+
+// Update Platforms
+const updatePlatforms = () => {
+    if (selectedPlatforms.value.length > 0) {
+        router.push({ query: { ...route.query, platform: selectedPlatforms.value.join(',') } });
+    } else {
+        const newQuery = { ...route.query };
+        delete newQuery.platform;
+        router.push({ query: newQuery });
+    }
 }
 
 const goToProduct = (id) => {
@@ -122,6 +110,19 @@ watch(() => route.query, (newQuery) => {
     const params = {};
     if (newQuery.category) params.category = newQuery.category;
     if (newQuery.offers) params.offers = newQuery.offers === 'true';
+    if (newQuery.platform) {
+        params.platform = newQuery.platform;
+        selectedPlatforms.value = newQuery.platform.split(',');
+    } else {
+        selectedPlatforms.value = [];
+    }
+    if (newQuery.q) params.q = newQuery.q;
+    if (newQuery.max_price) {
+        params.max_price = newQuery.max_price;
+        maxPrice.value = newQuery.max_price;
+    } else {
+        maxPrice.value = 100;
+    }
 
     // Trigger store fetch
     productStore.fetchProducts(params);
@@ -150,7 +151,7 @@ onMounted(() => {
                     <a href="#" @click.prevent="router.push({ query: { ...route.query, category: cat.name } })"
                         :class="{ 'fw-bold': route.query.category === cat.name }"
                         style="text-decoration: none; color: inherit; display: block; margin-bottom: 5px;">
-                        {{ cat.name }}
+                        {{ formatCategory(cat.name) }}
                     </a>
                 </div>
             </div>
@@ -158,13 +159,13 @@ onMounted(() => {
             <div class="filter-group">
                 <h4>Plataforma</h4>
                 <label v-for="plat in platforms" :key="plat">
-                    <input type="checkbox" :value="plat" v-model="selectedPlatforms" /> {{ plat }}
+                    <input type="checkbox" :value="plat" v-model="selectedPlatforms" @change="updatePlatforms" /> {{ plat }}
                 </label>
             </div>
 
             <div class="filter-group">
                 <h4>Precio Máximo</h4>
-                <input type="range" min="0" max="100" v-model="maxPrice" style="width: 100%" />
+                <input type="range" min="0" max="100" v-model="maxPrice" @change="updateMaxPrice" style="width: 100%" />
                 <p>Hasta: <span>{{ maxPrice }}</span>€</p>
             </div>
         </aside>
@@ -193,6 +194,9 @@ onMounted(() => {
                             class="badge badge-discount position-absolute top-0 end-0 m-2">
                             -{{ product.porcentaje_descuento }}%
                         </span>
+                        <span v-if="product.is_eco" class="badge bg-success position-absolute top-0 start-0 m-2">
+                            🌿 Eco
+                        </span>
                     </div>
                     <div class="shop-item-info">
                         <p class="shop-item-title" @click="goToProduct(product.id)" style="cursor:pointer">{{
@@ -202,10 +206,10 @@ onMounted(() => {
                         <p class="shop-item-price">
                             <span v-if="product.porcentaje_descuento > 0"
                                 class="text-muted text-decoration-line-through me-2">
-                                {{ parseFloat(product.precio).toFixed(2) }}€
+                                {{ parseFloat(product.precio || 0).toFixed(2) }}€
                             </span>
                             <span :class="{ 'text-danger': product.porcentaje_descuento > 0 }">
-                                {{ (parseFloat(product.precio) * (1 - product.porcentaje_descuento / 100)).toFixed(2)
+                                {{ (parseFloat(product.precio || 0) * (1 - (product.porcentaje_descuento || 0) / 100)).toFixed(2)
                                 }}€
                             </span>
                         </p>

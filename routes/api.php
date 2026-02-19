@@ -10,8 +10,11 @@ Route::get('/user', function (Request $request) {
 
 // API Publica de Productos
 Route::apiResource('products', ProductController::class)->only(['index', 'show', 'store']);
+Route::get('/products/{id}/recommendations', [App\Http\Controllers\Api\ProductController::class, 'recommendations']);
 Route::apiResource('categories', \App\Http\Controllers\Api\CategoryController::class);
 Route::post('/register', [App\Http\Controllers\Auth\RegisteredUserController::class, 'store']); // Registration for API
+Route::get('/auth/google/redirect', [App\Http\Controllers\Auth\SocialAuthController::class, 'redirectToGoogle']);
+Route::get('/auth/google/callback', [App\Http\Controllers\Auth\SocialAuthController::class, 'handleGoogleCallback']);
 Route::post('/import', [App\Http\Controllers\ProductImportController::class, 'importApi']);
 
 

@@ -26,7 +26,29 @@ class ProductRepository implements BaseRepository
             })->orWhere('categoria', $category); // Legacy support
         }
 
-        if (isset($filters['offers']) && $filters['offers']) {
+        if (isset($filters['platform'])) {
+            $platforms = explode(',', $filters['platform']);
+            $query->where(function ($q) use ($platforms) {
+                foreach ($platforms as $platform) {
+                    $q->orWhere('plataforma', 'like', "%{$platform}%")
+                      ->orWhere('descripcion', 'like', "%{$platform}%");
+                }
+            });
+        }
+
+        if (isset($filters['max_price'])) {
+            $query->where('precio', '<=', $filters['max_price']);
+        }
+
+        if (isset($filters['q'])) {
+            $search = $filters['q'];
+            $query->where(function($q) use ($search) {
+                $q->where('nombre', 'like', "%{$search}%")
+                  ->orWhere('descripcion', 'like', "%{$search}%");
+            });
+        }
+
+        if (isset($filters['offers']) && filter_var($filters['offers'], FILTER_VALIDATE_BOOLEAN)) {
             $query->where('porcentaje_descuento', '>', 0);
         }
 

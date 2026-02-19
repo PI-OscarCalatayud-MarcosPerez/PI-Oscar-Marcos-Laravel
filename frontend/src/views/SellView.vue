@@ -128,9 +128,17 @@ onMounted(() => {
                     </select>
                 </div>
                 <div class="col-md-6 mb-3">
-                    <label for="seccion" class="form-label">Sección (Opcional)</label>
-                    <input type="text" id="seccion" v-model="form.seccion" class="form-control"
-                        placeholder="Ej. RPG, Acción" />
+                    <label for="seccion" class="form-label">Sección</label>
+                    <select id="seccion" v-model="form.seccion" class="form-select">
+                        <option value="">Seleccionar (Opcional)</option>
+                        <option value="RPG">RPG</option>
+                        <option value="Acción">Acción</option>
+                        <option value="Aventura">Aventura</option>
+                        <option value="Deportes">Deportes</option>
+                        <option value="Estrategia">Estrategia</option>
+                         <option value="comprados">Destacado (Comprados)</option>
+                         <option value="software">Software</option>
+                    </select>
                 </div>
             </div>
 

@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive, onMounted, computed } from 'vue';
+import { ref, reactive, onMounted, computed, watch } from 'vue';
 import { useCartStore } from '../../cart/store/cartStore';
 import { useUiStore } from '@/stores/uiStore';
 import { useRoute, useRouter } from 'vue-router';
@@ -8,6 +8,7 @@ import { useAuthStore } from '../../auth/store/authStore';
 import { useRole } from '../../roles/composables/useRole';
 import http from '@/services/http';
 import RoleGuard from '../../roles/components/RoleGuard.vue';
+import ProductRecommendations from '../components/ProductRecommendations.vue';
 
 
 
@@ -187,6 +188,16 @@ onMounted(async () => {
         await authStore.bootstrap();
     }
 });
+
+// Watch for route changes to reload product data when clicking recommendations
+import { watch } from 'vue'; // Ensure watch is imported (it is imported in line 2)
+watch(() => route.params.id, (newId) => {
+    if (newId) {
+        fetchProduct();
+        // Scroll to top
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+});
 </script>
 
 <template>
@@ -197,7 +208,7 @@ onMounted(async () => {
         <div v-else class="product-detail-layout">
             <main class="product-detail-container">
                 <div class="product-image" style="position: relative;">
-                    <img :src="getImage(product)" :alt="product.nombre">
+                    <img :src="getImage(product)" :alt="product.nombre" loading="lazy" decoding="async">
                     <span v-if="product.porcentaje_descuento > 0"
                         class="badge badge-discount position-absolute top-0 end-0 m-3"
                         style="font-size: 1.2rem; padding: 10px;">
@@ -206,6 +217,7 @@ onMounted(async () => {
                 </div>
                 <div class="product-info">
                     <h1>{{ product.nombre }}</h1>
+                    <span v-if="product.is_eco" class="badge bg-success mb-2" style="font-size: 0.9rem;">🌿 Eco-Friendly</span>
                     <span class="product-sku">REF: {{ product.sku }}</span>
                     <div class="price-container mb-2">
                         <p v-if="product.porcentaje_descuento > 0" class="product-price mb-0">
@@ -229,6 +241,8 @@ onMounted(async () => {
                     </div>
                 </div>
             </main>
+
+            <ProductRecommendations :product-id="product.id" />
 
             <section class="reviews-container">
                 <div class="reviews-header">

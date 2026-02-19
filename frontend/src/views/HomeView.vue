@@ -21,9 +21,18 @@ const fetchProducts = async () => {
     }
 };
 
-const comprados = computed(() => products.value.filter(p => p.seccion === 'comprados'));
-const ofertas = computed(() => products.value.filter(p => p.seccion === 'ofertas'));
-const software = computed(() => products.value.filter(p => p.seccion === 'software'));
+const comprados = computed(() => {
+    const list = products.value.filter(p => p.seccion === 'comprados');
+    return [...list, ...list, ...list]; // Duplicate for infinite effect
+});
+const ofertas = computed(() => {
+    const list = products.value.filter(p => p.porcentaje_descuento > 0);
+    return [...list, ...list, ...list];
+});
+const software = computed(() => {
+    const list = products.value.filter(p => p.seccion === 'software');
+    return [...list, ...list, ...list];
+});
 
 // Fallback logic for images
 const getImage = (product) => {
@@ -40,10 +49,17 @@ const scrollCarousel = (id, direction) => {
     if (track) {
         const item = track.querySelector(".item");
         const scrollAmount = item ? item.offsetWidth + 20 : 300;
-        track.scrollBy({
-            left: direction * scrollAmount,
-            behavior: "smooth",
-        });
+        
+        if (direction === 1 && track.scrollLeft + track.clientWidth >= track.scrollWidth - 10) {
+             track.scrollTo({ left: 0, behavior: 'smooth' }); // Loop back to start
+        } else if (direction === -1 && track.scrollLeft <= 0) {
+             track.scrollTo({ left: track.scrollWidth, behavior: 'smooth' }); // Loop to end
+        } else {
+            track.scrollBy({
+                left: direction * scrollAmount,
+                behavior: "smooth",
+            });
+        }
     }
 };
 
@@ -57,15 +73,15 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="inicio-container">
+    <div class="inicio-container" style="min-height: 50vh;">
         <div class="video-background">
             <video autoplay muted loop playsinline aria-label="Video ambiental de introducción a videojuegos">
                 <source src="/videos/introduccion.mp4" type="video/mp4" />
                 Tu navegador no soporta la etiqueta de video.
             </video>
         </div>
-        <div class="inicio">
-            <p class="textoI">
+        <div class="inicio" style="margin-top: 0;">
+            <p class="textoI" style="margin-bottom: 1rem;">
                 MOKeys es un ecommerce especializado en la venta segura y rápida de
                 claves digitales para juegos, software y suscripciones. Compra, recibe
                 y activa — todo en minutos.

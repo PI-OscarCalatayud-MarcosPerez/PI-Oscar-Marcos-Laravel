@@ -12,9 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('products', function (Blueprint $table) {
-            $table->integer('porcentaje_descuento')->default(0);
-            $table->string('plataforma')->nullable();
-            $table->foreignId('category_id')->nullable()->constrained('categories')->nullOnDelete();
+            $table->boolean('is_eco')->default(false);
         });
     }
 
@@ -24,8 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('products', function (Blueprint $table) {
-            $table->dropForeign(['category_id']);
-            $table->dropColumn(['porcentaje_descuento', 'plataforma', 'category_id']);
+            //
         });
     }
 };

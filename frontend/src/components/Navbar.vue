@@ -23,11 +23,20 @@ const logout = async () => {
 const userName = computed(() => {
     return authStore.user?.name || authStore.user?.email?.split('@')[0] || 'Usuario';
 });
+
+const searchQuery = ref('');
+
+const handleSearch = () => {
+    if (searchQuery.value.trim()) {
+        router.push({ path: '/products', query: { q: searchQuery.value } });
+        searchQuery.value = ''; // Optional: clear after search
+    }
+};
 </script>
 
 <template>
     <div class="container-fluid px-md-5">
-        <div class="nav-container">
+        <div class="nav-container" :class="{ 'admin-nav': hasRole('admin') }">
             <RouterLink to="/">
                 <img src="/img/imagencolor.webp" alt="Logotipo MOKeys" class="logo-img" />
             </RouterLink>
@@ -54,8 +63,8 @@ const userName = computed(() => {
             </nav>
 
             <div class="d-flex align-items-center gap-3">
-                <form class="busqueda d-none d-md-block" action="#" method="get" role="search">
-                    <input type="text" placeholder="Buscar..." name="q" aria-label="Buscar producto" />
+                <form class="busqueda d-none d-md-block" @submit.prevent="handleSearch" role="search">
+                    <input type="text" placeholder="Buscar..." v-model="searchQuery" aria-label="Buscar producto" />
                 </form>
 
                 <RouterLink to="/cart" class="carro" aria-label="Carrito">

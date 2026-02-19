@@ -3,9 +3,19 @@ import vue from "@vitejs/plugin-vue";
 
 import { fileURLToPath, URL } from "node:url";
 
+import { ViteImageOptimizer } from 'vite-plugin-image-optimizer';
+
 // https://vite.dev/config/
 export default defineConfig({
-    plugins: [vue()],
+    plugins: [
+        vue(),
+        ViteImageOptimizer({
+            png: { quality: 80 },
+            jpeg: { quality: 75 },
+            webp: { quality: 80 },
+            avif: { quality: 70 },
+        }),
+    ],
     resolve: {
         alias: {
             "@": fileURLToPath(new URL("./src", import.meta.url)),

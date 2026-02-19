@@ -21,6 +21,8 @@ export const useProductStore = defineStore("products", {
 
                 if (!queryParams.offers) delete queryParams.offers;
                 if (!queryParams.category) delete queryParams.category;
+                if (!queryParams.platform) delete queryParams.platform;
+                if (!queryParams.q) delete queryParams.q;
 
                 const response = await ProductService.getProducts(queryParams);
                 const data = response.data;

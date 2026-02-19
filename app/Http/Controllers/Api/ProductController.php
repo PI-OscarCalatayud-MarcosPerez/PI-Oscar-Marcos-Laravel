@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Services\ProductService; // Usamos el servicio
+use OpenApi\Annotations as OA;
 
 class ProductController extends Controller
 {
@@ -12,9 +13,21 @@ class ProductController extends Controller
     }
 
     // Retorna todos los productos en formato JSON
+    // Retorna todos los productos en formato JSON
+    /**
+     * @OA\Get(
+     *      path="/api/products",
+     *      tags={"Products"},
+     *      summary="Get list of products",
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation"
+     *       )
+     *     )
+     */
     public function index(\Illuminate\Http\Request $request)
     {
-        $filters = $request->only(['category', 'offers']);
+        $filters = $request->only(['category', 'offers', 'platform', 'q', 'max_price']);
         return response()->json($this->service->listar($filters));
     }
 
@@ -42,6 +55,8 @@ class ProductController extends Controller
             'category_id' => 'nullable|exists:categories,id', // Relationship
             'seccion' => 'nullable|string',
             'imagen' => 'nullable|image|max:2048', // Max 2MB
+            'porcentaje_descuento' => 'nullable|integer|min:0|max:100',
+            'plataforma' => 'nullable|string',
         ]);
 
         // Handle image upload
@@ -59,5 +74,29 @@ class ProductController extends Controller
         $product = $this->service->crear($validated);
 
         return response()->json($product, 201);
+    }
+    public function recommendations($id)
+    {
+        try {
+            $product = $this->service->obtener($id);
+            // Simple logic: Same category, different ID
+            $recommendations = \App\Models\Product::where('category_id', $product->category_id)
+                ->where('id', '!=', $id)
+                ->inRandomOrder()
+                ->take(3)
+                ->get();
+            
+            // Fallback: If no related products, return random ones
+            if ($recommendations->isEmpty()) {
+                $recommendations = \App\Models\Product::where('id', '!=', $id)
+                    ->inRandomOrder()
+                    ->take(3)
+                    ->get();
+            }
+
+            return response()->json($recommendations);
+        } catch (\Exception $e) {
+            return response()->json([], 200); // Return empty array on error to avoiding breaking UI
+        }
     }
 }

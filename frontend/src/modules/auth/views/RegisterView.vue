@@ -2,23 +2,28 @@
 import { ref } from 'vue';
 import { useAuthStore } from '../store/authStore';
 import { useRouter } from 'vue-router';
-
-const form = ref({
-    name: '',
-    last_name: '',
-    email: '',
-    password: '',
-    password_confirmation: ''
-});
+import { Form, Field, ErrorMessage } from 'vee-validate'
+import * as yup from 'yup'
 
 const error = ref(null);
 const authStore = useAuthStore();
 const router = useRouter();
 
-const handleRegister = async () => {
+// Validation Schema
+const schema = yup.object({
+    name: yup.string().required('El nombre es obligatorio'),
+    last_name: yup.string(),
+    email: yup.string().email('Email inválido').required('El email es obligatorio'),
+    password: yup.string().required('Contraseña obligatoria').min(8, 'Mínimo 8 caracteres'),
+    password_confirmation: yup.string()
+        .oneOf([yup.ref('password'), null], 'Las contraseñas no coinciden')
+        .required('Confirma tu contraseña')
+})
+
+const handleRegister = async (values) => {
     try {
         error.value = null; // Clear previous errors
-        await authStore.register(form.value);
+        await authStore.register(values);
         router.push('/');
     } catch (err) {
         if (err.response && err.response.data && err.response.data.errors) {
@@ -39,34 +44,39 @@ const handleRegister = async () => {
             <h2>Crear Cuenta</h2>
             <p class="subtitulo-form">Únete a MOKeys y empieza a ahorrar.</p>
 
-            <form @submit.prevent="handleRegister" class="login-form">
+            <Form @submit="handleRegister" :validation-schema="schema" class="login-form" v-slot="{ errors, isSubmitting }">
                 <div class="form-group">
                     <label>Nombre:</label>
-                    <input type="text" v-model="form.name" placeholder="Tu nombre" required autofocus />
+                    <Field name="name" type="text" placeholder="Tu nombre" :class="{ 'is-invalid': errors.name }" />
+                    <ErrorMessage name="name" class="error-feedback" />
                 </div>
 
                 <div class="form-group">
                     <label>Apellidos:</label>
-                    <input type="text" v-model="form.last_name" placeholder="Tus apellidos" />
+                    <Field name="last_name" type="text" placeholder="Tus apellidos" />
                 </div>
 
                 <div class="form-group">
                     <label>Email:</label>
-                    <input type="email" v-model="form.email" placeholder="tucorreo@ejemplo.com" required />
+                    <Field name="email" type="email" placeholder="tucorreo@ejemplo.com" :class="{ 'is-invalid': errors.email }" />
+                    <ErrorMessage name="email" class="error-feedback" />
                 </div>
 
                 <div class="form-group">
                     <label>Contraseña:</label>
-                    <input type="password" v-model="form.password" placeholder="Mínimo 8 caracteres" required />
+                    <Field name="password" type="password" placeholder="Mínimo 8 caracteres" :class="{ 'is-invalid': errors.password }" />
+                    <ErrorMessage name="password" class="error-feedback" />
                 </div>
 
                 <div class="form-group">
                     <label>Confirmar Contraseña:</label>
-                    <input type="password" v-model="form.password_confirmation" placeholder="Repite tu contraseña"
-                        required />
+                    <Field name="password_confirmation" type="password" placeholder="Repite tu contraseña" :class="{ 'is-invalid': errors.password_confirmation }" />
+                    <ErrorMessage name="password_confirmation" class="error-feedback" />
                 </div>
 
-                <button type="submit">Registrarse</button>
+                <button type="submit" :disabled="isSubmitting">
+                    {{ isSubmitting ? 'Registrando...' : 'Registrarse' }}
+                </button>
 
                 <p class="error" v-if="error" style="white-space: pre-wrap;">{{ error }}</p>
 
@@ -74,7 +84,7 @@ const handleRegister = async () => {
                     ¿Ya tienes cuenta? <RouterLink to="/login" style="color: #fa4841; font-weight: bold;">Inicia sesión
                         aquí</RouterLink>.
                 </p>
-            </form>
+            </Form>
         </div>
     </div>
 </template>

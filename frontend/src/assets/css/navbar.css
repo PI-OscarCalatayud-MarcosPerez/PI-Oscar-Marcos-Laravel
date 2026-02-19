@@ -254,3 +254,16 @@
         margin-top: 20px;
     }
 }
+
+/* Admin Navbar Fix */
+.nav-container.admin-nav {
+    flex-wrap: nowrap !important;
+    white-space: nowrap;
+}
+
+.nav-container.admin-nav .enlaces_navegacion {
+    font-size: 0.9rem;
+    /* Slightly smaller to fit */
+    display: flex;
+    gap: 15px;
+}
