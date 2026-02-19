@@ -14,7 +14,7 @@ export default defineConfig({
     server: {
         proxy: {
             "/api": {
-                target: "http://web",
+                target: "http://backend:8000",
                 changeOrigin: true,
                 secure: false,
                 headers: {
@@ -23,34 +23,34 @@ export default defineConfig({
                 },
             },
             "/sanctum": {
-                target: "http://web",
+                target: "http://backend:8000",
                 changeOrigin: true,
                 secure: false,
                 cookieDomainRewrite: "",
             },
             "/login": {
-                target: "http://web",
+                target: "http://backend:8000",
                 changeOrigin: true,
                 secure: false,
                 cookieDomainRewrite: "",
             },
             "/logout": {
-                target: "http://web",
+                target: "http://backend:8000",
                 changeOrigin: true,
                 secure: false,
             },
             "/register": {
-                target: "http://web",
+                target: "http://backend:8000",
                 changeOrigin: true,
                 secure: false,
             },
             "/user": {
-                target: "http://web",
+                target: "http://backend:8000",
                 changeOrigin: true,
                 secure: false,
             },
             "/reviews": {
-                target: "http://web",
+                target: "http://backend:8000",
                 changeOrigin: true,
                 secure: false,
             },
