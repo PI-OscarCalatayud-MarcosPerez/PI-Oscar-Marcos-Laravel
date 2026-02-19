@@ -29,10 +29,15 @@ const reviewError = ref(null);
 const addToCart = () => {
     if (!product.value) return;
 
+    let finalPrice = parseFloat(product.value.precio);
+    if (product.value.porcentaje_descuento > 0) {
+        finalPrice = finalPrice * (1 - product.value.porcentaje_descuento / 100);
+    }
+
     cartStore.addItem({
         id: product.value.id,
         title: product.value.nombre,
-        price: parseFloat(product.value.precio),
+        price: finalPrice,
         image: getImage(product.value),
         quantity: 1
     });
@@ -191,13 +196,29 @@ onMounted(async () => {
 
         <div v-else class="product-detail-layout">
             <main class="product-detail-container">
-                <div class="product-image">
+                <div class="product-image" style="position: relative;">
                     <img :src="getImage(product)" :alt="product.nombre">
+                    <span v-if="product.porcentaje_descuento > 0"
+                        class="badge badge-discount position-absolute top-0 end-0 m-3"
+                        style="font-size: 1.2rem; padding: 10px;">
+                        -{{ product.porcentaje_descuento }}%
+                    </span>
                 </div>
                 <div class="product-info">
                     <h1>{{ product.nombre }}</h1>
                     <span class="product-sku">REF: {{ product.sku }}</span>
-                    <p class="product-price">{{ parseFloat(product.precio).toFixed(2) }} €</p>
+                    <div class="price-container mb-2">
+                        <p v-if="product.porcentaje_descuento > 0" class="product-price mb-0">
+                            <span class="text-muted text-decoration-line-through me-2" style="font-size: 1rem;">
+                                {{ parseFloat(product.precio).toFixed(2) }}€
+                            </span>
+                            <span class="text-danger me-2">
+                                {{ (parseFloat(product.precio) * (1 - product.porcentaje_descuento / 100)).toFixed(2)
+                                }}€
+                            </span>
+                        </p>
+                        <p v-else class="product-price">{{ parseFloat(product.precio).toFixed(2) }} €</p>
+                    </div>
                     <span class="product-stock">Stock: {{ product.stock }}</span>
                     <p class="product-desc">{{ product.descripcion }}</p>
                     <div class="product-actions">

@@ -37,8 +37,12 @@ const userName = computed(() => {
                     <li>
                         <RouterLink to="/products">Comprar</RouterLink>
                     </li>
+                    <li>
+                        <RouterLink to="/products?offers=true" :class="{ 'router-link-active': $route.query.offers }">
+                            Ofertas</RouterLink>
+                    </li>
                     <li v-if="can('sell')">
-                        <a href="#">Vender</a>
+                        <RouterLink to="/sell">Vender</RouterLink>
                     </li>
                     <li>
                         <RouterLink to="/contacto">Contacto</RouterLink>

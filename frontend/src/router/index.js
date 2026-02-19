@@ -55,6 +55,15 @@ const router = createRouter({
             meta: { requiresAuth: true, roles: ["admin", "gerent", "venedor"] },
         },
         {
+            path: "/sell",
+            name: "sell",
+            component: () => import("../views/SellView.vue"),
+            meta: {
+                requiresAuth: true,
+                roles: ["admin", "gerent", "venedor", "user"],
+            }, // User can become seller? Assuming 'user' or specific role.
+        },
+        {
             path: "/cart",
             name: "cart",
             component: () => import("../modules/cart/views/CartView.vue"),

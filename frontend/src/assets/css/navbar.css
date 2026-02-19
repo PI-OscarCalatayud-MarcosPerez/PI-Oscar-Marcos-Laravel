@@ -55,9 +55,18 @@
     color: #fa4841;
 }
 
-.link-with-icon:hover {
-    color: #fa4841 !important;
-}
+/* Remove hover for Vender button if it has a specific class, or user meant the "Publicar producto" button which might be the "Vender" link.
+   If "Publicar producto" is the text, it's the "Vender" link.
+   User said "boton de Publicar producto" which usually refers to the "Vender" link in navbar.
+   I will assume user might be referring to a specific button appearance.
+   But looking at Navbar.vue, it is just a text link <li><RouterLink to="/sell">Vender</RouterLink></li>
+   Maybe user means the "Sell" button in separate components?
+   Wait, "Publicar producto" text is NOT in Navbar.vue. It says "Vender".
+   Let's check if there is a "Publicar producto" button elsewhere or if usage of "Vender" implies it.
+   Ah, in the previous turn user said "boton de publicar producto en el frontend".
+   Let's check `SellView.vue` or maybe it's the button inside `Navbar` if logged in?
+   Actually, let's look for "Publicar producto" string in codebase.
+*/
 
 .link-with-icon {
     display: inline-block;
@@ -74,7 +83,7 @@
 
 .link-with-icon:hover .icon-upload {
     content: url("/img/boton-circular-plus.png");
-    transform: scale(1.1);
+    /* transform: scale(1.1); Removed hover effect */
 }
 
 .menu-toggle {
