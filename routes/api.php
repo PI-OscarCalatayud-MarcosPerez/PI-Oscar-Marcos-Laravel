@@ -9,7 +9,8 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 // API Publica de Productos
-Route::apiResource('products', ProductController::class)->only(['index', 'show']);
+Route::apiResource('products', ProductController::class)->only(['index', 'show', 'store']);
+Route::apiResource('categories', \App\Http\Controllers\Api\CategoryController::class);
 Route::post('/register', [App\Http\Controllers\Auth\RegisteredUserController::class, 'store']); // Registration for API
 Route::post('/import', [App\Http\Controllers\ProductImportController::class, 'importApi']);
 

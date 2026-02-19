@@ -12,14 +12,21 @@ class ProductService
     }
 
     // Lógica para listar productos
-    public function listar()
+    public function listar(array $filters = [])
     {
-        return $this->repository->getAll();
+        return $this->repository->getAll($filters);
     }
 
     // Lógica para obtener un producto
     public function obtener($id)
     {
         return $this->repository->find($id);
+    }
+
+    // Lógica para crear un producto
+    public function crear(array $data)
+    {
+        // Aquí podrías añadir lógica extra, como subir imágenes
+        return $this->repository->create($data);
     }
 }

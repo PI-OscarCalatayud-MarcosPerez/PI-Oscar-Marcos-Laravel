@@ -14,10 +14,23 @@ class ProductRepository implements BaseRepository
         $this->model = $model;
     }
 
-    // Obtener todos los registros
-    public function getAll()
+    // Obtener todos los registros, con filtros opcionales
+    public function getAll(array $filters = [])
     {
-        return $this->model->all();
+        $query = $this->model->with('category');
+
+        if (isset($filters['category'])) {
+            $category = $filters['category'];
+            $query->whereHas('category', function ($q) use ($category) {
+                $q->where('name', $category);
+            })->orWhere('categoria', $category); // Legacy support
+        }
+
+        if (isset($filters['offers']) && $filters['offers']) {
+            $query->where('porcentaje_descuento', '>', 0);
+        }
+
+        return $query->get();
     }
 
     // Buscar un registro por ID
@@ -26,7 +39,7 @@ class ProductRepository implements BaseRepository
         return $this->model->findOrFail($id);
     }
 
-    // Métodos para crear, actualizar y borrar (simplificados/pendientes de uso)
+    // Métodos para crear, actualizar y borrar
     public function create(array $data)
     {
         return $this->model->create($data);
