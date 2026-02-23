@@ -80,5 +80,19 @@ export const useAuthStore = defineStore("auth", {
                 this.bootstrapped = true;
             }
         },
+
+        async updateProfile(data) {
+            const { data: updatedUser } = await http.put(
+                "/api/user/profile",
+                data,
+            );
+            this.user = updatedUser;
+            return updatedUser;
+        },
+
+        async deleteAccount() {
+            await http.delete("/api/user/delete");
+            this.hardLogout();
+        },
     },
 });

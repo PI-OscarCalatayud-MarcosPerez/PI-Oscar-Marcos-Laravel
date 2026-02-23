@@ -26,4 +26,15 @@ class Product extends Model
     {
         return round($this->reviews()->avg('estrellas'), 1) ?? 0;
     }
+
+    public function productCodes()
+    {
+        return $this->hasMany(ProductCode::class);
+    }
+
+    // Calcula el stock dinámicamente según los códigos disponibles
+    public function getStockAttribute()
+    {
+        return $this->productCodes()->count();
+    }
 }

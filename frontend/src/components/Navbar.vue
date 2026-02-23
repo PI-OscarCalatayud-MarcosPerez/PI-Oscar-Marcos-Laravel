@@ -57,7 +57,7 @@ const handleSearch = () => {
                         <RouterLink to="/contacto">Contacto</RouterLink>
                     </li>
                     <li>
-                        <RouterLink to="/about">Sobre Nosotros</RouterLink>
+                        <RouterLink to="/about">Nosotros</RouterLink>
                     </li>
                 </ul>
             </nav>

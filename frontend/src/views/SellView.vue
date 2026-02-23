@@ -1,23 +1,36 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
-import http from '../services/http'; // Usamos la instancia configurada con interceptores
+import http from '../services/http';
 import CategoryService from '../modules/products/services/CategoryService';
 
 const router = useRouter();
 const loading = ref(false);
 const error = ref(null);
 const success = ref(false);
+const successMessage = ref('');
 const categories = ref([]);
+const allProducts = ref([]);
+const searchQuery = ref('');
+const selectedExistingProduct = ref(null);
+const isNewProduct = ref(false);
 
 const form = ref({
     nombre: '',
     descripcion: '',
     precio: '',
-    stock: '',
+    codigo: '',
     category_id: null,
     seccion: '',
+    plataforma: 'PC',
     imagen: null
+});
+
+// Productos filtrados por búsqueda
+const filteredProducts = computed(() => {
+    if (!searchQuery.value || searchQuery.value.length < 2) return [];
+    const q = searchQuery.value.toLowerCase();
+    return allProducts.value.filter(p => p.nombre.toLowerCase().includes(q));
 });
 
 const fetchCategories = async () => {
@@ -27,6 +40,43 @@ const fetchCategories = async () => {
     } catch (err) {
         console.error("Error fetching categories:", err);
     }
+};
+
+const fetchProducts = async () => {
+    try {
+        const response = await http.get('/api/products?per_page=100');
+        allProducts.value = response.data.data || [];
+    } catch (err) {
+        console.error("Error fetching products:", err);
+    }
+};
+
+const selectExistingProduct = (product) => {
+    selectedExistingProduct.value = product;
+    form.value.nombre = product.nombre;
+    form.value.descripcion = product.descripcion || '';
+    form.value.precio = product.precio;
+    form.value.plataforma = product.plataforma || 'PC';
+    form.value.category_id = product.category_id;
+    searchQuery.value = '';
+    isNewProduct.value = false;
+};
+
+const clearSelection = () => {
+    selectedExistingProduct.value = null;
+    form.value.nombre = '';
+    form.value.descripcion = '';
+    form.value.precio = '';
+    form.value.plataforma = 'PC';
+    form.value.category_id = null;
+    isNewProduct.value = false;
+};
+
+const setNewProduct = () => {
+    selectedExistingProduct.value = null;
+    form.value.nombre = searchQuery.value;
+    isNewProduct.value = true;
+    searchQuery.value = '';
 };
 
 const handleFileUpload = (event) => {
@@ -43,32 +93,35 @@ const submitForm = async () => {
         formData.append('nombre', form.value.nombre);
         formData.append('descripcion', form.value.descripcion);
         formData.append('precio', form.value.precio);
-        formData.append('stock', form.value.stock);
+        formData.append('codigo', form.value.codigo);
+        formData.append('plataforma', form.value.plataforma || 'PC');
+
         if (form.value.category_id) {
             formData.append('category_id', form.value.category_id);
         }
-        formData.append('seccion', form.value.seccion || ''); // Opcional
+        formData.append('seccion', form.value.seccion || '');
 
         if (form.value.imagen) {
             formData.append('imagen', form.value.imagen);
         }
 
-        await http.post('/api/products', formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data'
-            }
+        const response = await http.post('/api/products', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
         });
 
         success.value = true;
+        successMessage.value = response.data.message || 'Producto publicado correctamente';
         setTimeout(() => {
             router.push('/products');
-        }, 2000);
+        }, 2500);
 
     } catch (err) {
         console.error(err);
         if (err.response && err.response.status === 401) {
             error.value = "Tu sesión ha expirado. Por favor, inicia sesión nuevamente.";
-            // Opcional: router.push('/login');
+        } else if (err.response?.data?.errors) {
+            const errors = err.response.data.errors;
+            error.value = Object.values(errors).flat().join(', ');
         } else {
             error.value = err.response?.data?.message || "Error al crear el producto.";
         }
@@ -79,78 +132,156 @@ const submitForm = async () => {
 
 onMounted(() => {
     fetchCategories();
+    fetchProducts();
 });
 </script>
 
 <template>
-    <div class="container my-5">
-        <h2 class="text-center mb-4">Vender Producto</h2>
+    <div class="contenedor-formulario-principal">
+        <div class="caja-formulario-vender">
+            <h1>Vender Producto</h1>
+            <p class="subtitulo-form">Sube una clave de un juego para ponerlo a la venta</p>
 
-        <div v-if="success" class="alert alert-success">
-            Producto creado exitosamente. Redirigiendo...
+            <div v-if="success" class="alerta-exito">
+                ✅ {{ successMessage }}
+            </div>
+
+            <div v-if="error" class="alerta-error">
+                ❌ {{ error }}
+            </div>
+
+            <form @submit.prevent="submitForm">
+                <!-- Buscar producto existente o crear nuevo -->
+                <div class="grupo-input" v-if="!selectedExistingProduct && !isNewProduct">
+                    <label>Buscar juego existente o crear uno nuevo</label>
+                    <input type="text" v-model="searchQuery" placeholder="Escribe el nombre del juego..."
+                        autocomplete="off" />
+
+                    <!-- Resultados de búsqueda -->
+                    <div v-if="filteredProducts.length > 0" class="search-results">
+                        <div v-for="product in filteredProducts" :key="product.id" class="search-result-item"
+                            @click="selectExistingProduct(product)">
+                            <img v-if="product.imagen_url" :src="product.imagen_url" :alt="product.nombre"
+                                class="search-thumb" />
+                            <div class="search-info">
+                                <strong>{{ product.nombre }}</strong>
+                                <span>{{ product.plataforma || 'PC' }} · {{ product.precio }}€ · Stock: {{
+                                    product.stock }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Opción de crear nuevo si hay búsqueda -->
+                    <div v-if="searchQuery.length >= 2 && filteredProducts.length === 0" class="nuevo-producto-hint">
+                        <p>No se encontró ningún juego con ese nombre.</p>
+                        <button type="button" class="btn-nuevo" @click="setNewProduct">
+                            + Crear "{{ searchQuery }}" como producto nuevo
+                        </button>
+                    </div>
+
+                    <div v-if="searchQuery.length >= 2 && filteredProducts.length > 0" class="nuevo-producto-hint">
+                        <button type="button" class="btn-nuevo-alt" @click="setNewProduct">
+                            ¿No encuentras el juego? Crear "{{ searchQuery }}" como nuevo
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Producto seleccionado (existente) -->
+                <div v-if="selectedExistingProduct" class="producto-seleccionado">
+                    <div class="producto-sel-header">
+                        <div class="producto-sel-info">
+                            <span class="badge-existente">Producto existente</span>
+                            <h3>{{ selectedExistingProduct.nombre }}</h3>
+                            <p>{{ selectedExistingProduct.plataforma || 'PC' }} · {{
+                                selectedExistingProduct.precio }}€ · Stock actual: {{ selectedExistingProduct.stock }}
+                            </p>
+                        </div>
+                        <button type="button" class="btn-cambiar" @click="clearSelection">Cambiar</button>
+                    </div>
+                </div>
+
+                <!-- Producto nuevo: campos adicionales -->
+                <div v-if="isNewProduct" class="producto-nuevo-header">
+                    <div class="producto-sel-header">
+                        <div class="producto-sel-info">
+                            <span class="badge-nuevo">Producto nuevo</span>
+                            <h3>{{ form.nombre }}</h3>
+                        </div>
+                        <button type="button" class="btn-cambiar" @click="clearSelection">Cambiar</button>
+                    </div>
+                </div>
+
+                <!-- Campos de producto nuevo -->
+                <template v-if="isNewProduct">
+                    <div class="grupo-input">
+                        <label>Descripción</label>
+                        <textarea v-model="form.descripcion" rows="3" required
+                            placeholder="Describe el producto..."></textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="grupo-input">
+                            <label>Precio (€)</label>
+                            <input type="number" v-model="form.precio" step="0.01" min="0" required />
+                        </div>
+                        <div class="grupo-input">
+                            <label>Plataforma</label>
+                            <select v-model="form.plataforma">
+                                <option value="PC">PC</option>
+                                <option value="PS5">PS5</option>
+                                <option value="Xbox">Xbox</option>
+                                <option value="Switch">Switch</option>
+                                <option value="Web">Web</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="grupo-input">
+                            <label>Categoría</label>
+                            <select v-model="form.category_id">
+                                <option :value="null">Seleccionar...</option>
+                                <option v-for="cat in categories" :key="cat.id" :value="cat.id">
+                                    {{ cat.name }}
+                                </option>
+                            </select>
+                        </div>
+                        <div class="grupo-input">
+                            <label>Sección</label>
+                            <select v-model="form.seccion">
+                                <option value="">Seleccionar...</option>
+                                <option value="RPG">RPG</option>
+                                <option value="Acción">Acción</option>
+                                <option value="Aventura">Aventura</option>
+                                <option value="Deportes">Deportes</option>
+                                <option value="Estrategia">Estrategia</option>
+                                <option value="comprados">Destacado</option>
+                                <option value="software">Software</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grupo-input">
+                        <label>Imagen del Producto</label>
+                        <input type="file" @change="handleFileUpload" accept="image/*" />
+                    </div>
+                </template>
+
+                <!-- Campo de código (siempre visible cuando hay producto seleccionado) -->
+                <div v-if="selectedExistingProduct || isNewProduct" class="grupo-input codigo-input">
+                    <label>🔑 Código de activación</label>
+                    <input type="text" v-model="form.codigo" required placeholder="Ej: XXXX-XXXX-XXXX-XXXX"
+                        class="input-codigo" />
+                    <small class="codigo-ayuda">Introduce la clave del juego que quieres vender</small>
+                </div>
+
+                <!-- Botón enviar -->
+                <button v-if="selectedExistingProduct || isNewProduct" type="submit" class="btn-enviar"
+                    :disabled="loading">
+                    {{ loading ? 'Publicando...' : selectedExistingProduct ? 'Añadir Clave' : 'Publicar Producto' }}
+                </button>
+            </form>
         </div>
-
-        <div v-if="error" class="alert alert-danger">
-            {{ error }}
-        </div>
-
-        <form @submit.prevent="submitForm" class="card p-4 shadow-sm mx-auto" style="max-width: 600px;">
-            <div class="mb-3">
-                <label for="nombre" class="form-label">Nombre del Producto</label>
-                <input type="text" id="nombre" v-model="form.nombre" class="form-control" required />
-            </div>
-
-            <div class="mb-3">
-                <label for="descripcion" class="form-label">Descripción</label>
-                <textarea id="descripcion" v-model="form.descripcion" class="form-control" rows="3" required></textarea>
-            </div>
-
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label for="precio" class="form-label">Precio (€)</label>
-                    <input type="number" id="precio" v-model="form.precio" class="form-control" step="0.01" min="0"
-                        required />
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label for="stock" class="form-label">Stock</label>
-                    <input type="number" id="stock" v-model="form.stock" class="form-control" min="0" required />
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label for="categoria" class="form-label">Categoría</label>
-                    <select id="categoria" v-model="form.category_id" class="form-select">
-                        <option :value="null">Seleccionar...</option>
-                        <option v-for="cat in categories" :key="cat.id" :value="cat.id">
-                            {{ cat.name }}
-                        </option>
-                    </select>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label for="seccion" class="form-label">Sección</label>
-                    <select id="seccion" v-model="form.seccion" class="form-select">
-                        <option value="">Seleccionar (Opcional)</option>
-                        <option value="RPG">RPG</option>
-                        <option value="Acción">Acción</option>
-                        <option value="Aventura">Aventura</option>
-                        <option value="Deportes">Deportes</option>
-                        <option value="Estrategia">Estrategia</option>
-                         <option value="comprados">Destacado (Comprados)</option>
-                         <option value="software">Software</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="mb-3">
-                <label for="imagen" class="form-label">Imagen del Producto</label>
-                <input type="file" id="imagen" @change="handleFileUpload" class="form-control" accept="image/*" />
-            </div>
-
-            <button type="submit" class="btn btn-publicar w-100" :disabled="loading">
-                {{ loading ? 'Publicando...' : 'Publicar Producto' }}
-            </button>
-        </form>
     </div>
 </template>
 

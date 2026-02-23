@@ -27,7 +27,7 @@ class ProductController extends Controller
      */
     public function index(\Illuminate\Http\Request $request)
     {
-        $filters = $request->only(['category', 'offers', 'platform', 'q', 'max_price']);
+        $filters = $request->only(['category', 'offers', 'platform', 'q', 'max_price', 'page', 'per_page']);
         return response()->json($this->service->listar($filters));
     }
 
@@ -43,37 +43,68 @@ class ProductController extends Controller
         }
     }
 
-    // Crea un nuevo producto
+    // Crea un producto nuevo o añade un código a uno existente
     public function store(\Illuminate\Http\Request $request)
     {
         $validated = $request->validate([
             'nombre' => 'required|string|max:255',
             'descripcion' => 'required|string',
             'precio' => 'required|numeric|min:0',
-            'stock' => 'required|integer|min:0',
-            'categoria' => 'nullable|string', // Legacy support
-            'category_id' => 'nullable|exists:categories,id', // Relationship
+            'codigo' => 'required|string|max:255|unique:product_codes,code',
+            'categoria' => 'nullable|string',
+            'category_id' => 'nullable|exists:categories,id',
             'seccion' => 'nullable|string',
-            'imagen' => 'nullable|image|max:2048', // Max 2MB
+            'imagen' => 'nullable|image|max:2048',
             'porcentaje_descuento' => 'nullable|integer|min:0|max:100',
             'plataforma' => 'nullable|string',
         ]);
 
-        // Handle image upload
-        $path = null;
-        if ($request->hasFile('imagen')) {
-            $path = $request->file('imagen')->store('products', 'public'); // Store in 'storage/app/public/products'
-            $validated['imagen_url'] = '/storage/' . $path; // Accessible URL
+        // Buscar si ya existe un producto con el mismo nombre
+        $product = \App\Models\Product::where('nombre', $validated['nombre'])->first();
+
+        if ($product) {
+            // Producto existente: solo añadir el código
+            \App\Models\ProductCode::create([
+                'product_id' => $product->id,
+                'code' => $validated['codigo'],
+                'is_sold' => false,
+            ]);
+
+            return response()->json([
+                'message' => 'Código añadido al producto existente',
+                'product' => $product,
+                'stock' => $product->stock,
+            ], 200);
         }
 
-        // Generate SKU if missing (simple random for now)
+        // Producto nuevo: crear producto + código
+        if ($request->hasFile('imagen')) {
+            $path = $request->file('imagen')->store('products', 'public');
+            $validated['imagen_url'] = '/storage/' . $path;
+        }
+
         if (!isset($validated['sku'])) {
             $validated['sku'] = strtoupper(uniqid('SKU-'));
         }
 
+        // Quitar 'codigo' antes de crear el producto
+        $codigo = $validated['codigo'];
+        unset($validated['codigo']);
+
         $product = $this->service->crear($validated);
 
-        return response()->json($product, 201);
+        // Crear el código para el nuevo producto
+        \App\Models\ProductCode::create([
+            'product_id' => $product->id,
+            'code' => $codigo,
+            'is_sold' => false,
+        ]);
+
+        return response()->json([
+            'message' => 'Producto creado con código',
+            'product' => $product,
+            'stock' => 1,
+        ], 201);
     }
     public function recommendations($id)
     {
@@ -85,7 +116,7 @@ class ProductController extends Controller
                 ->inRandomOrder()
                 ->take(3)
                 ->get();
-            
+
             // Fallback: If no related products, return random ones
             if ($recommendations->isEmpty()) {
                 $recommendations = \App\Models\Product::where('id', '!=', $id)

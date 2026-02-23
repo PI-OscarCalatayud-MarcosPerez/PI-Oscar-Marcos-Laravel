@@ -175,7 +175,7 @@
 }
 
 /* Responsive */
-@media (max-width: 991px) {
+@media (max-width: 1100px) {
     .nav-container {
         text-align: left;
     }
@@ -255,15 +255,15 @@
     }
 }
 
-/* Admin Navbar Fix */
-.nav-container.admin-nav {
-    flex-wrap: nowrap !important;
-    white-space: nowrap;
-}
+@media (min-width: 1101px) {
+    .nav-container.admin-nav {
+        flex-wrap: nowrap !important;
+        white-space: nowrap;
+    }
 
-.nav-container.admin-nav .enlaces_navegacion {
-    font-size: 0.9rem;
-    /* Slightly smaller to fit */
-    display: flex;
-    gap: 15px;
+    .nav-container.admin-nav .enlaces_navegacion {
+        font-size: 0.9rem;
+        display: flex;
+        gap: 15px;
+    }
 }

@@ -63,7 +63,10 @@ const normalizar = (texto) => {
 
 // Helper for images
 const getImage = (product) => {
-    let img = product.imagen_url || product.img || "img/placeholder.jpg";
+    let img = product.imagen_url || product.img;
+    if (!img || img === "") {
+        return "https://placehold.co/400x600/1a1a2e/ffffff?text=MOKeys";
+    }
     if (img && !img.startsWith('http') && !img.startsWith('data:')) {
         if (img.startsWith('/')) img = img.substring(1);
         if (!img.startsWith('img/')) img = 'img/' + img;
@@ -81,9 +84,24 @@ const clearFilters = () => {
     selectedPlatforms.value = [];
     maxPrice.value = 100;
     sortOrder.value = 'default';
-    productStore.clearFilters(); // Clear store filters
+    productStore.clearFilters();
     router.replace({ query: {} });
 }
+
+const changePage = (page) => {
+    router.push({ query: { ...route.query, page } });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+const visiblePages = computed(() => {
+    const pages = [];
+    const current = productStore.currentPage;
+    const last = productStore.lastPage;
+    const start = Math.max(1, current - 2);
+    const end = Math.min(last, current + 2);
+    for (let i = start; i <= end; i++) pages.push(i);
+    return pages;
+})
 
 // Update Max Price
 const updateMaxPrice = () => {
@@ -123,6 +141,7 @@ watch(() => route.query, (newQuery) => {
     } else {
         maxPrice.value = 100;
     }
+    if (newQuery.page) params.page = parseInt(newQuery.page);
 
     // Trigger store fetch
     productStore.fetchProducts(params);
@@ -173,7 +192,7 @@ onMounted(() => {
         <!-- Product Grid -->
         <section class="products-section">
             <div class="products-header">
-                <span>{{ filteredProducts.length }} productos encontrados</span>
+                <span>{{ productStore.total }} productos encontrados</span>
                 <select v-model="sortOrder" id="sortOrder">
                     <option value="default">Orden por defecto</option>
                     <option value="price-asc">Precio: Menor a Mayor</option>
@@ -221,6 +240,24 @@ onMounted(() => {
                     No se encontraron productos con esos filtros.
                 </p>
             </div>
+
+            <!-- Paginación -->
+            <nav v-if="productStore.lastPage > 1" class="pagination-container" aria-label="Paginación de productos">
+                <button class="pagination-btn" :disabled="productStore.currentPage <= 1"
+                    @click="changePage(productStore.currentPage - 1)">
+                    ← Anterior
+                </button>
+
+                <button v-for="page in visiblePages" :key="page" class="pagination-btn"
+                    :class="{ active: page === productStore.currentPage }" @click="changePage(page)">
+                    {{ page }}
+                </button>
+
+                <button class="pagination-btn" :disabled="productStore.currentPage >= productStore.lastPage"
+                    @click="changePage(productStore.currentPage + 1)">
+                    Siguiente →
+                </button>
+            </nav>
         </section>
     </div>
 </template>

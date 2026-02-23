@@ -1,0 +1,57 @@
+{
+    "name": "MOKeys - Envío de Códigos (Gmail)",
+    "nodes": [
+        {
+            "parameters": {
+                "httpMethod": "POST",
+                "path": "mokeys-compra",
+                "responseMode": "onReceived",
+                "options": {}
+            },
+            "id": "a1b2c3d4-0001-0001-0001-000000000001",
+            "name": "Webhook Compra",
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 1,
+            "position": [240, 300],
+            "webhookId": "mokeys-compra-webhook"
+        },
+        {
+            "parameters": {
+                "sendTo": "={{ $json.body.email_comprador }}",
+                "subject": "🎮 Tu código de {{ $json.body.nombre_juego }} ya está aquí, {{ $json.body.nombre_usuario }}!",
+                "emailType": "html",
+                "message": "<!DOCTYPE html>\n<html lang=\"es\">\n<head>\n  <meta charset=\"UTF-8\">\n  <style>\n    body { font-family: Arial, sans-serif; background-color: #0f0f0f; color: #e0e0e0; margin: 0; padding: 0; }\n    .container { max-width: 600px; margin: 40px auto; background-color: #1a1a2e; border-radius: 12px; overflow: hidden; border: 1px solid #16213e; }\n    .header { background: linear-gradient(135deg, #e94560, #0f3460); padding: 30px; text-align: center; }\n    .header h1 { margin: 0; color: #ffffff; font-size: 28px; letter-spacing: 2px; }\n    .header span { color: #f5a623; }\n    .body { padding: 30px 40px; }\n    .greeting { font-size: 18px; color: #e0e0e0; margin-bottom: 10px; }\n    .thanks { font-size: 14px; color: #a0a0b0; margin-bottom: 30px; }\n    .game-card { background-color: #16213e; border-left: 4px solid #e94560; border-radius: 8px; padding: 20px 25px; margin-bottom: 25px; }\n    .game-card .label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #a0a0b0; margin-bottom: 5px; }\n    .game-name { font-size: 24px; font-weight: bold; color: #f5a623; margin-bottom: 20px; }\n    .code-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #a0a0b0; margin-bottom: 8px; }\n    .code-box { background-color: #0f0f0f; border: 2px dashed #e94560; border-radius: 6px; padding: 15px; text-align: center; font-size: 22px; font-weight: bold; color: #ffffff; letter-spacing: 4px; font-family: monospace; }\n    .instructions { background-color: #0d1b2a; border-radius: 8px; padding: 20px 25px; margin-bottom: 25px; }\n    .instructions h3 { color: #e94560; margin-top: 0; font-size: 15px; }\n    .instructions ol { padding-left: 20px; color: #c0c0d0; font-size: 14px; line-height: 1.8; margin: 0; }\n    .footer { text-align: center; padding: 20px; font-size: 12px; color: #555570; border-top: 1px solid #16213e; }\n  </style>\n</head>\n<body>\n  <div class=\"container\">\n    <div class=\"header\">\n      <h1>MO<span>KEYS</span></h1>\n    </div>\n    <div class=\"body\">\n      <p class=\"greeting\">¡Hola, <b>{{ $json.body.nombre_usuario }}</b>! 👋</p>\n      <p class=\"thanks\">Gracias por tu compra en <b>MOKeys</b>. Tu pago ha sido procesado con éxito y aquí tienes tu código de activación. ¡Disfruta el juego!</p>\n\n      <div class=\"game-card\">\n        <div class=\"label\">Juego adquirido</div>\n        <div class=\"game-name\">{{ $json.body.nombre_juego }}</div>\n        <div class=\"code-label\">Tu código de activación ({{ $json.body.plataforma }})</div>\n        <div class=\"code-box\">{{ $json.body.codigo_juego }}</div>\n      </div>\n\n      <div class=\"instructions\">\n        <h3>📋 Cómo activar tu juego en {{ $json.body.plataforma }}</h3>\n        <ol>\n          <li>Abre la aplicación de <b>{{ $json.body.plataforma }}</b> o accede a su web oficial.</li>\n          <li>Inicia sesión en tu cuenta o crea una si aún no tienes.</li>\n          <li>Busca la opción <b>\"Activar producto\"</b> o <b>\"Canjear código\"</b> (suele estar en tu perfil o en el menú principal).</li>\n          <li>Introduce el código tal y como aparece arriba, respetando mayúsculas y guiones.</li>\n          <li>Confirma la activación. El juego se añadirá automáticamente a tu biblioteca.</li>\n        </ol>\n      </div>\n\n      <p style=\"font-size: 13px; color: #a0a0b0;\">Si tienes cualquier problema con tu código, contáctanos en <a href=\"mailto:soporte@mokeys.com\" style=\"color: #e94560;\">soporte@mokeys.com</a> y lo resolvemos enseguida.</p>\n    </div>\n    <div class=\"footer\">\n      © 2025 MOKeys · Tu tienda de claves de confianza<br>\n      <span style=\"color: #333355;\">No respondas a este correo automático.</span>\n    </div>\n  </div>\n</body>\n</html>",
+                "options": {}
+            },
+            "id": "a1b2c3d4-0002-0002-0002-000000000002",
+            "name": "Gmail - Enviar Código",
+            "type": "n8n-nodes-base.gmail",
+            "typeVersion": 2,
+            "position": [520, 300],
+            "credentials": {
+                "gmailOAuth2": {
+                    "id": "1",
+                    "name": "Gmail MOKeys"
+                }
+            }
+        }
+    ],
+    "connections": {
+        "Webhook Compra": {
+            "main": [
+                [
+                    {
+                        "node": "Gmail - Enviar Código",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    },
+    "active": false,
+    "settings": {
+        "executionOrder": "v1"
+    },
+    "tags": []
+}

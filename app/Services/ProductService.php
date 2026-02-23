@@ -29,4 +29,10 @@ class ProductService
         // Aquí podrías añadir lógica extra, como subir imágenes
         return $this->repository->create($data);
     }
+
+    // Lógica para vender código
+    public function venderCodigo($productId)
+    {
+        return $this->repository->sellCode($productId);
+    }
 }

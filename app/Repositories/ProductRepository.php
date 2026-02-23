@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\Product;
+use App\Models\ProductCode;
 
 class ProductRepository implements BaseRepository
 {
@@ -31,7 +32,7 @@ class ProductRepository implements BaseRepository
             $query->where(function ($q) use ($platforms) {
                 foreach ($platforms as $platform) {
                     $q->orWhere('plataforma', 'like', "%{$platform}%")
-                      ->orWhere('descripcion', 'like', "%{$platform}%");
+                        ->orWhere('descripcion', 'like', "%{$platform}%");
                 }
             });
         }
@@ -42,9 +43,9 @@ class ProductRepository implements BaseRepository
 
         if (isset($filters['q'])) {
             $search = $filters['q'];
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('nombre', 'like', "%{$search}%")
-                  ->orWhere('descripcion', 'like', "%{$search}%");
+                    ->orWhere('descripcion', 'like', "%{$search}%");
             });
         }
 
@@ -52,7 +53,9 @@ class ProductRepository implements BaseRepository
             $query->where('porcentaje_descuento', '>', 0);
         }
 
-        return $query->get();
+        $perPage = $filters['per_page'] ?? 12;
+
+        return $query->paginate($perPage);
     }
 
     // Buscar un registro por ID
@@ -71,5 +74,21 @@ class ProductRepository implements BaseRepository
     }
     public function delete($id)
     { /* ... */
+    }
+
+    // Método para vender un código (se elimina tras la venta)
+    public function sellCode($productId)
+    {
+        $code = ProductCode::where('product_id', $productId)
+            ->where('is_sold', false)
+            ->first();
+
+        if ($code) {
+            $codigoTexto = $code->code;
+            $code->delete();
+            return $codigoTexto;
+        }
+
+        return null;
     }
 }

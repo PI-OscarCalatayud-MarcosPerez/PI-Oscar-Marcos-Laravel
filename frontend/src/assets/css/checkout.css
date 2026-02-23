@@ -218,3 +218,120 @@
         grid-template-columns: 1fr;
     }
 }
+
+/* Purchase Success Screen */
+.purchase-success {
+    display: flex;
+    justify-content: center;
+    padding: 40px 0;
+}
+
+.success-card {
+    background: white;
+    border-radius: 16px;
+    padding: 40px;
+    max-width: 700px;
+    width: 100%;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    text-align: center;
+}
+
+.success-icon {
+    font-size: 60px;
+    margin-bottom: 10px;
+}
+
+.success-card h1 {
+    color: #0e273f;
+    margin-bottom: 10px;
+}
+
+.success-subtitle {
+    color: #666;
+    margin-bottom: 30px;
+    font-size: 15px;
+}
+
+.codes-list {
+    text-align: left;
+    margin-bottom: 25px;
+}
+
+.code-card {
+    background: #f8f9fa;
+    border-left: 4px solid #fa4841;
+    border-radius: 8px;
+    padding: 18px 22px;
+    margin-bottom: 12px;
+}
+
+.code-game-name {
+    font-weight: 700;
+    color: #0e273f;
+    font-size: 16px;
+    margin-bottom: 8px;
+}
+
+.code-value {
+    font-family: "Courier New", monospace;
+    font-size: 20px;
+    font-weight: bold;
+    color: #fa4841;
+    letter-spacing: 2px;
+    background: #fff;
+    border: 2px dashed #fa4841;
+    border-radius: 6px;
+    padding: 10px 15px;
+    display: inline-block;
+    margin-bottom: 6px;
+}
+
+.code-status {
+    display: block;
+    font-size: 12px;
+    color: #2ecc71;
+    margin-top: 5px;
+}
+
+.errors-section {
+    background: #fff3cd;
+    border: 1px solid #ffc107;
+    border-radius: 8px;
+    padding: 15px 20px;
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.errors-section h3 {
+    margin-top: 0;
+    font-size: 15px;
+    color: #856404;
+}
+
+.error-item {
+    font-size: 14px;
+    color: #856404;
+    margin-bottom: 5px;
+}
+
+.btn-back-home {
+    background: #0e273f;
+    color: white;
+    border: none;
+    padding: 15px 40px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.btn-back-home:hover {
+    background: #1a3a5c;
+}
+
+.btn-confirm:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    box-shadow: none;
+}

@@ -73,6 +73,24 @@ services:
     networks:
       - app-network
 
+  # n8n (Workflow Automation)
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: n8n
+    restart: always
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_HOST=localhost
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - WEBHOOK_URL=http://localhost:5678/
+      - GENERIC_TIMEZONE=Europe/Madrid
+    volumes:
+      - ./n8n-local:/home/node/.n8n
+    networks:
+      - app-network
+
 networks:
   app-network:
     driver: bridge

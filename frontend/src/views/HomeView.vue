@@ -9,8 +9,7 @@ const loading = ref(true);
 
 const fetchProducts = async () => {
     try {
-        const response = await ProductService.getProducts();
-        // API might return array directly or object with data property
+        const response = await ProductService.getProducts({ per_page: 100 });
         const data = response.data;
         products.value = Array.isArray(data) ? data : (data.products || data.data || []);
         console.log("Productos cargados:", products.value);
@@ -36,7 +35,10 @@ const software = computed(() => {
 
 // Fallback logic for images
 const getImage = (product) => {
-    let img = product.imagen_url || product.img || "img/placeholder.jpg";
+    let img = product.imagen_url || product.img;
+    if (!img || img === "") {
+        return "https://placehold.co/400x600/1a1a2e/ffffff?text=MOKeys";
+    }
     if (img && !img.startsWith('http') && !img.startsWith('/')) {
         img = '/' + img;
     }
@@ -49,11 +51,11 @@ const scrollCarousel = (id, direction) => {
     if (track) {
         const item = track.querySelector(".item");
         const scrollAmount = item ? item.offsetWidth + 20 : 300;
-        
+
         if (direction === 1 && track.scrollLeft + track.clientWidth >= track.scrollWidth - 10) {
-             track.scrollTo({ left: 0, behavior: 'smooth' }); // Loop back to start
+            track.scrollTo({ left: 0, behavior: 'smooth' }); // Loop back to start
         } else if (direction === -1 && track.scrollLeft <= 0) {
-             track.scrollTo({ left: track.scrollWidth, behavior: 'smooth' }); // Loop to end
+            track.scrollTo({ left: track.scrollWidth, behavior: 'smooth' }); // Loop to end
         } else {
             track.scrollBy({
                 left: direction * scrollAmount,

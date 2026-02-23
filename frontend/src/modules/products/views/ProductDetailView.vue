@@ -65,8 +65,11 @@ const fetchProduct = async () => {
 }
 
 const getImage = (prod) => {
-    if (!prod) return "img/placeholder.jpg";
-    let img = prod.imagen_url || prod.img || "img/placeholder.jpg";
+    if (!prod) return "https://placehold.co/400x600/1a1a2e/ffffff?text=MOKeys";
+    let img = prod.imagen_url || prod.img;
+    if (!img || img === "") {
+        return "https://placehold.co/400x600/1a1a2e/ffffff?text=MOKeys";
+    }
     if (img && !img.startsWith('http') && !img.startsWith('data:')) {
         if (img.startsWith('/')) img = img.substring(1);
         if (!img.startsWith('img/')) img = 'img/' + img;
@@ -190,7 +193,6 @@ onMounted(async () => {
 });
 
 // Watch for route changes to reload product data when clicking recommendations
-import { watch } from 'vue'; // Ensure watch is imported (it is imported in line 2)
 watch(() => route.params.id, (newId) => {
     if (newId) {
         fetchProduct();
