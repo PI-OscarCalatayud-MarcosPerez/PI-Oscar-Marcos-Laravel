@@ -47,7 +47,7 @@ class AuthController extends Controller
             'last_name' => $validatedData['last_name'] ?? null,
             'email' => $validatedData['email'],
             'password' => \Illuminate\Support\Facades\Hash::make($validatedData['password']),
-            'role' => 'user', // Default role
+            'role' => 'user',
         ]);
 
         $token = $user->createToken('auth_token')->plainTextToken;
@@ -61,7 +61,6 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        // Revoke the token that was used to authenticate the current request
         $request->user()->currentAccessToken()->delete();
 
         return response()->json([

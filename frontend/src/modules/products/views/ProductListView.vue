@@ -178,7 +178,8 @@ onMounted(() => {
             <div class="filter-group">
                 <h4>Plataforma</h4>
                 <label v-for="plat in platforms" :key="plat">
-                    <input type="checkbox" :value="plat" v-model="selectedPlatforms" @change="updatePlatforms" /> {{ plat }}
+                    <input type="checkbox" :value="plat" v-model="selectedPlatforms" @change="updatePlatforms" /> {{
+                    plat }}
                 </label>
             </div>
 
@@ -228,7 +229,8 @@ onMounted(() => {
                                 {{ parseFloat(product.precio || 0).toFixed(2) }}€
                             </span>
                             <span :class="{ 'text-danger': product.porcentaje_descuento > 0 }">
-                                {{ (parseFloat(product.precio || 0) * (1 - (product.porcentaje_descuento || 0) / 100)).toFixed(2)
+                                {{ (parseFloat(product.precio || 0) * (1 - (product.porcentaje_descuento || 0) /
+                                    100)).toFixed(2)
                                 }}€
                             </span>
                         </p>
