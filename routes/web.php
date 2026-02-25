@@ -1,17 +1,28 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\PageController;
 use App\Http\Controllers\ProductController;
 
+// =========================================================================
+// SPRINT 3 - BACKEND LARAVEL V2 (Arquitectura MVC y Rutas)
+// =========================================================================
+// El frontend SPA (Vue.js) es el cliente principal, pero se han definido
+// estas rutas para cumplir con los requisitos de arquitectura MVC de la Iteración 3.
 
+Route::get('/', function () {
+    return view('spa');
+});
 
-// NOTA: El frontend ahora se maneja completamente con Vue.js (Vite)
-// Las siguientes rutas están comentadas porque Vue SPA maneja estas vistas
+// Ruta para el catálogo en Blade (Requisito C5: "Vista Blade de listado")
+// Aunque la SPA maneja el catálogo, este endpoint demuestra el uso de Controladores y Vistas Blade.
+Route::get('/productos-blade', [ProductController::class, 'index'])->name('products.index');
 
-// Route::get('/', function () {
-//     return view('pages.home');
-// })->name('home');
+// Rutas administrativas restringidas (Requisito C6: "CRUD administrativo")
+// Se utiliza el middleware 'auth' para asegurar que solo usuarios autenticados accedan.
+Route::middleware(['auth'])->prefix('admin')->group(function () {
+    Route::get('/products', [ProductController::class, 'index'])->name('admin.products.index');
+    // En el futuro se añadirían aquí 'edit', 'update', etc.
+});
 
 // Route::get('/contacto', function () {
 //     return view('pages.contacto');
@@ -50,12 +61,11 @@ use App\Http\Controllers\ProfileController;
 //     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 // });
 
-// Ruta principal para SPA (Vue)
-Route::get('/', function () {
-    return view('spa');
-});
-
-// Catch-all para cualquier otra ruta que no sea API, la maneja Vue Router
+// =========================================================================
+// SPRINT 3 - INTEGRACIÓN CON VUE SPA
+// =========================================================================
+// Catch-all para cualquier otra ruta que no sea API, la maneja Vue Router.
+// Esto permite que el servidor Laravel sirva la SPA correctamente.
 Route::get('/{any}', function () {
     return view('spa');
 })->where('any', '.*');

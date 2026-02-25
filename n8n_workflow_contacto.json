@@ -1,0 +1,136 @@
+{
+    "name": "Formulario de Contacto - MOKeys",
+    "nodes": [
+        {
+            "parameters": {
+                "httpMethod": "POST",
+                "path": "contacto",
+                "responseMode": "responseNode",
+                "options": {}
+            },
+            "id": "1",
+            "name": "Webhook",
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 1,
+            "position": [240, 300],
+            "webhookId": "contacto-mokeys"
+        },
+        {
+            "parameters": {
+                "operation": "insert",
+                "schema": "MOKeys",
+                "table": "incidents",
+                "columns": "nombre,email,motivo,created_at,updated_at",
+                "additionalFields": {}
+            },
+            "id": "2",
+            "name": "MySQL - Insertar Incidencia",
+            "type": "n8n-nodes-base.mySql",
+            "typeVersion": 1,
+            "position": [480, 300],
+            "credentials": {
+                "mySql": {
+                    "id": "MYSQL_CREDENTIAL_ID",
+                    "name": "MySQL - MOKeys"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "fromEmail": "noreply@tudominio.com",
+                "toEmail": "={{ $json[\"email\"] }}",
+                "subject": "Incidencia registrada correctamente",
+                "text": "Hola {{ $json[\"nombre\"] }}, tu incidencia ha sido registrada correctamente. Nos pondremos en contacto contigo lo antes posible.",
+                "options": {}
+            },
+            "id": "3",
+            "name": "Email - Confirmar Registro",
+            "type": "n8n-nodes-base.emailSend",
+            "typeVersion": 2,
+            "position": [720, 300],
+            "credentials": {
+                "smtp": {
+                    "id": "SMTP_CREDENTIAL_ID",
+                    "name": "SMTP - Servidor de Correo"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "respondWith": "json",
+                "responseBody": "={ \"success\": true, \"message\": \"Incidencia registrada correctamente\" }",
+                "options": {}
+            },
+            "id": "4",
+            "name": "Responder Webhook",
+            "type": "n8n-nodes-base.respondToWebhook",
+            "typeVersion": 1,
+            "position": [960, 300]
+        },
+        {
+            "parameters": {
+                "jsCode": "const body = $input.first().json.body;\n\nconst now = new Date().toISOString().slice(0, 19).replace('T', ' ');\n\nreturn [{\n  json: {\n    nombre: body.nombre,\n    email: body.email,\n    motivo: body.motivo,\n    created_at: now,\n    updated_at: now\n  }\n}];"
+            },
+            "id": "5",
+            "name": "Preparar Datos",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [360, 300]
+        }
+    ],
+    "connections": {
+        "Webhook": {
+            "main": [
+                [
+                    {
+                        "node": "Preparar Datos",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Preparar Datos": {
+            "main": [
+                [
+                    {
+                        "node": "MySQL - Insertar Incidencia",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "MySQL - Insertar Incidencia": {
+            "main": [
+                [
+                    {
+                        "node": "Email - Confirmar Registro",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Email - Confirmar Registro": {
+            "main": [
+                [
+                    {
+                        "node": "Responder Webhook",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    },
+    "pinData": {},
+    "settings": {
+        "executionOrder": "v1"
+    },
+    "staticData": null,
+    "tags": [],
+    "triggerCount": 1,
+    "updatedAt": "2024-01-01T00:00:00.000Z",
+    "versionId": "1"
+}

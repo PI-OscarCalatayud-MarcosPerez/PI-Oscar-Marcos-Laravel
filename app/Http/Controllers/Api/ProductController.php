@@ -11,20 +11,10 @@ class ProductController extends Controller
     public function __construct(private ProductService $service)
     {
     }
+    //store
+    // Retorna todos los productos en formato JSON
+    // Retorna todos los productos en formato JSON
 
-    // Retorna todos los productos en formato JSON
-    // Retorna todos los productos en formato JSON
-    /**
-     * @OA\Get(
-     *      path="/api/products",
-     *      tags={"Products"},
-     *      summary="Get list of products",
-     *      @OA\Response(
-     *          response=200,
-     *          description="Successful operation"
-     *       )
-     *     )
-     */
     public function index(\Illuminate\Http\Request $request)
     {
         $filters = $request->only(['category', 'offers', 'platform', 'q', 'max_price', 'page', 'per_page']);

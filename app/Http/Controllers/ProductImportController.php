@@ -8,6 +8,10 @@ use App\Models\Product;
 class ProductImportController extends Controller
 {
     /**
+     * SPRINT 3 - REQUISITO C4: Importación masiva de productos.
+     * Este controlador gestiona la lógica para leer archivos CSV/Excel,
+     * validar los datos y persistirlos en MySQL mediante Eloquent (v2).
+     *
      * Muestra el formulario de importación.
      */
     public function show()
@@ -143,7 +147,9 @@ class ProductImportController extends Controller
     }
 
     /**
-     * API Version: Procesa la subida del archivo CSV y devuelve JSON.
+     * SPRINT 3 - REQUISITO C5: API de Importación.
+     * Versión API que procesa el archivo y devuelve una respuesta estructurada en JSON.
+     * Útil para integrar con el frontend SPA o herramientas externas.
      */
     public function importApi(Request $request)
     {

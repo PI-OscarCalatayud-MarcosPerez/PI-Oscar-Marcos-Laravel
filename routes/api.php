@@ -8,7 +8,13 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
-// API Pública de Productos
+// =========================================================================
+// SPRINT 3 - API REST BASE (Preparación para Sprint 4)
+// =========================================================================
+// Se exponen los endpoints necesarios para que la SPA (Vue) pueda consumir
+// los datos del catálogo migrados a MySQL.
+
+// Requisito C5: API Pública de Productos (index, show)
 Route::apiResource('products', ProductController::class)->only(['index', 'show']);
 
 // Crear producto (requiere autenticación)
@@ -21,6 +27,7 @@ Route::post('/register', [App\Http\Controllers\Auth\RegisteredUserController::cl
 Route::get('/auth/google/redirect', [App\Http\Controllers\Auth\SocialAuthController::class, 'redirectToGoogle']);
 Route::get('/auth/google/callback', [App\Http\Controllers\Auth\SocialAuthController::class, 'handleGoogleCallback']);
 Route::post('/import', [App\Http\Controllers\ProductImportController::class, 'importApi']);
+Route::post('/contacto', [App\Http\Controllers\ContactoController::class, 'enviar']);
 
 
 Route::middleware(['web', 'auth:web'])->group(function () {

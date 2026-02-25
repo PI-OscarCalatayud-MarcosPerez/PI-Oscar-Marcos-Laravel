@@ -11,26 +11,33 @@ use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
 
+// =========================================================================
+// SPRINT 3 - AUTENTICACIÓN INTEGRADA (Laravel Breeze)
+// =========================================================================
+// Requisito C3: Se ha integrado Laravel Breeze para gestionar el sistema de
+// usuarios, registro y login, sustituyendo la gestión manual anterior.
+// Nota: Las rutas GET están comentadas porque la SPA (Vue) maneja las vistas.
+
 Route::middleware('guest')->group(function () {
     // Rutas GET comentadas - Vue SPA maneja las vistas de registro y login
-    // Route::get('register', [RegisteredUserController::class, 'create'])
-    //     ->name('register');
+// Route::get('register', [RegisteredUserController::class, 'create'])
+// ->name('register');
 
     Route::post('register', [RegisteredUserController::class, 'store']);
 
     // Route::get('login', [AuthenticatedSessionController::class, 'create'])
-    //     ->name('login');
+// ->name('login');
 
     Route::post('login', [AuthenticatedSessionController::class, 'store']);
 
     // Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
-    //     ->name('password.request');
+// ->name('password.request');
 
     Route::post('forgot-password', [PasswordResetLinkController::class, 'store'])
         ->name('password.email');
-
-    // Route::get('reset-password/{token}', [NewPasswordController::class, 'create'])
-    //     ->name('password.reset');
+    //Rutas vinculasdas
+// Route::get('reset-password/{token}', [NewPasswordController::class, 'create'])
+// ->name('password.reset');
 
     Route::post('reset-password', [NewPasswordController::class, 'store'])
         ->name('password.store');
@@ -38,7 +45,7 @@ Route::middleware('guest')->group(function () {
 
 Route::middleware('auth')->group(function () {
     // Route::get('verify-email', EmailVerificationPromptController::class)
-    //     ->name('verification.notice');
+// ->name('verification.notice');
 
     Route::get('verify-email/{id}/{hash}', VerifyEmailController::class)
         ->middleware(['signed', 'throttle:6,1'])
@@ -49,7 +56,7 @@ Route::middleware('auth')->group(function () {
         ->name('verification.send');
 
     // Route::get('confirm-password', [ConfirmablePasswordController::class, 'show'])
-    //     ->name('password.confirm');
+// ->name('password.confirm');
 
     Route::post('confirm-password', [ConfirmablePasswordController::class, 'store']);
 
