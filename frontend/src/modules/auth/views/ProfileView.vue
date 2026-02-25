@@ -6,6 +6,7 @@ import { useRole } from '@/modules/roles/composables/useRole'
 import RoleBadge from '@/modules/roles/components/RoleBadge.vue'
 import UiToast from '@/components/UiToast.vue'
 import ProductService from '@/modules/products/services/ProductService'
+import http from '@/services/http'
 
 const auth = useAuthStore()
 const router = useRouter()
@@ -39,6 +40,11 @@ const codesLoading = ref(false)
 const newCodesText = ref('')
 const addingCodes = ref(false)
 const codesRevealed = ref({})
+
+const importFile = ref(null)
+const importLoading = ref(false)
+const importResult = ref(null)
+const importError = ref(null)
 
 const filteredAdminProducts = computed(() => {
     if (!adminSearch.value) return adminProducts.value
@@ -145,6 +151,39 @@ const addNewCodes = async () => {
     }
 }
 
+const handleFileUpload = (event) => {
+    importFile.value = event.target.files[0]
+    importResult.value = null
+    importError.value = null
+}
+
+const submitImportFile = async () => {
+    if (!importFile.value) return
+
+    importLoading.value = true
+    const formData = new FormData()
+    formData.append('arxiuCsv', importFile.value)
+
+    try {
+        const response = await http.post('/api/import', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        })
+        importResult.value = response.data
+    } catch (err) {
+        console.error(err)
+        if (err.response && err.response.data) {
+            importError.value = err.response.data.message || 'Error al subir el archivo.'
+            if (err.response.data.errors) {
+                importResult.value = { errors: Object.values(err.response.data.errors).flat() }
+            }
+        } else {
+            importError.value = 'Ocurrió un error inesperado.'
+        }
+    } finally {
+        importLoading.value = false
+    }
+}
+
 const getStockClass = (stock) => {
     if (stock === 0) return 'stock-empty'
     if (stock <= 3) return 'stock-low'
@@ -235,12 +274,12 @@ onMounted(() => {
                     <button v-if="hasRole('admin')" class="menu-item"
                         :class="{ active: activeSection === 'admin-products' }"
                         @click="activeSection = 'admin-products'; fetchAdminProducts()">
-                        <span style="font-size: 20px; width: 22px; text-align: center;">🛒</span>
+                        <img src="/img/carrito1.png" alt="" class="menu-icon" />
                         <span>Gestión Productos</span>
                     </button>
 
                     <button v-if="hasRole('venedor', 'admin', 'gerent')" class="menu-item"
-                        @click="router.push('/import')">
+                        :class="{ active: activeSection === 'import' }" @click="activeSection = 'import'">
                         <img src="/img/boton-circular-plus2.png" alt="" class="menu-icon" />
                         <span>Subir Productos</span>
                     </button>
@@ -268,7 +307,7 @@ onMounted(() => {
 
                     <div class="info-grid">
                         <div class="info-card">
-                            <img src="/img/usuario.png" alt="Nombre" class="info-card-icon" />
+                            <img src="/img/usuario1.png" alt="Nombre" class="info-card-icon" />
                             <div>
                                 <label>Nombre</label>
                                 <p>{{ auth.user?.name || 'No disponible' }}</p>
@@ -339,7 +378,8 @@ onMounted(() => {
                     <h2 class="section-title">Gestión de Productos</h2>
                     <p class="section-subtitle">Editar productos, ofertas, precios y stock</p>
 
-                    <div v-if="adminMessage.text" :class="adminMessage.type === 'success' ? 'admin-msg-success' : 'admin-msg-error'">
+                    <div v-if="adminMessage.text"
+                        :class="adminMessage.type === 'success' ? 'admin-msg-success' : 'admin-msg-error'">
                         {{ adminMessage.text }}
                     </div>
 
@@ -369,7 +409,8 @@ onMounted(() => {
                             <tbody>
                                 <tr v-for="product in filteredAdminProducts" :key="product.id">
                                     <td>
-                                        <img :src="getProductImage(product)" :alt="product.nombre" class="admin-product-img" />
+                                        <img :src="getProductImage(product)" :alt="product.nombre"
+                                            class="admin-product-img" />
                                     </td>
                                     <td>
                                         <strong>{{ product.nombre }}</strong>
@@ -378,14 +419,17 @@ onMounted(() => {
                                     </td>
                                     <td>
                                         <template v-if="product.porcentaje_descuento > 0">
-                                            <span class="price-original-admin">{{ parseFloat(product.precio).toFixed(2) }}€</span>
+                                            <span class="price-original-admin">{{ parseFloat(product.precio).toFixed(2)
+                                                }}€</span>
                                             <br />
                                             <span class="price-final-admin" style="color: #c62828;">
-                                                {{ (parseFloat(product.precio) * (1 - product.porcentaje_descuento / 100)).toFixed(2) }}€
+                                                {{ (parseFloat(product.precio) * (1 - product.porcentaje_descuento /
+                                                    100)).toFixed(2) }}€
                                             </span>
                                         </template>
                                         <template v-else>
-                                            <span class="price-final-admin">{{ parseFloat(product.precio).toFixed(2) }}€</span>
+                                            <span class="price-final-admin">{{ parseFloat(product.precio).toFixed(2)
+                                                }}€</span>
                                         </template>
                                     </td>
                                     <td>
@@ -402,11 +446,13 @@ onMounted(() => {
                                     </td>
                                     <td>
                                         <div class="admin-actions-cell">
-                                            <button class="btn-admin-action btn-admin-edit" @click="openEditModal(product)" title="Editar producto">
-                                                ✏️
+                                            <button class="btn-admin-action btn-admin-edit"
+                                                @click="openEditModal(product)" title="Editar producto">
+                                                <img src="/img/lapiz.png" alt="Editar" class="admin-action-icon" />
                                             </button>
-                                            <button class="btn-admin-action btn-admin-keys" @click="openCodesModal(product)" title="Ver claves">
-                                                🔑
+                                            <button class="btn-admin-action btn-admin-keys"
+                                                @click="openCodesModal(product)" title="Ver claves">
+                                                <img src="/img/llave.png" alt="Claves" class="admin-action-icon" />
                                             </button>
                                         </div>
                                     </td>
@@ -445,13 +491,65 @@ onMounted(() => {
                     </div>
                 </section>
 
+                <section v-if="activeSection === 'import'" class="content-section">
+                    <h2 class="section-title">Importación de Productos</h2>
+                    <p class="section-subtitle">Sube un archivo CSV para actualizar el catálogo. (Columnas: id, nombre,
+                        descripcion,
+                        precio, img, estoc, categoria)</p>
+
+                    <div
+                        style="max-width: 500px; background: #f8f9fa; padding: 25px; border-radius: 12px; border: 1px solid #e0e0e0; margin-top: 20px;">
+                        <label for="csvFile"
+                            style="display:block; font-size:13px; font-weight:600; color:#0e273f; text-transform:uppercase; margin-bottom:10px;">Seleccionar
+                            archivo CSV</label>
+                        <input type="file" id="csvFile" accept=".csv" @change="handleFileUpload"
+                            style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 8px; background: white; margin-bottom: 20px;" />
+
+                        <button @click="submitImportFile" :disabled="!importFile || importLoading"
+                            style="width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s; background: linear-gradient(135deg, #2e7d32, #388e3c); color: white;">
+                            {{ importLoading ? 'Procesando archivo...' : 'Importar Catálogo' }}
+                        </button>
+                    </div>
+
+                    <div v-if="importError"
+                        style="margin-top: 20px; padding: 15px; border-radius: 8px; background: #ffebee; border: 1px solid #ffcdd2; color: #c62828;">
+                        {{ importError }}
+                    </div>
+
+                    <div v-if="importResult" style="margin-top: 20px;">
+                        <div v-if="importResult.messages && importResult.messages.length"
+                            style="padding: 15px; border-radius: 8px; background: #e8f5e9; border: 1px solid #c8e6c9; color: #2e7d32; margin-bottom: 10px;">
+                            <ul style="margin:0; padding-left: 20px;">
+                                <li v-for="(msg, index) in importResult.messages" :key="index">{{ msg }}</li>
+                            </ul>
+                        </div>
+                        <div v-if="importResult.errors && importResult.errors.length"
+                            style="padding: 15px; border-radius: 8px; background: #ffebee; border: 1px solid #ffcdd2; color: #c62828; margin-bottom: 10px;">
+                            <strong>Errores Críticos:</strong>
+                            <ul style="margin:5px 0 0; padding-left: 20px;">
+                                <li v-for="(err, index) in importResult.errors" :key="index">{{ err }}</li>
+                            </ul>
+                        </div>
+                        <div v-if="importResult.row_warnings && importResult.row_warnings.length"
+                            style="padding: 15px; border-radius: 8px; background: #fff3e0; border: 1px solid #ffe0b2; color: #e65100;">
+                            <strong>Advertencias (Filas ignoradas):</strong>
+                            <ul style="margin:5px 0 0; padding-left: 20px; max-height: 200px; overflow-y: auto;">
+                                <li v-for="(warn, index) in importResult.row_warnings" :key="index">{{ warn }}</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
             </main>
         </div>
     </div>
 
     <div v-if="editingProduct" class="modal-overlay" @click.self="closeEditModal">
         <div class="modal-content">
-            <h3 class="modal-title">✏️ Editar Producto</h3>
+            <h3 class="modal-title">
+                <img src="/img/lapiz.png" alt="" style="width: 24px; height: 24px; object-fit: contain;" />
+                Editar Producto
+            </h3>
 
             <div class="modal-form-group">
                 <label>Nombre</label>
@@ -510,7 +608,10 @@ onMounted(() => {
 
     <div v-if="codesModal" class="modal-overlay" @click.self="closeCodesModal">
         <div class="modal-content">
-            <h3 class="modal-title">🔑 Claves — {{ codesModal.nombre }}</h3>
+            <h3 class="modal-title">
+                <img src="/img/llave.png" alt="" style="width: 24px; height: 24px; object-fit: contain;" />
+                Claves — {{ codesModal.nombre }}
+            </h3>
 
             <div v-if="codesLoading" style="text-align: center; padding: 30px; color:#888;">
                 Cargando claves...
@@ -533,11 +634,10 @@ onMounted(() => {
                 </div>
 
                 <div class="codes-list" v-if="codesData.codes.length > 0">
-                    <div v-for="code in codesData.codes" :key="code.id"
-                        class="code-item" :class="code.is_sold ? 'code-sold' : 'code-available'">
+                    <div v-for="code in codesData.codes" :key="code.id" class="code-item"
+                        :class="code.is_sold ? 'code-sold' : 'code-available'">
                         <span @click="toggleCodeVisibility(code.id)"
-                            :class="codesRevealed[code.id] ? 'code-visible' : 'code-hidden'"
-                            style="cursor: pointer;"
+                            :class="codesRevealed[code.id] ? 'code-visible' : 'code-hidden'" style="cursor: pointer;"
                             :title="codesRevealed[code.id] ? '' : 'Clic para ver la clave'">
                             {{ code.code }}
                         </span>
@@ -551,7 +651,12 @@ onMounted(() => {
                 </div>
 
                 <div class="add-codes-area">
-                    <h4 style="margin: 0 0 10px; color: #0e273f; font-size: 16px;">➕ Añadir Nuevas Claves</h4>
+                    <h4
+                        style="margin: 0 0 10px; color: #0e273f; font-size: 16px; display: flex; align-items: center; gap: 8px;">
+                        <img src="/img/plus-pequeno.png" alt=""
+                            style="width: 16px; height: 16px; object-fit: contain;" />
+                        Añadir Nuevas Claves
+                    </h4>
                     <textarea v-model="newCodesText" placeholder="Introduce las claves, una por línea..."></textarea>
                     <p class="add-codes-hint">Escribe una clave por línea. Ejemplo: ABCD-1234-EFGH</p>
                     <button class="btn-add-codes" :disabled="addingCodes || !newCodesText.trim()" @click="addNewCodes">
