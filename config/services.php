@@ -41,4 +41,10 @@ return [
         'redirect' => env('GOOGLE_REDIRECT_URL'),
     ],
 
+    // Configuración de webhooks n8n
+    'n8n' => [
+        'webhook_compra' => env('N8N_WEBHOOK_URL', 'http://n8n:5678/webhook/mokeys-compra'),
+        'webhook_contacto' => env('N8N_WEBHOOK_CONTACTO', 'http://n8n:5678/webhook/contacto'),
+    ],
+
 ];

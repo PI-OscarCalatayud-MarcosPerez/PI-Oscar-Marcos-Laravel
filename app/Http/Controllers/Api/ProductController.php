@@ -3,38 +3,48 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Services\ProductService; // Usamos el servicio
-use OpenApi\Annotations as OA;
+use App\Services\ProductService;
+use Illuminate\Http\Request;
 
+/**
+ * Controlador API de productos.
+ * Gestiona las operaciones CRUD del catálogo para la SPA (Vue.js).
+ */
 class ProductController extends Controller
 {
     public function __construct(private ProductService $service)
     {
     }
-    //store
-    // Retorna todos los productos en formato JSON
-    // Retorna todos los productos en formato JSON
 
-    public function index(\Illuminate\Http\Request $request)
+    /**
+     * Lista todos los productos con filtros opcionales.
+     * Soporta filtrado por categoría, plataforma, precio, ofertas y búsqueda.
+     */
+    public function index(Request $request)
     {
         $filters = $request->only(['category', 'offers', 'platform', 'q', 'max_price', 'page', 'per_page']);
         return response()->json($this->service->listar($filters));
     }
 
-    // Retorna un producto específico
+    /**
+     * Retorna un producto específico con sus reseñas.
+     */
     public function show(string $id)
     {
         try {
             $product = $this->service->obtener($id);
-            $product->load('reviews.user', 'reviews'); // Eager load relationships
+            $product->load('reviews.user');
             return response()->json($product);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Producto no encontrado'], 404);
         }
     }
 
-    // Crea un producto nuevo o añade un código a uno existente
-    public function store(\Illuminate\Http\Request $request)
+    /**
+     * Crea un producto nuevo o añade un código a uno existente.
+     * Si ya existe un producto con el mismo nombre, solo se añade el código.
+     */
+    public function store(Request $request)
     {
         $validated = $request->validate([
             'nombre' => 'required|string|max:255',
@@ -53,37 +63,64 @@ class ProductController extends Controller
         $product = \App\Models\Product::where('nombre', $validated['nombre'])->first();
 
         if ($product) {
-            // Producto existente: solo añadir el código
-            \App\Models\ProductCode::create([
-                'product_id' => $product->id,
-                'code' => $validated['codigo'],
-                'is_sold' => false,
-            ]);
-
-            return response()->json([
-                'message' => 'Código añadido al producto existente',
-                'product' => $product,
-                'stock' => $product->stock,
-            ], 200);
+            return $this->agregarCodigoExistente($product, $validated['codigo']);
         }
 
-        // Producto nuevo: crear producto + código
+        return $this->crearProductoNuevo($request, $validated);
+    }
+
+    /**
+     * Devuelve hasta 3 productos recomendados similares al indicado.
+     * Busca por la misma categoría; si no hay, devuelve productos aleatorios.
+     */
+    public function recommendations(string $id)
+    {
+        try {
+            return response()->json($this->service->recomendaciones($id));
+        } catch (\Exception $e) {
+            return response()->json([]);
+        }
+    }
+
+    /**
+     * Añade un código de activación a un producto existente.
+     */
+    private function agregarCodigoExistente(\App\Models\Product $product, string $codigo)
+    {
+        \App\Models\ProductCode::create([
+            'product_id' => $product->id,
+            'code' => $codigo,
+            'is_sold' => false,
+        ]);
+
+        return response()->json([
+            'message' => 'Código añadido al producto existente',
+            'product' => $product,
+            'stock' => $product->stock,
+        ]);
+    }
+
+    /**
+     * Crea un producto nuevo con su primer código de activación.
+     */
+    private function crearProductoNuevo(Request $request, array $validated)
+    {
+        // Subir imagen si se proporciona
         if ($request->hasFile('imagen')) {
             $path = $request->file('imagen')->store('products', 'public');
             $validated['imagen_url'] = '/storage/' . $path;
         }
 
-        if (!isset($validated['sku'])) {
-            $validated['sku'] = strtoupper(uniqid('SKU-'));
-        }
+        // Generar SKU único
+        $validated['sku'] = strtoupper(uniqid('SKU-'));
 
-        // Quitar 'codigo' antes de crear el producto
+        // Separar el código antes de crear el producto
         $codigo = $validated['codigo'];
         unset($validated['codigo']);
 
         $product = $this->service->crear($validated);
 
-        // Crear el código para el nuevo producto
+        // Crear el código de activación asociado
         \App\Models\ProductCode::create([
             'product_id' => $product->id,
             'code' => $codigo,
@@ -95,29 +132,5 @@ class ProductController extends Controller
             'product' => $product,
             'stock' => 1,
         ], 201);
-    }
-    public function recommendations($id)
-    {
-        try {
-            $product = $this->service->obtener($id);
-            // Simple logic: Same category, different ID
-            $recommendations = \App\Models\Product::where('category_id', $product->category_id)
-                ->where('id', '!=', $id)
-                ->inRandomOrder()
-                ->take(3)
-                ->get();
-
-            // Fallback: If no related products, return random ones
-            if ($recommendations->isEmpty()) {
-                $recommendations = \App\Models\Product::where('id', '!=', $id)
-                    ->inRandomOrder()
-                    ->take(3)
-                    ->get();
-            }
-
-            return response()->json($recommendations);
-        } catch (\Exception $e) {
-            return response()->json([], 200); // Return empty array on error to avoiding breaking UI
-        }
     }
 }

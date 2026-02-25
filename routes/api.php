@@ -3,63 +3,56 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\ProductController;
+use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\ReviewController;
+use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\Auth\SocialAuthController;
+use App\Http\Controllers\CompraController;
+use App\Http\Controllers\ContactoController;
+use App\Http\Controllers\ProductImportController;
 
+/*
+|--------------------------------------------------------------------------
+| Rutas API
+|--------------------------------------------------------------------------
+| Endpoints de la API REST consumidos por la SPA (Vue.js).
+| Organizadas por recurso y nivel de autenticación.
+*/
+
+// ── Usuario autenticado (Sanctum) ──
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
-// =========================================================================
-// SPRINT 3 - API REST BASE (Preparación para Sprint 4)
-// =========================================================================
-// Se exponen los endpoints necesarios para que la SPA (Vue) pueda consumir
-// los datos del catálogo migrados a MySQL.
-
-// Requisito C5: API Pública de Productos (index, show)
+// ── Catálogo público ──
 Route::apiResource('products', ProductController::class)->only(['index', 'show']);
+Route::get('/products/{id}/recommendations', [ProductController::class, 'recommendations']);
+Route::apiResource('categories', CategoryController::class);
 
-// Crear producto (requiere autenticación)
+// ── Autenticación ──
+Route::post('/register', [RegisteredUserController::class, 'store']);
+Route::get('/auth/google/redirect', [SocialAuthController::class, 'redirectToGoogle']);
+Route::get('/auth/google/callback', [SocialAuthController::class, 'handleGoogleCallback']);
+
+// ── Endpoints públicos ──
+Route::post('/import', [ProductImportController::class, 'importApi']);
+Route::post('/contacto', [ContactoController::class, 'enviar']);
+
+// ── Rutas protegidas (requieren sesión autenticada) ──
 Route::middleware(['web', 'auth:web'])->group(function () {
+    // Productos: creación
     Route::post('/products', [ProductController::class, 'store']);
-});
-Route::get('/products/{id}/recommendations', [App\Http\Controllers\Api\ProductController::class, 'recommendations']);
-Route::apiResource('categories', \App\Http\Controllers\Api\CategoryController::class);
-Route::post('/register', [App\Http\Controllers\Auth\RegisteredUserController::class, 'store']); // Registration for API
-Route::get('/auth/google/redirect', [App\Http\Controllers\Auth\SocialAuthController::class, 'redirectToGoogle']);
-Route::get('/auth/google/callback', [App\Http\Controllers\Auth\SocialAuthController::class, 'handleGoogleCallback']);
-Route::post('/import', [App\Http\Controllers\ProductImportController::class, 'importApi']);
-Route::post('/contacto', [App\Http\Controllers\ContactoController::class, 'enviar']);
 
+    // Reseñas: CRUD
+    Route::post('/reviews', [ReviewController::class, 'store']);
+    Route::put('/reviews/{id}', [ReviewController::class, 'update']);
+    Route::delete('/reviews/{id}', [ReviewController::class, 'destroy']);
 
-Route::middleware(['web', 'auth:web'])->group(function () {
-    Route::post('/reviews', [App\Http\Controllers\Api\ReviewController::class, 'store']);
-    Route::put('/reviews/{id}', [App\Http\Controllers\Api\ReviewController::class, 'update']);
-    Route::delete('/reviews/{id}', [App\Http\Controllers\Api\ReviewController::class, 'destroy']);
-});
+    // Compra
+    Route::post('/compra', [CompraController::class, 'procesarCompraExitosa']);
 
-// Ruta de compra (requiere autenticación)
-Route::middleware(['web', 'auth:web'])->group(function () {
-    Route::post('/compra', [App\Http\Controllers\CompraController::class, 'procesarCompraExitosa']);
-});
-
-// Perfil de usuario (requiere autenticación)
-Route::middleware(['web', 'auth:web'])->group(function () {
-    Route::put('/user/profile', function (Request $request) {
-        $validated = $request->validate([
-            'name' => 'sometimes|string|max:255',
-            'last_name' => 'sometimes|string|max:255',
-            'username' => 'sometimes|string|max:255',
-        ]);
-
-        $user = $request->user();
-        $user->update($validated);
-
-        return response()->json($user);
-    });
-
-    Route::delete('/user/delete', function (Request $request) {
-        $user = $request->user();
-        $user->delete();
-
-        return response()->json(['message' => 'Cuenta eliminada correctamente']);
-    });
+    // Perfil de usuario
+    Route::put('/user/profile', [UserController::class, 'update']);
+    Route::delete('/user/delete', [UserController::class, 'destroy']);
 });

@@ -5,26 +5,28 @@ namespace App\Repositories;
 use App\Models\Product;
 use App\Models\ProductCode;
 
+/**
+ * Repositorio de productos.
+ * Gestiona las operaciones de persistencia y consultas sobre el catálogo.
+ */
 class ProductRepository implements BaseRepository
 {
-    protected $model;
-
-    // Inyección del Modelo Product
-    public function __construct(Product $model)
+    public function __construct(private Product $model)
     {
-        $this->model = $model;
     }
 
-    // Obtener todos los registros, con filtros opcionales
+    /**
+     * Obtiene productos paginados con filtros opcionales.
+     * Soporta: categoría, plataforma, precio máximo, búsqueda y ofertas.
+     */
     public function getAll(array $filters = [])
     {
         $query = $this->model->with('category');
 
         if (isset($filters['category'])) {
             $category = $filters['category'];
-            $query->whereHas('category', function ($q) use ($category) {
-                $q->where('name', $category);
-            })->orWhere('categoria', $category); // Legacy support
+            $query->whereHas('category', fn($q) => $q->where('name', $category))
+                ->orWhere('categoria', $category);
         }
 
         if (isset($filters['platform'])) {
@@ -53,42 +55,60 @@ class ProductRepository implements BaseRepository
             $query->where('porcentaje_descuento', '>', 0);
         }
 
-        $perPage = $filters['per_page'] ?? 12;
-
-        return $query->paginate($perPage);
+        return $query->paginate($filters['per_page'] ?? 12);
     }
 
-    // Buscar un registro por ID
+    /**
+     * Busca un producto por ID. Lanza ModelNotFoundException si no existe.
+     */
     public function find($id)
     {
         return $this->model->findOrFail($id);
     }
 
-    // Métodos para crear, actualizar y borrar
+    /**
+     * Crea un nuevo producto con los datos proporcionados.
+     */
     public function create(array $data)
     {
         return $this->model->create($data);
     }
+
+    /**
+     * Actualiza un producto existente.
+     */
     public function update($id, array $data)
-    { /* ... */
-    }
-    public function delete($id)
-    { /* ... */
+    {
+        $product = $this->find($id);
+        $product->update($data);
+        return $product;
     }
 
-    // Método para vender un código (se elimina tras la venta)
-    public function sellCode($productId)
+    /**
+     * Elimina un producto por ID.
+     */
+    public function delete($id)
+    {
+        return $this->find($id)->delete();
+    }
+
+    /**
+     * Obtiene un código disponible para el producto y lo elimina (venta).
+     * Retorna el texto del código o null si no hay stock.
+     */
+    public function sellCode($productId): ?string
     {
         $code = ProductCode::where('product_id', $productId)
             ->where('is_sold', false)
             ->first();
 
-        if ($code) {
-            $codigoTexto = $code->code;
-            $code->delete();
-            return $codigoTexto;
+        if (!$code) {
+            return null;
         }
 
-        return null;
+        $codigoTexto = $code->code;
+        $code->delete();
+
+        return $codigoTexto;
     }
 }
