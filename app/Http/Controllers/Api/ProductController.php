@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Services\ProductService;
+use App\Models\Product;
+use App\Models\ProductCode;
 use Illuminate\Http\Request;
 
 /**
@@ -82,12 +84,102 @@ class ProductController extends Controller
         }
     }
 
-    /**
-     * Añade un código de activación a un producto existente.
-     */
-    private function agregarCodigoExistente(\App\Models\Product $product, string $codigo)
+    public function update(Request $request, string $id)
     {
-        \App\Models\ProductCode::create([
+        $validated = $request->validate([
+            'nombre' => 'sometimes|string|max:255',
+            'descripcion' => 'sometimes|string',
+            'precio' => 'sometimes|numeric|min:0',
+            'categoria' => 'nullable|string',
+            'category_id' => 'nullable|exists:categories,id',
+            'seccion' => 'nullable|string',
+            'porcentaje_descuento' => 'nullable|integer|min:0|max:100',
+            'plataforma' => 'nullable|string',
+            'is_eco' => 'nullable|boolean',
+            'imagen_url' => 'nullable|string',
+        ]);
+
+        $product = Product::findOrFail($id);
+        $product->update($validated);
+        $product->load('category');
+
+        return response()->json([
+            'message' => 'Producto actualizado',
+            'product' => $product,
+            'stock' => $product->stock,
+        ]);
+    }
+
+    public function adminIndex()
+    {
+        $products = Product::with('category')->get();
+
+        $result = $products->map(function ($product) {
+            return [
+                'id' => $product->id,
+                'nombre' => $product->nombre,
+                'descripcion' => $product->descripcion,
+                'precio' => $product->precio,
+                'sku' => $product->sku,
+                'imagen_url' => $product->imagen_url,
+                'categoria' => $product->categoria,
+                'category' => $product->category,
+                'category_id' => $product->category_id,
+                'seccion' => $product->seccion,
+                'porcentaje_descuento' => $product->porcentaje_descuento,
+                'plataforma' => $product->plataforma,
+                'is_eco' => $product->is_eco,
+                'stock' => $product->stock,
+                'codes_count' => $product->productCodes()->count(),
+                'sold_count' => $product->productCodes()->where('is_sold', true)->count(),
+            ];
+        });
+
+        return response()->json($result);
+    }
+
+    public function getCodes(string $id)
+    {
+        $product = Product::findOrFail($id);
+        $codes = $product->productCodes()->orderBy('is_sold')->orderBy('created_at', 'desc')->get();
+
+        return response()->json([
+            'product' => $product->nombre,
+            'codes' => $codes,
+            'total' => $codes->count(),
+            'available' => $codes->where('is_sold', false)->count(),
+            'sold' => $codes->where('is_sold', true)->count(),
+        ]);
+    }
+
+    public function addCodes(Request $request, string $id)
+    {
+        $validated = $request->validate([
+            'codes' => 'required|array|min:1',
+            'codes.*' => 'required|string|max:255|distinct|unique:product_codes,code',
+        ]);
+
+        $product = Product::findOrFail($id);
+        $created = [];
+
+        foreach ($validated['codes'] as $code) {
+            $created[] = ProductCode::create([
+                'product_id' => $product->id,
+                'code' => $code,
+                'is_sold' => false,
+            ]);
+        }
+
+        return response()->json([
+            'message' => count($created) . ' códigos añadidos',
+            'stock' => $product->stock,
+            'codes_added' => count($created),
+        ]);
+    }
+
+    private function agregarCodigoExistente(Product $product, string $codigo)
+    {
+        ProductCode::create([
             'product_id' => $product->id,
             'code' => $codigo,
             'is_sold' => false,
@@ -100,28 +192,21 @@ class ProductController extends Controller
         ]);
     }
 
-    /**
-     * Crea un producto nuevo con su primer código de activación.
-     */
     private function crearProductoNuevo(Request $request, array $validated)
     {
-        // Subir imagen si se proporciona
         if ($request->hasFile('imagen')) {
             $path = $request->file('imagen')->store('products', 'public');
             $validated['imagen_url'] = '/storage/' . $path;
         }
 
-        // Generar SKU único
         $validated['sku'] = strtoupper(uniqid('SKU-'));
 
-        // Separar el código antes de crear el producto
         $codigo = $validated['codigo'];
         unset($validated['codigo']);
 
         $product = $this->service->crear($validated);
 
-        // Crear el código de activación asociado
-        \App\Models\ProductCode::create([
+        ProductCode::create([
             'product_id' => $product->id,
             'code' => $codigo,
             'is_sold' => false,

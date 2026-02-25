@@ -10,7 +10,7 @@ export const useAuthStore = defineStore("auth", {
     }),
 
     getters: {
-        isAuthenticated: (state) => !!state.token || !!state.user,
+        isAuthenticated: (state) => !!state.user,
         role: (state) => state.user?.role ?? null,
     },
 
@@ -30,7 +30,10 @@ export const useAuthStore = defineStore("auth", {
                     this.user = response.user;
                 }
 
-                console.log("Login successful:", this.user);
+                if (!this.token) {
+                    this.token = "session";
+                    localStorage.setItem("token", "session");
+                }
             } catch (error) {
                 console.error("Login error:", error);
                 throw error;
@@ -38,11 +41,12 @@ export const useAuthStore = defineStore("auth", {
         },
 
         async register(userData) {
+            await http.get("/sanctum/csrf-cookie");
             const { data } = await http.post("/api/register", userData);
             const { token, user } = data;
-            this.token = token;
+            this.token = token || "session";
             this.user = user;
-            localStorage.setItem("token", token);
+            localStorage.setItem("token", this.token);
         },
 
         async logout() {
@@ -55,7 +59,6 @@ export const useAuthStore = defineStore("auth", {
         },
 
         hardLogout() {
-            console.log("Hard logout executed");
             this.user = null;
             this.token = null;
             localStorage.removeItem("token");
@@ -68,13 +71,12 @@ export const useAuthStore = defineStore("auth", {
             }
 
             try {
-                console.log("Bootstrapping user...");
                 this.user = await apiGetUser();
-                console.log("Bootstrap success:", this.user);
             } catch (error) {
-                console.error("Bootstrap error:", error);
                 if (error.response?.status === 401) {
-                    this.hardLogout();
+                    this.user = null;
+                    this.token = null;
+                    localStorage.removeItem("token");
                 }
             } finally {
                 this.bootstrapped = true;

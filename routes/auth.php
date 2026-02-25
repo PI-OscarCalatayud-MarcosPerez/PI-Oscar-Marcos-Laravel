@@ -18,10 +18,10 @@ use Illuminate\Support\Facades\Route;
 | la SPA (Vue.js); aquí solo se definen los endpoints POST necesarios.
 */
 
-// ── Rutas para invitados (registro y login) ──
+Route::post('register', [RegisteredUserController::class, 'store']);
+Route::post('login', [AuthenticatedSessionController::class, 'store']);
+
 Route::middleware('guest')->group(function () {
-    Route::post('register', [RegisteredUserController::class, 'store']);
-    Route::post('login', [AuthenticatedSessionController::class, 'store']);
     Route::post('forgot-password', [PasswordResetLinkController::class, 'store'])->name('password.email');
     Route::post('reset-password', [NewPasswordController::class, 'store'])->name('password.store');
 });

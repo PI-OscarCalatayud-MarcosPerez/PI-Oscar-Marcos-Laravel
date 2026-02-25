@@ -267,3 +267,125 @@
         gap: 15px;
     }
 }
+
+.search-wrapper {
+    position: relative;
+}
+
+.search-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    width: 320px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+    z-index: 10000;
+    margin-top: 6px;
+    overflow: hidden;
+    animation: suggestionsSlide 0.2s ease;
+}
+
+@keyframes suggestionsSlide {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.suggestion-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.suggestion-item:last-of-type {
+    border-bottom: none;
+}
+
+.suggestion-item:hover {
+    background: #f8f0f0;
+    padding-left: 18px;
+}
+
+.suggestion-img {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    object-fit: cover;
+    border: 1px solid #eee;
+    flex-shrink: 0;
+}
+
+.suggestion-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.suggestion-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #0e273f;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.suggestion-price {
+    font-size: 13px;
+    font-weight: 700;
+    color: #0e273f;
+}
+
+.suggestion-price-old {
+    text-decoration: line-through;
+    color: #999;
+    font-weight: 400;
+    font-size: 11px;
+    margin-right: 4px;
+}
+
+.suggestion-price-discount {
+    color: #c62828;
+    font-weight: 700;
+}
+
+.suggestion-badge {
+    background: #fa4841;
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 10px;
+    flex-shrink: 0;
+}
+
+.suggestion-footer {
+    padding: 10px 14px;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 600;
+    color: #fa4841;
+    cursor: pointer;
+    background: #fafafa;
+    border-top: 1px solid #eee;
+    transition: all 0.15s ease;
+}
+
+.suggestion-footer:hover {
+    background: #f0f0f0;
+    color: #c62828;
+}

@@ -11,6 +11,8 @@ class Product extends Model
 
     protected $fillable = ['nombre', 'descripcion', 'precio', 'sku', 'stock', 'imagen_url', 'categoria', 'seccion', 'category_id', 'porcentaje_descuento', 'plataforma', 'is_eco'];
 
+    protected $appends = ['stock', 'media_estrellas'];
+
     public function category()
     {
         return $this->belongsTo(Category::class);
@@ -21,7 +23,6 @@ class Product extends Model
         return $this->hasMany(Review::class);
     }
 
-    // Calcula la media de estrellas automáticamente
     public function getMediaEstrellasAttribute()
     {
         return round($this->reviews()->avg('estrellas'), 1) ?? 0;
@@ -32,9 +33,8 @@ class Product extends Model
         return $this->hasMany(ProductCode::class);
     }
 
-    // Calcula el stock dinámicamente según los códigos disponibles
     public function getStockAttribute()
     {
-        return $this->productCodes()->count();
+        return $this->productCodes()->where('is_sold', false)->count();
     }
 }

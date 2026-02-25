@@ -151,12 +151,12 @@
     content: "★ ";
 }
 
-.rate input:checked ~ label {
+.rate input:checked~label {
     color: #fa4841;
 }
 
-.rate:not(:checked) > label:hover,
-.rate:not(:checked) > label:hover ~ label {
+.rate:not(:checked)>label:hover,
+.rate:not(:checked)>label:hover~label {
     color: #fa4841;
 }
 
@@ -173,7 +173,7 @@
     overflow: hidden;
 }
 
-.comment-header > div {
+.comment-header>div {
     float: left;
 }
 
@@ -308,4 +308,16 @@
 .btn-cancel-edit {
     background-color: #ccc;
     color: #333;
+}
+
+.stock-warning-detail {
+    background: #ffebee;
+    color: #c62828;
+    padding: 14px 20px;
+    border-radius: 10px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 15px;
+    margin-top: 10px;
+    border: 1px solid #ef9a9a;
 }

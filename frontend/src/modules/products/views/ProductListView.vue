@@ -14,6 +14,10 @@ const ui = useUiStore()
 const productStore = useProductStore() // Use Store
 
 const addToCart = (product) => {
+    if (product.stock === 0) {
+        ui.showToast('error', 'Producto agotado')
+        return
+    }
     let finalPrice = parseFloat(product.precio);
     if (product.porcentaje_descuento > 0) {
         finalPrice = finalPrice * (1 - product.porcentaje_descuento / 100);
@@ -29,6 +33,10 @@ const addToCart = (product) => {
 }
 
 const buyNow = (product) => {
+    if (product.stock === 0) {
+        ui.showToast('error', 'Producto agotado')
+        return
+    }
     addToCart(product)
     router.push('/cart')
 }
@@ -76,8 +84,7 @@ const getImage = (product) => {
 }
 
 const filteredProducts = computed(() => {
-    // Backend filtering handles everything now
-    return productStore.products;
+    return productStore.products.filter(p => p.stock > 0);
 });
 
 const clearFilters = () => {

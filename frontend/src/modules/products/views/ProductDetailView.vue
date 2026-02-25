@@ -28,7 +28,7 @@ const submitting = ref(false);
 const reviewError = ref(null);
 
 const addToCart = () => {
-    if (!product.value) return;
+    if (!product.value || product.value.stock === 0) return;
 
     let finalPrice = parseFloat(product.value.precio);
     if (product.value.porcentaje_descuento > 0) {
@@ -47,9 +47,14 @@ const addToCart = () => {
 }
 
 const buyNow = () => {
+    if (!product.value || product.value.stock === 0) return;
     addToCart();
     router.push('/checkout');
 }
+
+const isOutOfStock = computed(() => {
+    return product.value && product.value.stock === 0;
+});
 
 const fetchProduct = async () => {
     loading.value = true;
@@ -233,13 +238,16 @@ watch(() => route.params.id, (newId) => {
                         </p>
                         <p v-else class="product-price">{{ parseFloat(product.precio).toFixed(2) }} €</p>
                     </div>
-                    <span class="product-stock">Stock: {{ product.stock }}</span>
+                    <span class="product-stock" :style="{ color: product.stock === 0 ? '#c62828' : '' }">Stock: {{ product.stock }}</span>
                     <p class="product-desc">{{ product.descripcion }}</p>
-                    <div class="product-actions">
+                    <div v-if="!isOutOfStock" class="product-actions">
                         <button class="btn-buy-large" @click="buyNow">Comprar</button>
                         <button class="btn-add-cart" @click="addToCart" title="Añadir al carrito">
                             <img src="/img/carrito1.png" alt="Carrito" />
                         </button>
+                    </div>
+                    <div v-else class="stock-warning-detail">
+                        ⛔ Producto Agotado — No disponible
                     </div>
                 </div>
             </main>
