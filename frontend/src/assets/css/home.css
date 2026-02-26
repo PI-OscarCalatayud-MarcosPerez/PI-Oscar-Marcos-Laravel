@@ -339,3 +339,38 @@
     transform: scale(1.02);
     z-index: 1000;
 }
+
+html.dark-mode .section-title {
+    color: #e0e0e0;
+}
+
+html.dark-mode .item {
+    background-color: #1e1e2f;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+html.dark-mode .item-titulo {
+    color: #e0e0e0;
+}
+
+html.dark-mode .item-descripcion-hover {
+    color: #bbb;
+}
+
+html.dark-mode .price {
+    color: #e0e0e0;
+}
+
+html.dark-mode .categorias-section {
+    background-color: #0a0a1a;
+}
+
+html.dark-mode .categoria-btn {
+    background-color: #1e1e2f;
+    color: #e0e0e0;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+html.dark-mode .categoria-btn:hover {
+    background-color: #2a2a3e;
+}

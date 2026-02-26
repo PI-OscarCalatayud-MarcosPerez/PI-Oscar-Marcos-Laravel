@@ -257,3 +257,43 @@
         border: 1px solid #eee;
     }
 }
+
+html.dark-mode .caja-formulario-vender {
+    background-color: #1e1e2f;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+html.dark-mode .caja-formulario-vender h1 {
+    color: #e0e0e0;
+}
+
+html.dark-mode .search-results {
+    background: #1e1e2f;
+    border-color: #333;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+html.dark-mode .search-result-item {
+    border-bottom-color: #333;
+}
+
+html.dark-mode .search-result-item:hover {
+    background-color: #2a2a3e;
+}
+
+html.dark-mode .search-info strong {
+    color: #e0e0e0;
+}
+
+html.dark-mode .producto-seleccionado,
+html.dark-mode .producto-nuevo-header {
+    background-color: #2a2a3e;
+}
+
+html.dark-mode .producto-sel-info h3 {
+    color: #e0e0e0;
+}
+
+html.dark-mode .producto-sel-info p {
+    color: #888;
+}

@@ -98,3 +98,67 @@ a {
 a:hover {
     text-decoration: underline;
 }
+
+@media (max-width: 480px) {
+    .login-container {
+        padding: 15px;
+        padding-top: 50px;
+        min-height: auto;
+    }
+
+    .login-card {
+        padding: 25px 20px;
+        max-width: 100%;
+    }
+
+    .login-card h2 {
+        font-size: 22px;
+    }
+
+    .form-group input {
+        font-size: 14px;
+        padding: 10px;
+    }
+
+    button[type="submit"] {
+        font-size: 15px;
+        padding: 12px;
+    }
+}
+
+html.dark-mode .login-container {
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+}
+
+html.dark-mode .login-card {
+    background: #1e1e2f;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+html.dark-mode .login-card h2 {
+    color: #e0e0e0;
+}
+
+html.dark-mode .subtitulo-form {
+    color: #888;
+}
+
+html.dark-mode .form-group label {
+    color: #bbb;
+}
+
+html.dark-mode .form-group input {
+    background: #2a2a3e;
+    border-color: #444;
+    color: #e0e0e0;
+}
+
+html.dark-mode .form-group input:focus {
+    border-color: #fa4841;
+    background: #333350;
+}
+
+html.dark-mode .register-link,
+html.dark-mode .register-link a {
+    color: #ccc;
+}

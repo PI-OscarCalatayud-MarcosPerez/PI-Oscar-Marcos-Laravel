@@ -6,23 +6,14 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use App\Services\ProductService;
+use App\Models\Purchase;
 
-/**
- * Controlador de compras.
- * Gestiona el flujo de compra: validación, asignación de código
- * de producto y notificación al webhook de n8n.
- */
 class CompraController extends Controller
 {
     public function __construct(private ProductService $productService)
     {
     }
 
-    /**
-     * Procesa una compra exitosa.
-     * Obtiene un código disponible para el producto, lo marca como vendido
-     * y envía los datos al webhook de n8n para notificar al comprador.
-     */
     public function procesarCompraExitosa(Request $request)
     {
         $validated = $request->validate([
@@ -36,14 +27,12 @@ class CompraController extends Controller
 
         $productId = $validated['product_id'];
 
-        // Obtener el producto desde el servicio
         try {
             $producto = $this->productService->obtener($productId);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Producto no encontrado'], 404);
         }
 
-        // Intentar obtener un código disponible y marcarlo como vendido
         $codigo = $this->productService->venderCodigo($productId);
         if (!$codigo) {
             Log::error('Intento de compra sin stock', [
@@ -55,7 +44,20 @@ class CompraController extends Controller
             ], 409);
         }
 
-        // Preparar datos para el webhook de n8n
+        $finalPrice = floatval($producto->precio);
+        if ($producto->porcentaje_descuento > 0) {
+            $finalPrice = $finalPrice * (1 - $producto->porcentaje_descuento / 100);
+        }
+
+        Purchase::create([
+            'user_id' => $user->id,
+            'product_id' => $productId,
+            'product_name' => $producto->nombre,
+            'price_paid' => round($finalPrice, 2),
+            'code' => $codigo,
+            'platform' => $producto->plataforma ?? 'PC',
+        ]);
+
         $payload = [
             'email_comprador' => $user->email,
             'nombre_usuario' => $user->name,
@@ -64,7 +66,6 @@ class CompraController extends Controller
             'plataforma' => $producto->plataforma ?? 'PC',
         ];
 
-        // Enviar notificación a n8n (no bloquea la compra si falla)
         $this->notificarWebhook($payload, $producto->nombre, $codigo);
 
         return response()->json([
@@ -74,10 +75,49 @@ class CompraController extends Controller
         ]);
     }
 
-    /**
-     * Envía los datos de compra al webhook de n8n.
-     * Si falla, la compra se mantiene pero se registra el error.
-     */
+    public function miHistorial(Request $request)
+    {
+        $purchases = Purchase::where('user_id', $request->user()->id)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json($purchases);
+    }
+
+    public function adminSales(Request $request)
+    {
+        if ($request->user()->role !== 'admin') {
+            return response()->json(['message' => 'No autorizado'], 403);
+        }
+
+        $purchases = Purchase::with('user:id,name,email')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $totalRevenue = $purchases->sum('price_paid');
+        $totalSales = $purchases->count();
+        $avgTicket = $totalSales > 0 ? round($totalRevenue / $totalSales, 2) : 0;
+
+        $byProduct = $purchases->groupBy('product_name')->map(function ($group) {
+            return [
+                'product' => $group->first()->product_name,
+                'platform' => $group->first()->platform,
+                'count' => $group->count(),
+                'revenue' => round($group->sum('price_paid'), 2),
+            ];
+        })->sortByDesc('revenue')->values();
+
+        return response()->json([
+            'purchases' => $purchases,
+            'stats' => [
+                'total_revenue' => round($totalRevenue, 2),
+                'total_sales' => $totalSales,
+                'avg_ticket' => $avgTicket,
+            ],
+            'by_product' => $byProduct,
+        ]);
+    }
+
     private function notificarWebhook(array $payload, string $juego, string $codigo): void
     {
         $webhookUrl = config('services.n8n.webhook_compra', 'http://n8n:5678/webhook/mokeys-compra');

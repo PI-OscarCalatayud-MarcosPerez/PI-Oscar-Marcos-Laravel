@@ -8,8 +8,11 @@ import { ref, onMounted, computed } from 'vue';
 import ProductService from '../modules/products/services/ProductService';
 import ProductCarousel from '../components/ProductCarousel.vue';
 import { useRouter } from 'vue-router';
+import { usePrefsStore } from '../stores/prefsStore';
 
 const router = useRouter();
+const prefsStore = usePrefsStore();
+const t = computed(() => prefsStore.t);
 const products = ref([]);
 const loading = ref(true);
 
@@ -66,32 +69,30 @@ onMounted(fetchProducts);
         </div>
         <div class="inicio" style="margin-top: 0;">
             <p class="textoI" style="margin-bottom: 1rem;">
-                MOKeys es un ecommerce especializado en la venta segura y rápida de
-                claves digitales para juegos, software y suscripciones. Compra, recibe
-                y activa — todo en minutos.
+                {{ t.home.heroText }}
             </p>
             <div class="oferta">
-                <p>LOS JUEGOS MÁS BARATOS</p>
-                <button class="btnOferta" @click="router.push('/products?offers=true')">OFERTAS</button>
+                <p>{{ t.home.cheapest }}</p>
+                <button class="btnOferta" @click="router.push('/products?offers=true')">{{ t.home.offersBtn }}</button>
             </div>
         </div>
     </div>
 
     <!-- Carruseles de productos -->
     <main class="container-fluid px-0" id="main-content" role="main">
-        <ProductCarousel title="Juegos más comprados" track-id="lista-comprados" :products="comprados"
+        <ProductCarousel :title="t.home.mostBought" track-id="lista-comprados" :products="comprados"
             @product-click="goToProduct" />
 
-        <ProductCarousel title="Mejores Ofertas" track-id="lista-ofertas" :products="ofertas"
+        <ProductCarousel :title="t.home.bestOffers" track-id="lista-ofertas" :products="ofertas"
             @product-click="goToProduct" />
 
-        <ProductCarousel title="Software Clave y Plataformas de IA" track-id="lista-nuevos" :products="software"
+        <ProductCarousel :title="t.home.software" track-id="lista-nuevos" :products="software"
             @product-click="goToProduct" />
 
         <!-- Sección de categorías -->
         <section class="categorias-section" aria-label="Categorías">
             <div class="container">
-                <h2 class="text-center mb-5 fs-1">Lo mejor del gaming, por categorías</h2>
+                <h2 class="text-center mb-5 fs-1">{{ t.home.categoriesTitle }}</h2>
                 <div class="row row-cols-2 row-cols-md-4 row-cols-lg-8 g-4">
                     <div class="col" v-for="cat in categorias" :key="cat">
                         <button class="categoria-btn"

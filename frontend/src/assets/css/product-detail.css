@@ -321,3 +321,131 @@
     margin-top: 10px;
     border: 1px solid #ef9a9a;
 }
+
+@media (max-width: 768px) {
+    .product-image {
+        width: 100%;
+        float: none;
+        margin-right: 0;
+        margin-bottom: 25px;
+    }
+
+    .product-info {
+        width: 100%;
+        float: none;
+    }
+
+    .product-info h1 {
+        font-size: 28px;
+    }
+
+    .product-price {
+        font-size: 28px;
+    }
+
+    .product-detail-container {
+        padding: 25px;
+    }
+
+    .product-actions {
+        grid-template-columns: 1fr auto;
+        width: 100%;
+    }
+
+    .btn-buy-large {
+        width: 100%;
+        font-size: 16px;
+        height: 48px;
+    }
+
+    .reviews-container {
+        padding: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .product-main {
+        width: 95%;
+        padding: 20px 0;
+    }
+
+    .product-detail-container {
+        padding: 15px;
+    }
+
+    .product-info h1 {
+        font-size: 24px;
+    }
+
+    .product-price {
+        font-size: 24px;
+    }
+
+    .product-desc {
+        font-size: 15px;
+    }
+
+    .comment-header>div {
+        float: none;
+    }
+
+    .comment-date {
+        float: none;
+        display: block;
+        margin-top: 5px;
+    }
+}
+
+html.dark-mode .product-detail-container {
+    background: #1e1e2f;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+html.dark-mode .product-info h1 {
+    color: #e0e0e0;
+}
+
+html.dark-mode .product-sku {
+    color: #888;
+}
+
+html.dark-mode .product-stock {
+    background: #2a2a3e;
+    color: #4caf50;
+}
+
+html.dark-mode .product-desc {
+    color: #bbb;
+}
+
+html.dark-mode .reviews-container {
+    background: #1e1e2f;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+html.dark-mode .reviews-header {
+    border-bottom-color: #333;
+}
+
+html.dark-mode .review-form-card {
+    background: #2a2a3e;
+}
+
+html.dark-mode .review-form-card textarea {
+    background: #1e1e2f;
+    border-color: #444;
+    color: #e0e0e0;
+}
+
+html.dark-mode .comment-item {
+    background: #2a2a3e;
+    border-color: #444;
+}
+
+html.dark-mode .user-name {
+    color: #e0e0e0;
+}
+
+html.dark-mode .comment-body {
+    color: #bbb;
+}

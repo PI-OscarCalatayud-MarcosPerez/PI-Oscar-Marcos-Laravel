@@ -72,4 +72,28 @@ class ReviewController extends Controller
         $review->delete();
         return response()->json(['message' => 'Reseña eliminada'], 200);
     }
+
+    public function adminIndex(Request $request)
+    {
+        if ($request->user()->role !== 'admin') {
+            return response()->json(['message' => 'No autorizado'], 403);
+        }
+
+        $reviews = Review::with(['user:id,name,email', 'product:id,nombre,imagen_url'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json($reviews);
+    }
+
+    public function adminDestroy($id, Request $request)
+    {
+        if ($request->user()->role !== 'admin') {
+            return response()->json(['message' => 'No autorizado'], 403);
+        }
+
+        $review = Review::findOrFail($id);
+        $review->delete();
+        return response()->json(['message' => 'Reseña eliminada'], 200);
+    }
 }

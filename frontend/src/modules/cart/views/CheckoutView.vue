@@ -5,11 +5,14 @@ import { useRouter } from 'vue-router';
 import { useUiStore } from '@/stores/uiStore';
 import { useAuthStore } from '../../auth/store/authStore';
 import http from '@/services/http';
+import { usePrefsStore } from '../../../stores/prefsStore';
 
 const cartStore = useCartStore();
 const router = useRouter();
 const ui = useUiStore();
 const authStore = useAuthStore();
+const prefsStore = usePrefsStore();
+const t = computed(() => prefsStore.t);
 
 const form = reactive({
     firstName: '',
@@ -84,8 +87,8 @@ const submitOrder = async () => {
         <div v-if="purchaseComplete" class="purchase-success">
             <div class="success-card">
                 <div class="success-icon">🎉</div>
-                <h1>¡Compra Realizada!</h1>
-                <p class="success-subtitle">Tus códigos de activación han sido enviados a <strong>{{
+                <h1>{{ t.checkout.successTitle }}</h1>
+                <p class="success-subtitle">{{ t.checkout.successSubtitle }} <strong>{{
                         authStore.user?.email }}</strong></p>
 
                 <div class="codes-list">
@@ -97,77 +100,77 @@ const submitOrder = async () => {
                 </div>
 
                 <div v-if="purchaseErrors.length > 0" class="errors-section">
-                    <h3>⚠️ Algunos productos no se pudieron procesar:</h3>
+                    <h3>{{ t.checkout.errorsTitle }}</h3>
                     <div v-for="(err, index) in purchaseErrors" :key="index" class="error-item">
                         <strong>{{ err.juego }}</strong>: {{ err.error }}
                     </div>
                 </div>
 
                 <button class="btn-back-home" @click="router.push('/')">
-                    Volver al Inicio
+                    {{ t.checkout.backHome }}
                 </button>
             </div>
         </div>
 
         <!-- Formulario de checkout -->
         <template v-else>
-            <h1 class="checkout-title">Tramitar Pedido</h1>
+            <h1 class="checkout-title">{{ t.checkout.title }}</h1>
 
             <div class="checkout-grid">
                 <!-- Columna Izquierda: Formulario -->
                 <div class="checkout-form">
                     <section class="form-section">
-                        <h2>Datos de Envío</h2>
+                        <h2>{{ t.checkout.shippingInfo }}</h2>
                         <div class="form-row two-col">
                             <div class="form-group">
-                                <label>Nombre</label>
+                                <label>{{ t.checkout.name }}</label>
                                 <input type="text" v-model="form.firstName" required />
                             </div>
                             <div class="form-group">
-                                <label>Apellidos</label>
+                                <label>{{ t.checkout.lastName }}</label>
                                 <input type="text" v-model="form.lastName" required />
                             </div>
                         </div>
 
                         <div class="form-group">
-                            <label>Email</label>
+                            <label>{{ t.checkout.email }}</label>
                             <input type="email" v-model="form.email" required />
                         </div>
 
                         <div class="form-group">
-                            <label>Dirección</label>
+                            <label>{{ t.checkout.address }}</label>
                             <input type="text" v-model="form.address" required />
                         </div>
 
                         <div class="form-row three-col">
                             <div class="form-group">
-                                <label>Ciudad</label>
+                                <label>{{ t.checkout.city }}</label>
                                 <input type="text" v-model="form.city" required />
                             </div>
                             <div class="form-group">
-                                <label>Código Postal</label>
+                                <label>{{ t.checkout.zip }}</label>
                                 <input type="text" v-model="form.zip" required />
                             </div>
                         </div>
                     </section>
 
                     <section class="form-section">
-                        <h2>Pago</h2>
+                        <h2>{{ t.checkout.paymentInfo }}</h2>
                         <div class="form-group">
-                            <label>Nombre en la tarjeta</label>
+                            <label>{{ t.checkout.cardName }}</label>
                             <input type="text" v-model="form.cardName" required />
                         </div>
                         <div class="form-group">
-                            <label>Número de tarjeta</label>
+                            <label>{{ t.checkout.cardNumber }}</label>
                             <input type="text" v-model="form.cardNumber" placeholder="0000 0000 0000 0000" required />
                         </div>
                         <div class="form-row two-col">
                             <div class="form-group">
-                                <label>Fecha Exp.</label>
+                                <label>{{ t.checkout.expDate }}</label>
                                 <input type="text" v-model="form.expDate" placeholder="MM/YY" required />
                             </div>
                             <div class="form-group">
-                                <label>CVV</label>
+                                <label>{{ t.checkout.cvv }}</label>
                                 <input type="text" v-model="form.cvv" required />
                             </div>
                         </div>
@@ -177,7 +180,7 @@ const submitOrder = async () => {
                 <!-- Columna Derecha: Resumen -->
                 <div class="order-summary">
                     <div class="summary-card">
-                        <h2>Resumen del Pedido</h2>
+                        <h2>{{ t.checkout.summary }}</h2>
                         <div class="order-items">
                             <div v-for="item in cartStore.items" :key="item.id" class="order-item">
                                 <div class="item-thumb">
@@ -185,7 +188,7 @@ const submitOrder = async () => {
                                 </div>
                                 <div class="item-details">
                                     <span class="item-title">{{ item.title }}</span>
-                                    <span class="item-qty">Cantidad: {{ item.quantity }}</span>
+                                    <span class="item-qty">{{ t.cart.quantity }}: {{ item.quantity }}</span>
                                 </div>
                                 <div class="item-price">
                                     {{ (item.price * item.quantity).toFixed(2) }}€
@@ -195,26 +198,26 @@ const submitOrder = async () => {
 
                         <div class="price-breakdown">
                             <div class="breakdown-row">
-                                <span>Subtotal</span>
+                                <span>{{ t.checkout.subtotal }}</span>
                                 <span>{{ cartStore.totalPrice.toFixed(2) }}€</span>
                             </div>
                             <div class="breakdown-row">
-                                <span>IVA (21%)</span>
+                                <span>{{ t.checkout.tax }}</span>
                                 <span>{{ (cartStore.totalPrice * 0.21).toFixed(2) }}€</span>
                             </div>
                             <div class="total-row">
-                                <span>Total</span>
+                                <span>{{ t.checkout.total }}</span>
                                 <span>{{ total }}€</span>
                             </div>
                         </div>
 
                         <button class="btn-confirm" @click="submitOrder" :disabled="processing">
-                            <span v-if="processing">⏳ Procesando...</span>
-                            <span v-else>Confirmar Pago de {{ total }}€</span>
+                            <span v-if="processing">⏳ {{ t.checkout.processing }}</span>
+                            <span v-else>{{ t.checkout.confirmBtn }} {{ total }}€</span>
                         </button>
 
                         <p class="secure-payment">
-                            <span class="lock-icon">🔒</span> Pago 100% Seguro
+                            <span class="lock-icon">🔒</span> {{ t.checkout.securePayment }}
                         </p>
                     </div>
                 </div>

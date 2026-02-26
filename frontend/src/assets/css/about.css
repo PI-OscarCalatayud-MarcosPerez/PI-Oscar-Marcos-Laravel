@@ -181,3 +181,55 @@
         font-size: 28px;
     }
 }
+
+@media (max-width: 480px) {
+    .about-hero h1 {
+        font-size: 32px;
+    }
+
+    .about-hero {
+        padding: 50px 15px;
+    }
+
+    .about-content {
+        padding: 30px 10px;
+    }
+
+    .btn-cta {
+        font-size: 16px;
+        padding: 12px 30px;
+    }
+}
+
+html.dark-mode .about-container {
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+}
+
+html.dark-mode .about-hero {
+    background: linear-gradient(135deg, #0a1628, #0e273f);
+}
+
+html.dark-mode .about-section {
+    background: #1e1e2f;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+html.dark-mode .about-section h2 {
+    color: #e0e0e0;
+}
+
+html.dark-mode .about-section p {
+    color: #bbb;
+}
+
+html.dark-mode .feature-card {
+    background: #2a2a3e;
+}
+
+html.dark-mode .feature-card h3 {
+    color: #e0e0e0;
+}
+
+html.dark-mode .feature-card p {
+    color: #888;
+}

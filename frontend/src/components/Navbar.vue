@@ -5,6 +5,10 @@ import { useAuthStore } from '../modules/auth/store/authStore';
 import { useRole } from '../modules/roles/composables/useRole';
 import { useCartStore } from '../modules/cart/store/cartStore';
 import ProductService from '../modules/products/services/ProductService';
+import { usePrefsStore } from '../stores/prefsStore';
+
+const prefsStore = usePrefsStore();
+const t = computed(() => prefsStore.t);
 
 const authStore = useAuthStore();
 const cartStore = useCartStore();
@@ -103,20 +107,20 @@ const hideSuggestions = () => {
             <nav id="navLinks" aria-label="Menú principal">
                 <ul class="enlaces_navegacion" :class="{ active: isMenuOpen }">
                     <li>
-                        <RouterLink to="/products">Comprar</RouterLink>
+                        <RouterLink to="/products">{{ t.nav.buy }}</RouterLink>
                     </li>
                     <li>
                         <RouterLink to="/products?offers=true" :class="{ 'router-link-active': $route.query.offers }">
-                            Ofertas</RouterLink>
+                            {{ t.nav.offers }}</RouterLink>
                     </li>
                     <li v-if="can('sell')">
-                        <RouterLink to="/sell">Vender</RouterLink>
+                        <RouterLink to="/sell">{{ t.nav.sell }}</RouterLink>
                     </li>
                     <li>
-                        <RouterLink to="/contacto">Contacto</RouterLink>
+                        <RouterLink to="/contacto">{{ t.nav.contact }}</RouterLink>
                     </li>
                     <li>
-                        <RouterLink to="/about">Nosotros</RouterLink>
+                        <RouterLink to="/about">{{ t.nav.about }}</RouterLink>
                     </li>
                 </ul>
             </nav>
@@ -124,7 +128,7 @@ const hideSuggestions = () => {
             <div class="d-flex align-items-center gap-3">
                 <div class="busqueda d-none d-md-block search-wrapper">
                     <form @submit.prevent="handleSearch" role="search">
-                        <input type="text" placeholder="Buscar..." v-model="searchQuery"
+                        <input type="text" :placeholder="t.nav.search" v-model="searchQuery"
                             aria-label="Buscar producto" @focus="showSuggestions = suggestions.length > 0"
                             @blur="hideSuggestions" autocomplete="off" />
                     </form>
@@ -147,7 +151,7 @@ const hideSuggestions = () => {
                             <span v-if="product.porcentaje_descuento > 0" class="suggestion-badge">-{{ product.porcentaje_descuento }}%</span>
                         </div>
                         <div class="suggestion-footer" @mousedown.prevent="handleSearch">
-                            Ver todos los resultados →
+                            {{ t.nav.allResults }}
                         </div>
                     </div>
                 </div>

@@ -6,12 +6,15 @@ import { useProductStore } from '../store/productStore' // Import Store
 import CategoryService from '../services/CategoryService'
 import { useCartStore } from '@/modules/cart/store/cartStore'
 import { useUiStore } from '@/stores/uiStore'
+import { usePrefsStore } from '../../../stores/prefsStore'
 
 const router = useRouter()
 const route = useRoute()
 const cartStore = useCartStore()
 const ui = useUiStore()
 const productStore = useProductStore() // Use Store
+const prefsStore = usePrefsStore()
+const t = computed(() => prefsStore.t)
 
 const addToCart = (product) => {
     if (product.stock === 0) {
@@ -60,7 +63,8 @@ const fetchCategories = async () => {
 // Helper to capitalize strings
 const formatCategory = (name) => {
     if (!name) return '';
-    return name.charAt(0).toUpperCase() + name.slice(1);
+    const capitalized = name.charAt(0).toUpperCase() + name.slice(1);
+    return t.value.products.genres ? (t.value.products.genres[capitalized] || capitalized) : capitalized;
 }
 
 // Helper to clean strings
@@ -166,12 +170,12 @@ onMounted(() => {
         <!-- Sidebar -->
         <aside class="sidebar-filtros">
             <div class="filter-header">
-                <h3>Filtrar por</h3>
-                <button @click="clearFilters" class="btn-clean">Limpiar</button>
+                <h3>{{ t.products.filterBy }}</h3>
+                <button @click="clearFilters" class="btn-clean">{{ t.products.clearFilters }}</button>
             </div>
 
             <div class="filter-group">
-                <h4>Género</h4>
+                <h4>{{ t.products.genre }}</h4>
                 <div v-for="cat in categories" :key="cat.id">
                     <!-- Using link or click to navigate/filter via URL -->
                     <a href="#" @click.prevent="router.push({ query: { ...route.query, category: cat.name } })"
@@ -183,7 +187,7 @@ onMounted(() => {
             </div>
 
             <div class="filter-group">
-                <h4>Plataforma</h4>
+                <h4>{{ t.products.platformSingle }}</h4>
                 <label v-for="plat in platforms" :key="plat">
                     <input type="checkbox" :value="plat" v-model="selectedPlatforms" @change="updatePlatforms" /> {{
                     plat }}
@@ -191,9 +195,9 @@ onMounted(() => {
             </div>
 
             <div class="filter-group">
-                <h4>Precio Máximo</h4>
+                <h4>{{ t.products.maxPriceFilter }}</h4>
                 <input type="range" min="0" max="100" v-model="maxPrice" @change="updateMaxPrice" style="width: 100%" />
-                <p>Hasta: <span>{{ maxPrice }}</span>€</p>
+                <p>{{ t.products.upTo }}: <span>{{ maxPrice }}</span>€</p>
             </div>
         </aside>
 

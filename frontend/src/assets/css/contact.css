@@ -174,8 +174,50 @@
         opacity: 0;
         transform: translateY(-8px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+html.dark-mode .contenedor-formulario-principal {
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+}
+
+html.dark-mode .caja-formulario {
+    background-color: #1e1e2f;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+html.dark-mode .caja-formulario h1,
+html.dark-mode .caja-formulario h2 {
+    color: #e0e0e0;
+}
+
+html.dark-mode .subtitulo-form {
+    color: #888;
+}
+
+html.dark-mode .grupo-input label {
+    color: #bbb;
+}
+
+html.dark-mode .grupo-input input,
+html.dark-mode .grupo-input select,
+html.dark-mode .grupo-input textarea {
+    background-color: #2a2a3e;
+    border-color: #444;
+    color: #e0e0e0;
+}
+
+html.dark-mode .grupo-input input:focus,
+html.dark-mode .grupo-input select:focus,
+html.dark-mode .grupo-input textarea:focus {
+    background-color: #333350;
+    border-color: #fa4841;
+}
+
+html.dark-mode .grupo-checkbox label {
+    color: #bbb;
 }

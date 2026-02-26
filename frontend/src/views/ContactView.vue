@@ -1,6 +1,10 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import http from '@/services/http.js';
+import { usePrefsStore } from '../stores/prefsStore';
+
+const prefsStore = usePrefsStore();
+const t = computed(() => prefsStore.t);
 
 
 const form = ref({
@@ -105,55 +109,55 @@ const handleSubmit = async () => {
 <template>
     <main class="contenedor-formulario-principal" id="main-content">
         <div class="caja-formulario">
-            <h1>Contacta con nosotros</h1>
-            <p class="subtitulo-form">¿Tienes dudas con tu clave? Envíanos un mensaje.</p>
+            <h1>{{ t.contact.title }}</h1>
+            <p class="subtitulo-form">{{ t.contact.subtitle }}</p>
 
             <!-- Mensajes de feedback -->
-            <div v-if="successMessage" class="mensaje-exito">{{ successMessage }}</div>
-            <div v-if="errorMessage" class="mensaje-error">{{ errorMessage }}</div>
+            <div v-if="successMessage" class="mensaje-exito">{{ t.contact.success }}</div>
+            <div v-if="errorMessage" class="mensaje-error">{{ t.contact.error }}</div>
 
             <form @submit.prevent="handleSubmit" id="formulario">
                 <div class="grupo-input">
-                    <label for="nombre">Nombre:</label>
-                    <input type="text" id="nombre" v-model="form.nombre" placeholder="Tu nombre completo" />
+                    <label for="nombre">{{ t.contact.name }}:</label>
+                    <input type="text" id="nombre" v-model="form.nombre" :placeholder="t.contact.name" />
                     <span class="error" id="error-nom">{{ errors.nombre }}</span>
                 </div>
                 <div class="grupo-input">
-                    <label for="correo">Correo:</label>
+                    <label for="correo">{{ t.contact.email }}:</label>
                     <input type="email" id="correo" v-model="form.correo" placeholder="tucorreo@email.com" />
                     <span class="error" id="error-correu">{{ errors.correo }}</span>
                 </div>
                 <div class="grupo-input">
-                    <label for="asunto">Asunto:</label>
+                    <label for="asunto">{{ t.contact.subject }}:</label>
                     <select id="asunto" v-model="form.asunto">
-                        <option value="">Seleccione un asunto</option>
-                        <option value="informacion">Información General</option>
-                        <option value="soporte">Soporte Técnico</option>
-                        <option value="ventas">Ventas</option>
+                        <option value="">{{ t.contact.subject }}</option>
+                        <option value="informacion">{{ t.contact.subjectOptions.other }}</option>
+                        <option value="soporte">{{ t.contact.subjectOptions.support }}</option>
+                        <option value="ventas">{{ t.contact.subjectOptions.sales }}</option>
                     </select>
                     <span class="error" id="error-cicle">{{ errors.asunto }}</span>
                 </div>
                 <div class="grupo-input">
-                    <label for="Telefono">Teléfono:</label>
+                    <label for="Telefono">{{ t.contact.phone }}:</label>
                     <input type="tel" id="Telefono" v-model="form.telefono" placeholder="+34 600 000 000" />
                     <span class="error" id="error-telefono">{{ errors.telefono }}</span>
                 </div>
                 <div class="grupo-input">
-                    <label for="mensaje">Mensaje / Consulta:</label>
+                    <label for="mensaje">{{ t.contact.message }}:</label>
                     <textarea id="mensaje" v-model="form.mensaje" rows="5"
-                        placeholder="Escribe aquí tu consulta..."></textarea>
+                        :placeholder="t.contact.messagePlaceholder"></textarea>
                     <span class="error">{{ errors.mensaje }}</span>
                 </div>
                 <div class="grupo-checkbox">
                     <label>
                         <input type="checkbox" id="consentimiento" v-model="form.consentimiento" />
-                        Acepto el tratamiento de los datos
+                        {{ t.contact.privacy }}
                     </label>
                     <span class="error" id="error-consentimiento">{{ errors.consentimiento }}</span>
                 </div>
                 <button type="submit" class="btn-enviar" :disabled="loading">
-                    <span v-if="loading">Enviando...</span>
-                    <span v-else>Enviar Mensaje</span>
+                    <span v-if="loading">{{ t.contact.sending }}</span>
+                    <span v-else>{{ t.contact.sendBtn }}</span>
                 </button>
             </form>
         </div>

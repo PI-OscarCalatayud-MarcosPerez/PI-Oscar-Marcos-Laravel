@@ -3,6 +3,10 @@ import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import http from '../services/http';
 import CategoryService from '../modules/products/services/CategoryService';
+import { usePrefsStore } from '../stores/prefsStore';
+
+const prefsStore = usePrefsStore();
+const t = computed(() => prefsStore.t);
 
 const router = useRouter();
 const loading = ref(false);
@@ -139,8 +143,8 @@ onMounted(() => {
 <template>
     <div class="contenedor-formulario-principal">
         <div class="caja-formulario-vender">
-            <h1>Vender Producto</h1>
-            <p class="subtitulo-form">Sube una clave de un juego para ponerlo a la venta</p>
+            <h1>{{ t.sell.title }}</h1>
+            <p class="subtitulo-form">{{ t.sell.searchLabel }}</p>
 
             <div v-if="success" class="alerta-exito">
                 ✅ {{ successMessage }}
@@ -153,8 +157,8 @@ onMounted(() => {
             <form @submit.prevent="submitForm">
                 <!-- Buscar producto existente o crear nuevo -->
                 <div class="grupo-input" v-if="!selectedExistingProduct && !isNewProduct">
-                    <label>Buscar juego existente o crear uno nuevo</label>
-                    <input type="text" v-model="searchQuery" placeholder="Escribe el nombre del juego..."
+                    <label>{{ t.sell.searchLabel }}</label>
+                    <input type="text" v-model="searchQuery" :placeholder="t.sell.searchPlaceholder"
                         autocomplete="off" />
 
                     <!-- Resultados de búsqueda -->
@@ -173,15 +177,15 @@ onMounted(() => {
 
                     <!-- Opción de crear nuevo si hay búsqueda -->
                     <div v-if="searchQuery.length >= 2 && filteredProducts.length === 0" class="nuevo-producto-hint">
-                        <p>No se encontró ningún juego con ese nombre.</p>
+                        <p>{{ t.sell.newProductHint }}</p>
                         <button type="button" class="btn-nuevo" @click="setNewProduct">
-                            + Crear "{{ searchQuery }}" como producto nuevo
+                            {{ t.sell.newProductBtn }} "{{ searchQuery }}"
                         </button>
                     </div>
 
                     <div v-if="searchQuery.length >= 2 && filteredProducts.length > 0" class="nuevo-producto-hint">
                         <button type="button" class="btn-nuevo-alt" @click="setNewProduct">
-                            ¿No encuentras el juego? Crear "{{ searchQuery }}" como nuevo
+                            {{ t.sell.newProductHint }} "{{ searchQuery }}" {{ t.sell.new }}
                         </button>
                     </div>
                 </div>
@@ -190,13 +194,13 @@ onMounted(() => {
                 <div v-if="selectedExistingProduct" class="producto-seleccionado">
                     <div class="producto-sel-header">
                         <div class="producto-sel-info">
-                            <span class="badge-existente">Producto existente</span>
+                            <span class="badge-existente">{{ t.sell.existing }}</span>
                             <h3>{{ selectedExistingProduct.nombre }}</h3>
                             <p>{{ selectedExistingProduct.plataforma || 'PC' }} · {{
                                 selectedExistingProduct.precio }}€ · Stock actual: {{ selectedExistingProduct.stock }}
                             </p>
                         </div>
-                        <button type="button" class="btn-cambiar" @click="clearSelection">Cambiar</button>
+                        <button type="button" class="btn-cambiar" @click="clearSelection">{{ t.sell.changeProduct }}</button>
                     </div>
                 </div>
 
@@ -204,28 +208,28 @@ onMounted(() => {
                 <div v-if="isNewProduct" class="producto-nuevo-header">
                     <div class="producto-sel-header">
                         <div class="producto-sel-info">
-                            <span class="badge-nuevo">Producto nuevo</span>
+                            <span class="badge-nuevo">{{ t.sell.new }}</span>
                             <h3>{{ form.nombre }}</h3>
                         </div>
-                        <button type="button" class="btn-cambiar" @click="clearSelection">Cambiar</button>
+                        <button type="button" class="btn-cambiar" @click="clearSelection">{{ t.sell.changeProduct }}</button>
                     </div>
                 </div>
 
                 <!-- Campos de producto nuevo -->
                 <template v-if="isNewProduct">
                     <div class="grupo-input">
-                        <label>Descripción</label>
+                        <label>{{ t.sell.descLabel }}</label>
                         <textarea v-model="form.descripcion" rows="3" required
-                            placeholder="Describe el producto..."></textarea>
+                            :placeholder="t.sell.descLabel"></textarea>
                     </div>
 
                     <div class="form-row">
                         <div class="grupo-input">
-                            <label>Precio (€)</label>
+                            <label>{{ t.sell.priceLabel }}</label>
                             <input type="number" v-model="form.precio" step="0.01" min="0" required />
                         </div>
                         <div class="grupo-input">
-                            <label>Plataforma</label>
+                            <label>{{ t.sell.platformLabel }}</label>
                             <select v-model="form.plataforma">
                                 <option value="PC">PC</option>
                                 <option value="PS5">PS5</option>
@@ -269,16 +273,16 @@ onMounted(() => {
 
                 <!-- Campo de código (siempre visible cuando hay producto seleccionado) -->
                 <div v-if="selectedExistingProduct || isNewProduct" class="grupo-input codigo-input">
-                    <label>🔑 Código de activación</label>
-                    <input type="text" v-model="form.codigo" required placeholder="Ej: XXXX-XXXX-XXXX-XXXX"
+                    <label>🔑 {{ t.sell.codeLabel }}</label>
+                    <input type="text" v-model="form.codigo" required :placeholder="t.sell.codePlaceholder"
                         class="input-codigo" />
-                    <small class="codigo-ayuda">Introduce la clave del juego que quieres vender</small>
+                    <small class="codigo-ayuda">{{ t.sell.codeHelp }}</small>
                 </div>
 
                 <!-- Botón enviar -->
                 <button v-if="selectedExistingProduct || isNewProduct" type="submit" class="btn-enviar"
                     :disabled="loading">
-                    {{ loading ? 'Publicando...' : selectedExistingProduct ? 'Añadir Clave' : 'Publicar Producto' }}
+                    {{ loading ? t.sell.processing : t.sell.sellBtn }}
                 </button>
             </form>
         </div>

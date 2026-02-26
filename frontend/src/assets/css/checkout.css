@@ -335,3 +335,113 @@
     cursor: not-allowed;
     box-shadow: none;
 }
+
+@media (max-width: 480px) {
+    .checkout-container {
+        padding: 0 10px;
+        margin: 20px auto;
+    }
+
+    .checkout-title {
+        font-size: 24px;
+    }
+
+    .checkout-form {
+        padding: 20px;
+    }
+
+    .two-col {
+        grid-template-columns: 1fr;
+    }
+
+    .summary-card {
+        padding: 20px;
+    }
+
+    .success-card {
+        padding: 25px;
+    }
+
+    .code-value {
+        font-size: 16px;
+        letter-spacing: 1px;
+    }
+}
+
+html.dark-mode .checkout-title {
+    color: #e0e0e0;
+    border-bottom-color: #333;
+}
+
+html.dark-mode .checkout-form {
+    background: #1e1e2f;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+html.dark-mode .form-section h2 {
+    color: #e0e0e0;
+    border-bottom-color: #333;
+}
+
+html.dark-mode .form-group label {
+    color: #bbb;
+}
+
+html.dark-mode .form-group input {
+    background: #2a2a3e;
+    border-color: #444;
+    color: #e0e0e0;
+}
+
+html.dark-mode .summary-card {
+    background: #1e1e2f;
+    border-color: #333;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+html.dark-mode .summary-card h2 {
+    color: #e0e0e0;
+}
+
+html.dark-mode .order-item {
+    border-bottom-color: #333;
+}
+
+html.dark-mode .item-title {
+    color: #e0e0e0;
+}
+
+html.dark-mode .breakdown-row {
+    color: #bbb;
+}
+
+html.dark-mode .total-row {
+    color: #e0e0e0;
+    border-top-color: #555;
+}
+
+html.dark-mode .success-card {
+    background: #1e1e2f;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+html.dark-mode .success-card h1 {
+    color: #e0e0e0;
+}
+
+html.dark-mode .success-subtitle {
+    color: #bbb;
+}
+
+html.dark-mode .code-card {
+    background: #2a2a3e;
+}
+
+html.dark-mode .code-game-name {
+    color: #e0e0e0;
+}
+
+html.dark-mode .code-value {
+    background: #1e1e2f;
+    color: #fa4841;
+}

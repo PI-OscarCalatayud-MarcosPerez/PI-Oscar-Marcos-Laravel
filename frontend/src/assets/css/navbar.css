@@ -389,3 +389,53 @@
     background: #f0f0f0;
     color: #c62828;
 }
+
+html.dark-mode .navbar {
+    background: #0a0a1a !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+}
+
+html.dark-mode .navbar a {
+    color: #ccc;
+}
+
+html.dark-mode .search-input {
+    background: #1e1e2f;
+    border-color: #444;
+    color: #e0e0e0;
+}
+
+html.dark-mode .search-input:focus {
+    border-color: #fa4841;
+}
+
+html.dark-mode .search-suggestions {
+    background: #1e1e2f;
+    border-color: #333;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+}
+
+html.dark-mode .suggestion-item {
+    border-bottom-color: #333;
+}
+
+html.dark-mode .suggestion-item:hover {
+    background: #2a2a3e;
+}
+
+html.dark-mode .suggestion-name {
+    color: #e0e0e0;
+}
+
+html.dark-mode .suggestion-price {
+    color: #ccc;
+}
+
+html.dark-mode .suggestion-footer {
+    background: #1a1a2e;
+    border-top-color: #333;
+}
+
+html.dark-mode .suggestion-footer:hover {
+    background: #2a2a3e;
+}

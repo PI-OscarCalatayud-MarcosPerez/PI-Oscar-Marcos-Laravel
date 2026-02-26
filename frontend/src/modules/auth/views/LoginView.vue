@@ -5,12 +5,15 @@ import { useUiStore } from '@/stores/uiStore'
 import UiToast from '@/components/UiToast.vue'
 import { Form, Field, ErrorMessage } from 'vee-validate'
 import * as yup from 'yup'
-import { onMounted } from 'vue'
+import { onMounted, computed } from 'vue'
+import { usePrefsStore } from '../../../stores/prefsStore'
 
 const auth = useAuthStore()
 const ui = useUiStore()
 const router = useRouter()
 const route = useRoute()
+const prefsStore = usePrefsStore()
+const t = computed(() => prefsStore.t)
 
 // Validation Schema
 const schema = yup.object({
@@ -39,16 +42,16 @@ async function handleLogin(values) {
     <UiToast />
     <div class="login-container">
         <div class="login-card">
-            <h2>Iniciar Sesión</h2>
+            <h2>{{ t.auth.loginTitle }}</h2>
             <Form @submit="handleLogin" :validation-schema="schema" class="login-form" v-slot="{ errors, isSubmitting }">
                 <div class="form-group">
-                    <label>Email:</label>
+                    <label>{{ t.auth.email }}:</label>
                     <Field name="email" type="email" placeholder="tu@email.com" :class="{ 'is-invalid': errors.email }" />
                     <ErrorMessage name="email" class="error-feedback" />
                 </div>
                 <div class="form-group">
-                    <label>Contraseña:</label>
-                    <Field name="password" type="password" placeholder="Tu contraseña"
+                    <label>{{ t.auth.password }}:</label>
+                    <Field name="password" type="password" :placeholder="t.auth.password"
                         :class="{ 'is-invalid': errors.password }" />
                     <ErrorMessage name="password" class="error-feedback" />
                 </div>
@@ -60,20 +63,20 @@ async function handleLogin(values) {
                 </div>
 
                 <button type="submit" :disabled="isSubmitting">
-                    {{ isSubmitting ? 'Entrando...' : 'Entrar' }}
+                    {{ isSubmitting ? t.cart.processing || '...' : t.auth.loginBtn }}
                 </button>
 
                 <!-- Google Login Placeholder (C1) -->
                 <div class="google-login mt-3">
                     <a href="http://localhost:8000/api/auth/google/redirect" class="btn-google">
                         <img src="/img/google_logo.svg" alt="Google" style="width:20px;vertical-align:middle;margin-right:8px;">
-                        Iniciar con Google
+                        {{ t.auth.loginGoogle }}
                     </a>
                 </div>
 
                 <p class="register-link">
-                    ¿No tienes cuenta?
-                    <RouterLink to="/register" style="color: #fa4841; font-weight: bold;">Regístrate aquí.</RouterLink>
+                    {{ t.auth.dontHaveAccount }}
+                    <RouterLink to="/register" style="color: #fa4841; font-weight: bold;">{{ t.auth.registerHere }}</RouterLink>
                 </p>
             </Form>
         </div>

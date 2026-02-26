@@ -1,23 +1,23 @@
 <script setup>
 import { useCartStore } from '../store/cartStore';
-import { onMounted } from 'vue';
+import { usePrefsStore } from '../../../stores/prefsStore';
+import { computed } from 'vue';
 
 const cartStore = useCartStore();
+const prefsStore = usePrefsStore();
+const t = computed(() => prefsStore.t);
 
-onMounted(() => {
-    // Carrito vacío al inicio
-});
 </script>
 
 <template>
     <div class="cart-container">
-        <h1 class="cart-title">Tu Carrito</h1>
+        <h1 class="cart-title">{{ t.cart.title }}</h1>
 
         <div class="cart-grid">
             <!-- Columna Izquierda: Productos -->
             <div class="cart-items">
                 <div v-if="cartStore.items.length === 0" class="empty-cart">
-                    <p>No hay productos en tu carrito.</p>
+                    <p>{{ t.cart.empty }}</p>
                 </div>
 
                 <div v-else v-for="item in cartStore.items" :key="item.id" class="cart-item">
@@ -43,36 +43,36 @@ onMounted(() => {
 
             <!-- Columna Derecha: Resumen -->
             <div class="cart-summary">
-                <h2>Resumen del Pedido</h2>
+                <h2>{{ t.cart.summary }}</h2>
 
                 <div class="summary-row">
-                    <span>Subtotal</span>
+                    <span>{{ t.cart.subtotal }}</span>
                     <span>{{ cartStore.totalPrice.toFixed(2) }}€</span>
                 </div>
 
                 <div class="summary-row">
-                    <span>Impuestos (21%)</span>
+                    <span>{{ t.cart.tax }}</span>
                     <span>{{ (cartStore.totalPrice * 0.21).toFixed(2) }}€</span>
                 </div>
 
                 <div class="coupon-section">
-                    <input type="text" placeholder="Código de descuento" />
-                    <button>Aplicar</button>
+                    <input type="text" :placeholder="t.cart.coupon" />
+                    <button>{{ t.cart.apply }}</button>
                 </div>
 
                 <div class="terms-section">
                     <label>
                         <input type="checkbox" />
-                        Acepto los términos y condiciones del procedimiento de compra.
+                        {{ t.cart.terms }}
                     </label>
                 </div>
 
                 <div class="total-row">
-                    <span>Total</span>
+                    <span>{{ t.cart.total }}</span>
                     <span>{{ (cartStore.totalPrice * 1.21).toFixed(2) }}€</span>
                 </div>
 
-                <button class="checkout-btn" @click="$router.push('/checkout')">Tramitar Pedido</button>
+                <button class="checkout-btn" @click="$router.push('/checkout')">{{ t.cart.checkoutLine }}</button>
             </div>
         </div>
     </div>

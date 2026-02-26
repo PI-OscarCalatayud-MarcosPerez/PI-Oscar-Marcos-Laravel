@@ -48,11 +48,16 @@ Route::middleware(['web', 'auth:web'])->group(function () {
     Route::get('/admin/products/{id}/codes', [ProductController::class, 'getCodes']);
     Route::post('/admin/products/{id}/codes', [ProductController::class, 'addCodes']);
 
+    Route::get('/admin/reviews', [ReviewController::class, 'adminIndex']);
+    Route::delete('/admin/reviews/{id}', [ReviewController::class, 'adminDestroy']);
+
     Route::post('/reviews', [ReviewController::class, 'store']);
     Route::put('/reviews/{id}', [ReviewController::class, 'update']);
     Route::delete('/reviews/{id}', [ReviewController::class, 'destroy']);
 
     Route::post('/compra', [CompraController::class, 'procesarCompraExitosa']);
+    Route::get('/mis-compras', [CompraController::class, 'miHistorial']);
+    Route::get('/admin/sales', [CompraController::class, 'adminSales']);
 
     Route::put('/user/profile', [UserController::class, 'update']);
     Route::delete('/user/delete', [UserController::class, 'destroy']);
