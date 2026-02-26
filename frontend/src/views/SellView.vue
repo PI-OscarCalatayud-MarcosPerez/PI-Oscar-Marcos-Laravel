@@ -4,6 +4,8 @@ import { useRouter } from 'vue-router';
 import http from '../services/http';
 import CategoryService from '../modules/products/services/CategoryService';
 import { usePrefsStore } from '../stores/prefsStore';
+import { Form, Field, ErrorMessage } from 'vee-validate';
+import * as yup from 'yup';
 
 const prefsStore = usePrefsStore();
 const t = computed(() => prefsStore.t);
@@ -19,15 +21,40 @@ const searchQuery = ref('');
 const selectedExistingProduct = ref(null);
 const isNewProduct = ref(false);
 
-const form = ref({
-    nombre: '',
-    descripcion: '',
-    precio: '',
-    codigo: '',
-    category_id: null,
-    seccion: '',
-    plataforma: 'PC',
-    imagen: null
+const imagenRef = ref(null);
+const newProductName = ref('');
+
+const schema = computed(() => {
+    return yup.object({
+        codigo: yup.string().required(t.value?.sell?.codeRequired || 'El código es obligatorio'),
+        ...(isNewProduct.value ? {
+            descripcion: yup.string().required(t.value?.sell?.descRequired || 'La descripción es obligatoria'),
+            precio: yup.number()
+                .typeError('El precio debe ser un número')
+                .required(t.value?.sell?.priceRequired || 'El precio es obligatorio')
+                .positive('El precio debe ser mayor a 0')
+                .min(1.01, 'El mínimo es 1.01'),
+            plataforma: yup.string().required('La plataforma es obligatoria'),
+            category_id: yup.number().nullable().notRequired(),
+            seccion: yup.string().nullable().notRequired(),
+        } : {})
+    });
+});
+
+const initialValues = computed(() => {
+    if (selectedExistingProduct.value) {
+        return {
+            codigo: '',
+        };
+    }
+    return {
+        descripcion: '',
+        precio: '',
+        plataforma: 'PC',
+        category_id: null,
+        seccion: '',
+        codigo: ''
+    };
 });
 
 // Productos filtrados por búsqueda
@@ -57,56 +84,58 @@ const fetchProducts = async () => {
 
 const selectExistingProduct = (product) => {
     selectedExistingProduct.value = product;
-    form.value.nombre = product.nombre;
-    form.value.descripcion = product.descripcion || '';
-    form.value.precio = product.precio;
-    form.value.plataforma = product.plataforma || 'PC';
-    form.value.category_id = product.category_id;
     searchQuery.value = '';
     isNewProduct.value = false;
 };
 
 const clearSelection = () => {
     selectedExistingProduct.value = null;
-    form.value.nombre = '';
-    form.value.descripcion = '';
-    form.value.precio = '';
-    form.value.plataforma = 'PC';
-    form.value.category_id = null;
     isNewProduct.value = false;
+    newProductName.value = '';
 };
 
 const setNewProduct = () => {
     selectedExistingProduct.value = null;
-    form.value.nombre = searchQuery.value;
     isNewProduct.value = true;
+    newProductName.value = searchQuery.value;
     searchQuery.value = '';
 };
 
 const handleFileUpload = (event) => {
-    form.value.imagen = event.target.files[0];
+    imagenRef.value = event.target.files[0];
 };
 
-const submitForm = async () => {
+const submitForm = async (values) => {
     loading.value = true;
     error.value = null;
     success.value = false;
 
     try {
         const formData = new FormData();
-        formData.append('nombre', form.value.nombre);
-        formData.append('descripcion', form.value.descripcion);
-        formData.append('precio', form.value.precio);
-        formData.append('codigo', form.value.codigo);
-        formData.append('plataforma', form.value.plataforma || 'PC');
+        formData.append('codigo', values.codigo);
 
-        if (form.value.category_id) {
-            formData.append('category_id', form.value.category_id);
-        }
-        formData.append('seccion', form.value.seccion || '');
+        if (isNewProduct.value) {
+            formData.append('nombre', newProductName.value);
+            formData.append('descripcion', values.descripcion);
+            formData.append('precio', values.precio);
+            formData.append('plataforma', values.plataforma || 'PC');
 
-        if (form.value.imagen) {
-            formData.append('imagen', form.value.imagen);
+            if (values.category_id) {
+                formData.append('category_id', values.category_id);
+            }
+            formData.append('seccion', values.seccion || '');
+
+            if (imagenRef.value) {
+                formData.append('imagen', imagenRef.value);
+            }
+        } else {
+            formData.append('nombre', selectedExistingProduct.value.nombre);
+            formData.append('descripcion', selectedExistingProduct.value.descripcion || '');
+            formData.append('precio', selectedExistingProduct.value.precio);
+            formData.append('plataforma', selectedExistingProduct.value.plataforma || 'PC');
+            if (selectedExistingProduct.value.category_id) {
+                formData.append('category_id', selectedExistingProduct.value.category_id);
+            }
         }
 
         const response = await http.post('/api/products', formData, {
@@ -154,7 +183,8 @@ onMounted(() => {
                 ❌ {{ error }}
             </div>
 
-            <form @submit.prevent="submitForm">
+            <Form @submit="submitForm" :validation-schema="schema" :initial-values="initialValues"
+                v-slot="{ isSubmitting, errors }">
                 <!-- Buscar producto existente o crear nuevo -->
                 <div class="grupo-input" v-if="!selectedExistingProduct && !isNewProduct">
                     <label>{{ t.sell.searchLabel }}</label>
@@ -200,7 +230,8 @@ onMounted(() => {
                                 selectedExistingProduct.precio }}€ · Stock actual: {{ selectedExistingProduct.stock }}
                             </p>
                         </div>
-                        <button type="button" class="btn-cambiar" @click="clearSelection">{{ t.sell.changeProduct }}</button>
+                        <button type="button" class="btn-cambiar" @click="clearSelection">{{ t.sell.changeProduct
+                        }}</button>
                     </div>
                 </div>
 
@@ -209,9 +240,10 @@ onMounted(() => {
                     <div class="producto-sel-header">
                         <div class="producto-sel-info">
                             <span class="badge-nuevo">{{ t.sell.new }}</span>
-                            <h3>{{ form.nombre }}</h3>
+                            <h3>{{ newProductName }}</h3>
                         </div>
-                        <button type="button" class="btn-cambiar" @click="clearSelection">{{ t.sell.changeProduct }}</button>
+                        <button type="button" class="btn-cambiar" @click="clearSelection">{{ t.sell.changeProduct
+                        }}</button>
                     </div>
                 </div>
 
@@ -219,40 +251,47 @@ onMounted(() => {
                 <template v-if="isNewProduct">
                     <div class="grupo-input">
                         <label>{{ t.sell.descLabel }}</label>
-                        <textarea v-model="form.descripcion" rows="3" required
-                            :placeholder="t.sell.descLabel"></textarea>
+                        <Field name="descripcion" as="textarea" rows="3" :placeholder="t.sell.descLabel"
+                            :class="{ 'is-invalid': errors.descripcion }" />
+                        <ErrorMessage name="descripcion" class="error-text"
+                            style="color: #fa4841; font-size: 0.85rem;" />
                     </div>
 
                     <div class="form-row">
                         <div class="grupo-input">
                             <label>{{ t.sell.priceLabel }}</label>
-                            <input type="number" v-model="form.precio" step="0.01" min="0" required />
+                            <Field name="precio" type="number" step="0.01" min="0" :placeholder="t.sell.priceLabel"
+                                :class="{ 'is-invalid': errors.precio }" />
+                            <ErrorMessage name="precio" class="error-text"
+                                style="color: #fa4841; font-size: 0.85rem;" />
                         </div>
                         <div class="grupo-input">
                             <label>{{ t.sell.platformLabel }}</label>
-                            <select v-model="form.plataforma">
+                            <Field name="plataforma" as="select" :class="{ 'is-invalid': errors.plataforma }">
                                 <option value="PC">PC</option>
                                 <option value="PS5">PS5</option>
                                 <option value="Xbox">Xbox</option>
                                 <option value="Switch">Switch</option>
                                 <option value="Web">Web</option>
-                            </select>
+                            </Field>
+                            <ErrorMessage name="plataforma" class="error-text"
+                                style="color: #fa4841; font-size: 0.85rem;" />
                         </div>
                     </div>
 
                     <div class="form-row">
                         <div class="grupo-input">
                             <label>Categoría</label>
-                            <select v-model="form.category_id">
+                            <Field name="category_id" as="select">
                                 <option :value="null">Seleccionar...</option>
                                 <option v-for="cat in categories" :key="cat.id" :value="cat.id">
                                     {{ cat.name }}
                                 </option>
-                            </select>
+                            </Field>
                         </div>
                         <div class="grupo-input">
                             <label>Sección</label>
-                            <select v-model="form.seccion">
+                            <Field name="seccion" as="select">
                                 <option value="">Seleccionar...</option>
                                 <option value="RPG">RPG</option>
                                 <option value="Acción">Acción</option>
@@ -261,7 +300,7 @@ onMounted(() => {
                                 <option value="Estrategia">Estrategia</option>
                                 <option value="comprados">Destacado</option>
                                 <option value="software">Software</option>
-                            </select>
+                            </Field>
                         </div>
                     </div>
 
@@ -274,17 +313,19 @@ onMounted(() => {
                 <!-- Campo de código (siempre visible cuando hay producto seleccionado) -->
                 <div v-if="selectedExistingProduct || isNewProduct" class="grupo-input codigo-input">
                     <label>🔑 {{ t.sell.codeLabel }}</label>
-                    <input type="text" v-model="form.codigo" required :placeholder="t.sell.codePlaceholder"
-                        class="input-codigo" />
+                    <Field name="codigo" type="text" :placeholder="t.sell.codePlaceholder" class="input-codigo"
+                        :class="{ 'is-invalid': errors.codigo }" />
                     <small class="codigo-ayuda">{{ t.sell.codeHelp }}</small>
+                    <ErrorMessage name="codigo" class="error-text"
+                        style="display: block; margin-top: 5px; color: #fa4841; font-size: 0.85rem;" />
                 </div>
 
                 <!-- Botón enviar -->
                 <button v-if="selectedExistingProduct || isNewProduct" type="submit" class="btn-enviar"
-                    :disabled="loading">
-                    {{ loading ? t.sell.processing : t.sell.sellBtn }}
+                    :disabled="loading || isSubmitting">
+                    {{ loading || isSubmitting ? t.sell.processing : t.sell.sellBtn }}
                 </button>
-            </form>
+            </Form>
         </div>
     </div>
 </template>

@@ -6,6 +6,8 @@ import { useUiStore } from '@/stores/uiStore';
 import { useAuthStore } from '../../auth/store/authStore';
 import http from '@/services/http';
 import { usePrefsStore } from '../../../stores/prefsStore';
+import { Form, Field, ErrorMessage } from 'vee-validate';
+import * as yup from 'yup';
 
 const cartStore = useCartStore();
 const router = useRouter();
@@ -14,7 +16,8 @@ const authStore = useAuthStore();
 const prefsStore = usePrefsStore();
 const t = computed(() => prefsStore.t);
 
-const form = reactive({
+// Valores iniciales (se llenan después si hay usuario autenticado)
+const initialValues = ref({
     firstName: '',
     lastName: '',
     email: '',
@@ -25,6 +28,25 @@ const form = reactive({
     cardNumber: '',
     expDate: '',
     cvv: ''
+});
+
+const schema = yup.object({
+    firstName: yup.string().required(t.value?.checkout?.nameRequired || 'El nombre es obligatorio').min(2, 'Min 2 caracteres'),
+    lastName: yup.string().required(t.value?.checkout?.lastNameRequired || 'El apellido es obligatorio').min(2, 'Min 2 caracteres'),
+    email: yup.string().email('Email inválido').required(t.value?.checkout?.emailRequired || 'Obligatorio'),
+    address: yup.string().required(t.value?.checkout?.addressRequired || 'La dirección es obligatoria'),
+    city: yup.string().required(t.value?.checkout?.cityRequired || 'La ciudad es obligatoria'),
+    zip: yup.string().required(t.value?.checkout?.zipRequired || 'El CP es obligatorio'),
+    cardName: yup.string().required(t.value?.checkout?.cardNameRequired || 'El titular es obligatorio'),
+    cardNumber: yup.string()
+        .matches(/^\d{16}$/, 'Debe contener 16 dígitos')
+        .required(t.value?.checkout?.cardNumberRequired || 'La tarjeta es obligatoria'),
+    expDate: yup.string()
+        .matches(/^(0[1-9]|1[0-2])\/\d{2}$/, 'Formato MM/YY')
+        .required(t.value?.checkout?.expDateRequired || 'La caducidad es obligatoria'),
+    cvv: yup.string()
+        .matches(/^\d{3,4}$/, 'CVV inválido')
+        .required(t.value?.checkout?.cvvRequired || 'CVV es obligatorio')
 });
 
 const processing = ref(false);
@@ -38,12 +60,12 @@ const total = computed(() => {
 
 // Pre-fill email from authenticated user
 if (authStore.user) {
-    form.email = authStore.user.email || '';
-    form.firstName = authStore.user.name || '';
-    form.lastName = authStore.user.last_name || '';
+    initialValues.value.email = authStore.user.email || '';
+    initialValues.value.firstName = authStore.user.name || '';
+    initialValues.value.lastName = authStore.user.last_name || '';
 }
 
-const submitOrder = async () => {
+const submitOrder = async (values) => {
     processing.value = true;
     purchasedCodes.value = [];
     purchaseErrors.value = [];
@@ -89,7 +111,7 @@ const submitOrder = async () => {
                 <div class="success-icon">🎉</div>
                 <h1>{{ t.checkout.successTitle }}</h1>
                 <p class="success-subtitle">{{ t.checkout.successSubtitle }} <strong>{{
-                        authStore.user?.email }}</strong></p>
+                    authStore.user?.email }}</strong></p>
 
                 <div class="codes-list">
                     <div v-for="(item, index) in purchasedCodes" :key="index" class="code-card">
@@ -116,7 +138,8 @@ const submitOrder = async () => {
         <template v-else>
             <h1 class="checkout-title">{{ t.checkout.title }}</h1>
 
-            <div class="checkout-grid">
+            <Form class="checkout-grid" @submit="submitOrder" :validation-schema="schema"
+                :initial-values="initialValues" v-slot="{ isSubmitting, errors }">
                 <!-- Columna Izquierda: Formulario -->
                 <div class="checkout-form">
                     <section class="form-section">
@@ -124,32 +147,43 @@ const submitOrder = async () => {
                         <div class="form-row two-col">
                             <div class="form-group">
                                 <label>{{ t.checkout.name }}</label>
-                                <input type="text" v-model="form.firstName" required />
+                                <Field name="firstName" type="text" :class="{ 'is-invalid': errors.firstName }" />
+                                <ErrorMessage name="firstName" class="error-text"
+                                    style="color: #fa4841; font-size: 0.85rem;" />
                             </div>
                             <div class="form-group">
                                 <label>{{ t.checkout.lastName }}</label>
-                                <input type="text" v-model="form.lastName" required />
+                                <Field name="lastName" type="text" :class="{ 'is-invalid': errors.lastName }" />
+                                <ErrorMessage name="lastName" class="error-text"
+                                    style="color: #fa4841; font-size: 0.85rem;" />
                             </div>
                         </div>
 
                         <div class="form-group">
                             <label>{{ t.checkout.email }}</label>
-                            <input type="email" v-model="form.email" required />
+                            <Field name="email" type="email" :class="{ 'is-invalid': errors.email }" />
+                            <ErrorMessage name="email" class="error-text" style="color: #fa4841; font-size: 0.85rem;" />
                         </div>
 
                         <div class="form-group">
                             <label>{{ t.checkout.address }}</label>
-                            <input type="text" v-model="form.address" required />
+                            <Field name="address" type="text" :class="{ 'is-invalid': errors.address }" />
+                            <ErrorMessage name="address" class="error-text"
+                                style="color: #fa4841; font-size: 0.85rem;" />
                         </div>
 
                         <div class="form-row three-col">
                             <div class="form-group">
                                 <label>{{ t.checkout.city }}</label>
-                                <input type="text" v-model="form.city" required />
+                                <Field name="city" type="text" :class="{ 'is-invalid': errors.city }" />
+                                <ErrorMessage name="city" class="error-text"
+                                    style="color: #fa4841; font-size: 0.85rem;" />
                             </div>
                             <div class="form-group">
                                 <label>{{ t.checkout.zip }}</label>
-                                <input type="text" v-model="form.zip" required />
+                                <Field name="zip" type="text" :class="{ 'is-invalid': errors.zip }" />
+                                <ErrorMessage name="zip" class="error-text"
+                                    style="color: #fa4841; font-size: 0.85rem;" />
                             </div>
                         </div>
                     </section>
@@ -158,20 +192,30 @@ const submitOrder = async () => {
                         <h2>{{ t.checkout.paymentInfo }}</h2>
                         <div class="form-group">
                             <label>{{ t.checkout.cardName }}</label>
-                            <input type="text" v-model="form.cardName" required />
+                            <Field name="cardName" type="text" :class="{ 'is-invalid': errors.cardName }" />
+                            <ErrorMessage name="cardName" class="error-text"
+                                style="color: #fa4841; font-size: 0.85rem;" />
                         </div>
                         <div class="form-group">
                             <label>{{ t.checkout.cardNumber }}</label>
-                            <input type="text" v-model="form.cardNumber" placeholder="0000 0000 0000 0000" required />
+                            <Field name="cardNumber" type="text" placeholder="0000 1111 2222 3333"
+                                :class="{ 'is-invalid': errors.cardNumber }" />
+                            <ErrorMessage name="cardNumber" class="error-text"
+                                style="color: #fa4841; font-size: 0.85rem;" />
                         </div>
                         <div class="form-row two-col">
                             <div class="form-group">
                                 <label>{{ t.checkout.expDate }}</label>
-                                <input type="text" v-model="form.expDate" placeholder="MM/YY" required />
+                                <Field name="expDate" type="text" placeholder="MM/YY"
+                                    :class="{ 'is-invalid': errors.expDate }" />
+                                <ErrorMessage name="expDate" class="error-text"
+                                    style="color: #fa4841; font-size: 0.85rem;" />
                             </div>
                             <div class="form-group">
                                 <label>{{ t.checkout.cvv }}</label>
-                                <input type="text" v-model="form.cvv" required />
+                                <Field name="cvv" type="text" :class="{ 'is-invalid': errors.cvv }" />
+                                <ErrorMessage name="cvv" class="error-text"
+                                    style="color: #fa4841; font-size: 0.85rem;" />
                             </div>
                         </div>
                     </section>
@@ -211,8 +255,9 @@ const submitOrder = async () => {
                             </div>
                         </div>
 
-                        <button class="btn-confirm" @click="submitOrder" :disabled="processing">
-                            <span v-if="processing">⏳ {{ t.checkout.processing }}</span>
+                        <button type="submit" class="btn-confirm"
+                            :disabled="processing || isSubmitting || Object.keys(errors).length > 0">
+                            <span v-if="processing || isSubmitting">⏳ {{ t.checkout.processing }}</span>
                             <span v-else>{{ t.checkout.confirmBtn }} {{ total }}€</span>
                         </button>
 
@@ -221,7 +266,7 @@ const submitOrder = async () => {
                         </p>
                     </div>
                 </div>
-            </div>
+            </Form>
         </template>
     </div>
 </template>
