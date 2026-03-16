@@ -13,7 +13,7 @@ use App\Models\Product;
 class ProductImportController extends Controller
 {
     /** Cabeceras esperadas en el archivo CSV */
-    private const CSV_HEADERS = ['id', 'nombre', 'descripcion', 'precio', 'img', 'estoc', 'categoria'];
+    private const CSV_HEADERS = ['id', 'nombre', 'descripcion', 'precio', 'sku', 'stock', 'imagen_url', 'categoria', 'seccion', 'is_eco', 'porcentaje_descuento', 'plataforma', 'category_id', 'claves'];
 
     /**
      * Muestra el formulario de importación (vista Blade).
@@ -126,11 +126,18 @@ class ProductImportController extends Controller
             // Mapear datos del CSV a variables
             $id = (int) $row[$headerMap['id']];
             $nombre = trim($row[$headerMap['nombre']]);
-            $precio = (float) str_replace(',', '.', $row[$headerMap['precio']]);
-            $stock = (int) $row[$headerMap['estoc']];
-            $categoria = trim($row[$headerMap['categoria']]);
-            $imagenUrl = trim($row[$headerMap['img']]);
             $descripcion = trim($row[$headerMap['descripcion']]);
+            $precio = (float) str_replace(',', '.', $row[$headerMap['precio']]);
+            $sku = trim($row[$headerMap['sku']]);
+            $stock = (int) $row[$headerMap['stock']];
+            $imagenUrl = trim($row[$headerMap['imagen_url']]);
+            $categoria = trim($row[$headerMap['categoria']]);
+            $seccion = isset($headerMap['seccion']) ? trim($row[$headerMap['seccion']]) : null;
+            $isEco = isset($headerMap['is_eco']) ? filter_var(trim($row[$headerMap['is_eco']]), FILTER_VALIDATE_BOOLEAN) : false;
+            $descuento = isset($headerMap['porcentaje_descuento']) ? (int) $row[$headerMap['porcentaje_descuento']] : 0;
+            $plataforma = isset($headerMap['plataforma']) ? trim($row[$headerMap['plataforma']]) : 'PC';
+            $categoryId = (!empty($headerMap['category_id']) && !empty($row[$headerMap['category_id']])) ? (int) $row[$headerMap['category_id']] : null;
+            $clavesTexto = isset($headerMap['claves']) ? trim($row[$headerMap['claves']]) : '';
 
             // Verificar duplicados por ID
             if (Product::find($id)) {
@@ -138,8 +145,10 @@ class ProductImportController extends Controller
                 continue;
             }
 
-            // Generar SKU y verificar duplicados
-            $sku = 'JUEGO-' . $id;
+            // Generar SKU si está vacío y verificar duplicados
+            if (empty($sku)) {
+                $sku = 'JUEGO-' . $id;
+            }
             if (Product::where('sku', $sku)->exists()) {
                 $rowErrors[] = "Fila $rowNum ignorada: El SKU $sku ya existe.";
                 continue;
@@ -162,7 +171,28 @@ class ProductImportController extends Controller
                 $product->stock = $stock;
                 $product->imagen_url = $imagenUrl;
                 $product->categoria = $categoria;
+                $product->seccion = $seccion;
+                $product->is_eco = $isEco;
+                $product->porcentaje_descuento = $descuento;
+                $product->plataforma = $plataforma;
+                $product->category_id = $categoryId;
                 $product->save();
+
+                if (!empty($clavesTexto)) {
+                    $listaClaves = explode('|', $clavesTexto);
+                    foreach ($listaClaves as $clave) {
+                        $clave = trim($clave);
+                        if (!empty($clave)) {
+                            if (!\App\Models\ProductCode::where('code', $clave)->exists()) {
+                                \App\Models\ProductCode::create([
+                                    'product_id' => $id,
+                                    'code' => $clave,
+                                    'is_sold' => false,
+                                ]);
+                            }
+                        }
+                    }
+                }
 
                 $importedCount++;
             } catch (\Exception $e) {
